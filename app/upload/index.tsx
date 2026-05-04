@@ -1,9 +1,10 @@
-import { Text, View } from "react-native";
+import ImageBackgroundScreen from "@/components/screens/image-background-screen";
+import { Text } from "react-native";
 
 export default function Index() {
   return (
-    <View>
+    <ImageBackgroundScreen>
       <Text>Upload</Text>
-    </View>
+    </ImageBackgroundScreen>
   );
 }

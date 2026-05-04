@@ -3,7 +3,7 @@ import { ImageBackground, ImageSource } from "expo-image";
 import React from "react";
 import { StyleSheet } from "react-native";
 
-const defaultAvatar = require("../../assets/images/backgrounds/cream-patterned-background.png");
+const defaultBackground = require("../../assets/images/backgrounds/cream-patterned-background.png");
 
 interface Props {
   children?: React.ReactNode;
@@ -21,7 +21,7 @@ interface Props {
 export default function ImageBackgroundScreen({ children, source }: Props) {
   return (
     <ImageBackground
-      source={source ? source : defaultAvatar}
+      source={source ? source : defaultBackground}
       style={styles.container}
     >
       {children}

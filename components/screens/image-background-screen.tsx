@@ -3,7 +3,7 @@ import { ImageBackground, ImageSource } from "expo-image";
 import React from "react";
 import { StyleSheet } from "react-native";
 
-const defaultAvatar = require("../../assets/images/background.png");
+const defaultAvatar = require("../../assets/images/backgrounds/cream-patterned-background.png");
 
 interface Props {
   children?: React.ReactNode;

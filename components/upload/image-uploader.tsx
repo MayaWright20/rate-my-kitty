@@ -5,6 +5,8 @@ import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
+const defaultStar = require("../../assets/images/sparcles/star-purple.png");
+
 export default function ImageUploader() {
   const [image, setImage] = useState<string | null>(null);
 
@@ -23,7 +25,7 @@ export default function ImageUploader() {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [4, 4],
       quality: 1,
     });
 
@@ -36,7 +38,22 @@ export default function ImageUploader() {
 
   return (
     <>
-      {image && <Image source={{ uri: image }} style={styles.image} />}
+      {/* <View> */}
+      {image && (
+        <View
+          style={{
+            flexDirection: "row",
+          }}
+        >
+          <Image source={{ uri: image }} style={styles.image} />
+          <Image source={defaultStar} style={styles.star} />
+          <Image
+            source={defaultStar}
+            style={[styles.star, styles.startTrailing]}
+          />
+        </View>
+      )}
+      {/* </View> */}
       <Pressable
         style={
           image
@@ -101,6 +118,17 @@ const styles = StyleSheet.create({
   },
   textWrapper: {
     alignItems: "center",
+  },
+  star: {
+    position: "absolute",
+    top: -5,
+    zIndex: 5,
+    height: 50,
+    aspectRatio: 1,
+  },
+  startTrailing: {
+    top: 410,
+    left: 330,
   },
   image: {
     aspectRatio: 1 / 1,

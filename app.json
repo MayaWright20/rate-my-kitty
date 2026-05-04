@@ -26,6 +26,20 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share your favourite kitty pictures",
+          "colors": {
+            "cropToolbarColor": "#6A4CE0"
+          },
+          "dark": {
+            "colors": {
+              "cropToolbarColor": "#6A4CE0"
+            }
+          }
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",

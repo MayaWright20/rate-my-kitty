@@ -48,6 +48,5 @@ const styles = StyleSheet.create({
   subheading: {
     marginTop: 12,
     fontWeight: "semibold",
-    textTransform: "capitalize",
   },
 });

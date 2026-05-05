@@ -69,10 +69,12 @@ export default function ImageUploader() {
           size={image ? 50 : 70}
         />
         <View style={!image && styles.textWrapper}>
-          <Text style={styles.title}>
+          <Text style={[styles.title, image && styles.titleSmall]}>
             {image ? "Edit photo" : "Tap to upload"}
           </Text>
-          <Text>{"Pick your best cat picture!"}</Text>
+          <Text style={[styles.label, image && styles.labelSmall]}>
+            {"Pick your best cat picture!"}
+          </Text>
         </View>
       </Pressable>
     </>
@@ -81,21 +83,23 @@ export default function ImageUploader() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.PURPLE[0],
     borderStyle: "dotted",
     borderWidth: 5,
-    borderColor: COLORS.PURPLE[1],
     margin: 15,
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
   },
   containerSmall: {
+    backgroundColor: COLORS.CREAM[0],
+    borderColor: COLORS.CREAM[3],
     flexDirection: "row",
     aspectRatio: 2 / 0.5,
   },
   containerLarge: {
     width: "90%",
+    borderColor: COLORS.PURPLE[1],
+    backgroundColor: COLORS.PURPLE[0],
     aspectRatio: 2 / 1.5,
   },
   icon: {
@@ -103,18 +107,27 @@ const styles = StyleSheet.create({
   },
   iconSmall: {
     marginRight: 15,
+    color: COLORS.CREAM[3],
   },
   title: {
-    color: COLORS.PURPLE[3],
     fontWeight: "bold",
   },
   titleLarge: {
     fontSize: 25,
     marginBottom: 15,
+    color: COLORS.PURPLE[3],
+  },
+  label: {
+    color: COLORS.BLACK[3],
+  },
+  labelSmall: {
+    color: COLORS.CREAM[3],
+    marginTop: -10,
   },
   titleSmall: {
     fontSize: 15,
     marginBottom: 10,
+    color: COLORS.CREAM[3],
   },
   textWrapper: {
     alignItems: "center",

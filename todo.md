@@ -1,0 +1,2 @@
+- keyboard avoiding view on submit your cat screen
+- add styles file with reusable units e.g 90%, aspect ratio ect.

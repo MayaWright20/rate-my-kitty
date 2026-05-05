@@ -4,18 +4,35 @@ import CartoonGenerator from "@/helpers/cartoon-generator";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import { useCallback, useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import {
+  Alert,
+  ImageSourcePropType,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 const defaultStar = require("../../assets/images/sparcles/star-purple.png");
 
 interface Props {
   getImage: (value: string | null) => void;
+  resetImages?: boolean;
 }
 
-export default function ImageUploader({ getImage }: Props) {
+export default function ImageUploader({ getImage, resetImages }: Props) {
   const [image, setImage] = useState<string | null>(null);
-  const [cartoon, setCartoon] = useState(CartoonGenerator());
+  const [cartoon, setCartoon] = useState<null | ImageSourcePropType[]>(
+    CartoonGenerator(),
+  );
+
+  useEffect(() => {
+    if (resetImages) {
+      setImage(null);
+      setCartoon(null);
+    }
+  }, [resetImages]);
 
   const onImagePicked = useCallback(
     (result: ImagePicker.ImagePickerSuccessResult) => {
@@ -65,9 +82,9 @@ export default function ImageUploader({ getImage }: Props) {
             source={defaultStar}
             style={[styles.star, styles.startTrailing]}
           />
-          <Image source={cartoon[0]} style={[styles.cartoon]} />
+          <Image source={cartoon && cartoon[0]} style={[styles.cartoon]} />
           <Image
-            source={cartoon[1]}
+            source={cartoon && cartoon[1]}
             style={[styles.badge]}
             contentFit="contain"
           />

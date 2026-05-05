@@ -7,32 +7,34 @@ import { COLORS } from "@/constants/colors";
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
 import { router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-type UploadResult = {
-  approved: number;
-  [key: string]: unknown;
-};
 
 export default function Index() {
   const [image, setImage] = useState<null | string>(null);
-  const isSubmitBtnDisabled = useMemo(() => !image, [image]);
+  const [errorMessage, setErrorMessage] = useState<string>();
+  const isSubmitBtnDisabled = useMemo(
+    () => !image || !!errorMessage,
+    [image, errorMessage],
+  );
 
   const onChangeImage = useCallback(
     (value: string | null) => {
       setImage(value);
+      setErrorMessage(undefined);
     },
     [setImage],
   );
 
   const uploadImageHandler = async () => {
-    const result = (await uploadImage({ file: image })) as UploadResult;
+    const result = await uploadImage({ file: image });
 
     if (result["approved"] === 1) {
       router.push("/");
+      setImage(null);
+      onChangeImage(null);
     } else {
-      console.log("result res", result);
+      setErrorMessage(result);
     }
   };
   return (
@@ -49,7 +51,11 @@ export default function Index() {
             font={LilitaOne_400Regular}
             subheading="Upload a photo of your cat to put them in the vote!"
           />
-          <ImageUploader getImage={(value) => onChangeImage(value)} />
+          <ImageUploader
+            resetImages={image === null}
+            getImage={(value) => onChangeImage(value)}
+          />
+          {errorMessage && <Text>{errorMessage}</Text>}
           <CTA_BTN
             isDisabled={isSubmitBtnDisabled}
             title="Submit"

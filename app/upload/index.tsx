@@ -4,6 +4,7 @@ import TitleHeader from "@/components/headers/title-header";
 import ImageBackgroundScreen from "@/components/screens/image-background-screen";
 import ImageUploader from "@/components/upload/image-uploader";
 import { COLORS } from "@/constants/colors";
+import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
 import { router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -55,7 +56,6 @@ export default function Index() {
             resetImages={image === null}
             getImage={(value) => onChangeImage(value)}
           />
-          {errorMessage && <Text>{errorMessage}</Text>}
           <CTA_BTN
             isDisabled={isSubmitBtnDisabled}
             title="Submit"
@@ -66,6 +66,11 @@ export default function Index() {
             }}
             onPress={uploadImageHandler}
           />
+          {errorMessage && (
+            <Text
+              style={styles.errorMessage}
+            >{`*${errorMessage} \n   Please try again`}</Text>
+          )}
         </ScrollView>
       </SafeAreaView>
     </ImageBackgroundScreen>
@@ -88,5 +93,12 @@ const styles = StyleSheet.create({
   subheader: {
     fontSize: 20,
     marginBottom: 15,
+  },
+  errorMessage: {
+    color: COLORS.RED[0],
+    fontWeight: "bold",
+    marginTop: 15,
+    textAlign: "right",
+    width: SCREEN_WIDTH_MARGIN,
   },
 });

@@ -10,6 +10,9 @@ export const COLORS = {
     1: "#FF6DBD",
     2: "#FF4FA3",
   },
+  RED: {
+    0: "#ef4545",
+  },
   CREAM: {
     0: "#FFF9E6",
     1: "#FFF2CC",

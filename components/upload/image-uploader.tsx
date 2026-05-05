@@ -54,7 +54,6 @@ export default function ImageUploader() {
             style={[styles.star, styles.startTrailing]}
           />
           <Image source={cartoon[0]} style={[styles.cartoon]} />
-
           <Image
             source={cartoon[1]}
             style={[styles.badge]}

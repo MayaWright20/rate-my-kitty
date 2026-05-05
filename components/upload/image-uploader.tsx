@@ -1,4 +1,5 @@
 import { COLORS } from "@/constants/colors";
+import CartoonGenerator from "@/helpers/cartoon-generator";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
@@ -9,6 +10,7 @@ const defaultStar = require("../../assets/images/sparcles/star-purple.png");
 
 export default function ImageUploader() {
   const [image, setImage] = useState<string | null>(null);
+  const [cartoon, setCartoon] = useState(CartoonGenerator());
 
   const pickImage = async () => {
     const permissionResult =
@@ -28,6 +30,7 @@ export default function ImageUploader() {
       aspect: [4, 4],
       quality: 1,
     });
+    setCartoon(CartoonGenerator());
 
     console.log(result);
 
@@ -38,7 +41,6 @@ export default function ImageUploader() {
 
   return (
     <>
-      {/* <View> */}
       {image && (
         <View
           style={{
@@ -51,9 +53,15 @@ export default function ImageUploader() {
             source={defaultStar}
             style={[styles.star, styles.startTrailing]}
           />
+          <Image source={cartoon[0]} style={[styles.cartoon]} />
+
+          <Image
+            source={cartoon[1]}
+            style={[styles.badge]}
+            contentFit="contain"
+          />
         </View>
       )}
-      {/* </View> */}
       <Pressable
         style={
           image
@@ -140,8 +148,8 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
   },
   startTrailing: {
-    top: 410,
-    left: 330,
+    top: "90%",
+    right: 0,
   },
   image: {
     aspectRatio: 1 / 1,
@@ -150,5 +158,21 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 5,
     borderColor: COLORS.PURPLE[1],
+  },
+  cartoon: {
+    top: "30%",
+    right: -15,
+    position: "absolute",
+    zIndex: 5,
+    height: 80,
+    aspectRatio: 1,
+  },
+  badge: {
+    position: "absolute",
+    top: "78%",
+    left: "-7%",
+    zIndex: 5,
+    height: 80,
+    width: "50%",
   },
 });

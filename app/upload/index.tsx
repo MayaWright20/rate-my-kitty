@@ -7,6 +7,7 @@ import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
 import { SupermercadoOne_400Regular } from "@expo-google-fonts/supermercado-one/400Regular";
 import { ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 export default function Index() {
   return (
     <ImageBackgroundScreen>
@@ -50,7 +51,6 @@ const styles = StyleSheet.create({
   },
   subheader: {
     fontSize: 20,
-    textAlign: "left",
     marginBottom: 15,
   },
 });

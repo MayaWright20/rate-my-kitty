@@ -1,6 +1,7 @@
 import CircularBTN from "@/components/buttons/circular-btn";
 import ImageBackgroundScreen from "@/components/screens/image-background-screen";
 import { COLORS } from "@/constants/colors";
+import { OPACITY } from "@/constants/styles";
 import { router, Tabs, usePathname } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
@@ -60,6 +61,6 @@ const styles = StyleSheet.create({
       height: 3,
     },
     shadowRadius: 5,
-    shadowOpacity: 0.2,
+    shadowOpacity: OPACITY[0],
   },
 });

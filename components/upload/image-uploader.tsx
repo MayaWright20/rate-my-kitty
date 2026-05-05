@@ -1,4 +1,5 @@
 import { COLORS } from "@/constants/colors";
+import { OPACITY } from "@/constants/styles";
 import CartoonGenerator from "@/helpers/cartoon-generator";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
@@ -96,6 +97,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
+    opacity: OPACITY[1],
   },
   containerSmall: {
     backgroundColor: COLORS.CREAM[0],

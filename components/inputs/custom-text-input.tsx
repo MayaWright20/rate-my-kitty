@@ -1,4 +1,5 @@
 import { COLORS } from "@/constants/colors";
+import { OPACITY } from "@/constants/styles";
 import { useState } from "react";
 import { StyleSheet, TextInput } from "react-native";
 
@@ -22,7 +23,7 @@ export default function CustomTextInput({ placeholder }: Props) {
 const styles = StyleSheet.create({
   input: {
     backgroundColor: COLORS.PURPLE[0],
-    opacity: 0.8,
+    opacity: OPACITY[1],
     width: "90%",
     aspectRatio: 2 / 0.4,
     paddingHorizontal: 15,

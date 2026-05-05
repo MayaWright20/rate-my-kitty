@@ -1,3 +1,9 @@
+import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
+import { router } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
+import { ScrollView, StyleSheet, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { uploadImage } from "@/api/api";
 import CTA_BTN from "@/components/buttons/cta-btn";
 import TitleHeader from "@/components/headers/title-header";
@@ -5,18 +11,13 @@ import ImageBackgroundScreen from "@/components/screens/image-background-screen"
 import ImageUploader from "@/components/upload/image-uploader";
 import { COLORS } from "@/constants/colors";
 import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
-import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
-import { router } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [image, setImage] = useState<null | string>(null);
   const [errorMessage, setErrorMessage] = useState<string>();
   const isSubmitBtnDisabled = useMemo(
     () => !image || !!errorMessage,
-    [image, errorMessage],
+    [image, errorMessage]
   );
 
   const onChangeImage = useCallback(
@@ -24,7 +25,7 @@ export default function Index() {
       setImage(value);
       setErrorMessage(undefined);
     },
-    [setImage],
+    [setImage]
   );
 
   const uploadImageHandler = async () => {
@@ -62,7 +63,7 @@ export default function Index() {
             icon={{
               name: "paw",
               size: 30,
-              color: COLORS.WHITE[0],
+              color: COLORS.WHITE[0]
             }}
             onPress={uploadImageHandler}
           />
@@ -78,27 +79,27 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  safeAreaView: {
-    flex: 1,
-  },
-  scrollView: {
-    alignItems: "center",
-    flexGrow: 1,
-    paddingBottom: 90,
-  },
-  title: {
-    fontSize: 20,
-    textTransform: "uppercase",
-  },
-  subheader: {
-    fontSize: 20,
-    marginBottom: 15,
-  },
   errorMessage: {
     color: COLORS.RED[0],
     fontWeight: "bold",
     marginTop: 15,
     textAlign: "right",
-    width: SCREEN_WIDTH_MARGIN,
+    width: SCREEN_WIDTH_MARGIN
   },
+  safeAreaView: {
+    flex: 1
+  },
+  scrollView: {
+    alignItems: "center",
+    flexGrow: 1,
+    paddingBottom: 90
+  },
+  subheader: {
+    fontSize: 20,
+    marginBottom: 15
+  },
+  title: {
+    fontSize: 20,
+    textTransform: "uppercase"
+  }
 });

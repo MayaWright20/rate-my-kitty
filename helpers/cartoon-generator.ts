@@ -11,7 +11,7 @@ export default function CartoonGenerator(): ImageSourcePropType[] {
     7: require(`../assets/images/cartoons/cartoon-7.png`),
     8: require(`../assets/images/cartoons/cartoon-8.png`),
     9: require(`../assets/images/cartoons/cartoon-9.png`),
-    10: require(`../assets/images/cartoons/cartoon-10.png`),
+    10: require(`../assets/images/cartoons/cartoon-10.png`)
   };
 
   const badges: Record<string, ImageSourcePropType> = {
@@ -24,7 +24,7 @@ export default function CartoonGenerator(): ImageSourcePropType[] {
     7: require(`../assets/images/badges/badge-7.png`),
     8: require(`../assets/images/badges/badge-8.png`),
     9: require(`../assets/images/badges/badge-9.png`),
-    10: require(`../assets/images/badges/badge-10.png`),
+    10: require(`../assets/images/badges/badge-10.png`)
   };
 
   const keys = Object.keys(cartoons);

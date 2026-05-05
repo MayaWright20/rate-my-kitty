@@ -1,13 +1,15 @@
-import { COLORS } from "@/constants/colors";
-import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
-import { Icon } from "@/types";
 import { SupermercadoOne_400Regular } from "@expo-google-fonts/supermercado-one/400Regular";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   GestureResponderEvent,
   StyleSheet,
-  TouchableOpacity,
+  TouchableOpacity
 } from "react-native";
+
+import { COLORS } from "@/constants/colors";
+import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
+import { Icon } from "@/types";
+
 import { CustomFont } from "../fonts/custom-fonts";
 
 interface Props {
@@ -24,7 +26,7 @@ export default function CTA_BTN({ title, icon, onPress, isDisabled }: Props) {
       disabled={isDisabled}
       style={[
         styles.container,
-        { backgroundColor: isDisabled ? COLORS.BLACK[1] : COLORS.PURPLE[3] },
+        { backgroundColor: isDisabled ? COLORS.BLACK[1] : COLORS.PURPLE[3] }
       ]}
     >
       {icon && (
@@ -44,20 +46,20 @@ export default function CTA_BTN({ title, icon, onPress, isDisabled }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    width: SCREEN_WIDTH_MARGIN,
-    borderRadius: 150,
-    height: 50,
     alignItems: "center",
-    justifyContent: "center",
+    borderRadius: 150,
     flexDirection: "row",
-  },
-  title: {
-    fontSize: 30,
-    textAlign: "center",
-    color: COLORS.WHITE[0],
-    textTransform: "uppercase",
+    height: 50,
+    justifyContent: "center",
+    width: SCREEN_WIDTH_MARGIN
   },
   icon: {
-    marginRight: 5,
+    marginRight: 5
   },
+  title: {
+    color: COLORS.WHITE[0],
+    fontSize: 30,
+    textAlign: "center",
+    textTransform: "uppercase"
+  }
 });

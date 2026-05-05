@@ -1,5 +1,3 @@
-import { COLORS } from "@/constants/colors";
-import { Icon } from "@/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React from "react";
 import {
@@ -8,8 +6,11 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+
+import { COLORS } from "@/constants/colors";
+import { Icon } from "@/types";
 
 interface Props {
   icon?: Icon;
@@ -22,7 +23,7 @@ export default function CircularBTN({
   icon,
   onPress,
   title,
-  titleColor,
+  titleColor
 }: Props) {
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
@@ -32,7 +33,7 @@ export default function CircularBTN({
       <Text
         style={[
           styles.title,
-          { color: titleColor ? titleColor : COLORS.BLACK[2] },
+          { color: titleColor ? titleColor : COLORS.BLACK[2] }
         ]}
       >
         {title}
@@ -42,28 +43,28 @@ export default function CircularBTN({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    top: "-70%",
-    alignItems: "center",
-  },
   circle: {
     alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 100,
-    aspectRatio: 1,
     alignSelf: "center",
-    top: "-15%",
-    width: "70%",
-    maxWidth: 100,
-    maxHeight: 100,
-    borderWidth: 7,
-    borderColor: COLORS.CREAM[0],
+    aspectRatio: 1,
     backgroundColor: COLORS.PURPLE[3],
+    borderColor: COLORS.CREAM[0],
+    borderRadius: 100,
+    borderWidth: 7,
+    justifyContent: "center",
+    maxHeight: 100,
+    maxWidth: 100,
+    top: "-15%",
+    width: "70%"
+  },
+  container: {
+    alignItems: "center",
+    top: "-70%"
   },
   title: {
     fontSize: 9,
-    top: "-17%",
-    textTransform: "uppercase",
     fontWeight: "bold",
-  },
+    textTransform: "uppercase",
+    top: "-17%"
+  }
 });

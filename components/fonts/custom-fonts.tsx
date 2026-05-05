@@ -8,7 +8,7 @@ type CustomFontProps = TextProps & {
 
 export function CustomFont({ font, style, ...props }: CustomFontProps) {
   const [fontLoaded] = useFonts({
-    fontFamily: font,
+    fontFamily: font
   });
 
   if (!fontLoaded) {
@@ -20,6 +20,6 @@ export function CustomFont({ font, style, ...props }: CustomFontProps) {
 
 const styles = StyleSheet.create({
   defaultFont: {
-    fontWeight: "bold",
-  },
+    fontWeight: "bold"
+  }
 });

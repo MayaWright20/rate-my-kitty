@@ -1,6 +1,3 @@
-import { COLORS } from "@/constants/colors";
-import { OPACITY, SCREEN_WIDTH_MARGIN } from "@/constants/styles";
-import CartoonGenerator from "@/helpers/cartoon-generator";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
@@ -11,8 +8,12 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
+
+import { COLORS } from "@/constants/colors";
+import { OPACITY, SCREEN_WIDTH_MARGIN } from "@/constants/styles";
+import CartoonGenerator from "@/helpers/cartoon-generator";
 
 const defaultStar = require("../../assets/images/sparcles/star-purple.png");
 
@@ -24,7 +25,7 @@ interface Props {
 export default function ImageUploader({ getImage, resetImages }: Props) {
   const [image, setImage] = useState<string | null>(null);
   const [cartoon, setCartoon] = useState<null | ImageSourcePropType[]>(
-    CartoonGenerator(),
+    CartoonGenerator()
   );
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
       setImage(result.assets[0].uri);
       getImage(result.assets[0].uri);
     },
-    [getImage],
+    [getImage]
   );
 
   const pickImage = async () => {
@@ -50,7 +51,7 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
     if (!permissionResult.granted) {
       Alert.alert(
         "Permission required",
-        "Permission to access the media library is required.",
+        "Permission to access the media library is required."
       );
       return;
     }
@@ -59,7 +60,7 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
       mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [4, 4],
-      quality: 1,
+      quality: 1
     });
     setCartoon(CartoonGenerator());
 
@@ -73,7 +74,7 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
       {image && (
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: "row"
           }}
         >
           <Image source={{ uri: image }} style={styles.image} />
@@ -122,90 +123,90 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
 }
 
 const styles = StyleSheet.create({
+  badge: {
+    height: 80,
+    left: "-7%",
+    position: "absolute",
+    top: "78%",
+    width: "50%",
+    zIndex: 5
+  },
+  cartoon: {
+    aspectRatio: 1,
+    height: 80,
+    position: "absolute",
+    right: -15,
+    top: "30%",
+    zIndex: 5
+  },
   container: {
+    alignItems: "center",
+    borderRadius: 15,
     borderStyle: "dotted",
     borderWidth: 5,
-    margin: 15,
-    borderRadius: 15,
-    alignItems: "center",
     justifyContent: "center",
-    opacity: OPACITY[1],
-  },
-  containerSmall: {
-    backgroundColor: COLORS.CREAM[0],
-    borderColor: COLORS.CREAM[3],
-    flexDirection: "row",
-    aspectRatio: 2 / 0.5,
+    margin: 15,
+    opacity: OPACITY[1]
   },
   containerLarge: {
-    width: SCREEN_WIDTH_MARGIN,
-    borderColor: COLORS.PURPLE[1],
-    backgroundColor: COLORS.PURPLE[0],
     aspectRatio: 2 / 1.5,
+    backgroundColor: COLORS.PURPLE[0],
+    borderColor: COLORS.PURPLE[1],
+    width: SCREEN_WIDTH_MARGIN
+  },
+  containerSmall: {
+    aspectRatio: 2 / 0.5,
+    backgroundColor: COLORS.CREAM[0],
+    borderColor: COLORS.CREAM[3],
+    flexDirection: "row"
   },
   icon: {
-    marginBottom: 5,
+    marginBottom: 5
   },
   iconSmall: {
-    marginRight: 15,
     color: COLORS.CREAM[3],
-  },
-  title: {
-    fontWeight: "bold",
-  },
-  titleLarge: {
-    fontSize: 25,
-    marginBottom: 15,
-    color: COLORS.PURPLE[3],
-  },
-  label: {
-    color: COLORS.BLACK[3],
-  },
-  labelSmall: {
-    color: COLORS.CREAM[3],
-    marginTop: -10,
-  },
-  titleSmall: {
-    fontSize: 15,
-    marginBottom: 10,
-    color: COLORS.CREAM[3],
-  },
-  textWrapper: {
-    alignItems: "center",
-  },
-  star: {
-    position: "absolute",
-    top: -5,
-    zIndex: 5,
-    height: 50,
-    aspectRatio: 1,
-  },
-  startTrailing: {
-    top: "90%",
-    right: 0,
+    marginRight: 15
   },
   image: {
     aspectRatio: 1 / 1,
-    width: SCREEN_WIDTH_MARGIN,
-    marginTop: 25,
+    borderColor: COLORS.PURPLE[1],
     borderRadius: 15,
     borderWidth: 5,
-    borderColor: COLORS.PURPLE[1],
+    marginTop: 25,
+    width: SCREEN_WIDTH_MARGIN
   },
-  cartoon: {
-    top: "30%",
-    right: -15,
-    position: "absolute",
-    zIndex: 5,
-    height: 80,
+  label: {
+    color: COLORS.BLACK[3]
+  },
+  labelSmall: {
+    color: COLORS.CREAM[3],
+    marginTop: -10
+  },
+  star: {
     aspectRatio: 1,
-  },
-  badge: {
+    height: 50,
     position: "absolute",
-    top: "78%",
-    left: "-7%",
-    zIndex: 5,
-    height: 80,
-    width: "50%",
+    top: -5,
+    zIndex: 5
   },
+  startTrailing: {
+    right: 0,
+    top: "90%"
+  },
+  textWrapper: {
+    alignItems: "center"
+  },
+  title: {
+    fontWeight: "bold"
+  },
+  titleLarge: {
+    color: COLORS.PURPLE[3],
+    fontSize: 25,
+    marginBottom: 15
+  },
+  titleSmall: {
+    color: COLORS.CREAM[3],
+    fontSize: 15,
+    marginBottom: 10
+  }
 });

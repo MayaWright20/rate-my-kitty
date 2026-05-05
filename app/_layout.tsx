@@ -1,9 +1,10 @@
+import { router, Tabs, usePathname } from "expo-router";
+import { StyleSheet, View } from "react-native";
+
 import CircularBTN from "@/components/buttons/circular-btn";
 import ImageBackgroundScreen from "@/components/screens/image-background-screen";
 import { COLORS } from "@/constants/colors";
 import { OPACITY } from "@/constants/styles";
-import { router, Tabs, usePathname } from "expo-router";
-import { StyleSheet, View } from "react-native";
 
 export default function RootLayout() {
   const pathname = usePathname();
@@ -14,7 +15,7 @@ export default function RootLayout() {
           headerShown: false,
           tabBarBackground: () => {
             return <View style={styles.tabBarBackground}></View>;
-          },
+          }
         }}
       >
         <Tabs.Screen
@@ -33,13 +34,11 @@ export default function RootLayout() {
                     name: "add",
                     size: 60,
                     color:
-                      pathname === "/upload"
-                        ? COLORS.GREEN[0]
-                        : COLORS.WHITE[0],
+                      pathname === "/upload" ? COLORS.GREEN[0] : COLORS.WHITE[0]
                   }}
                 />
               );
-            },
+            }
           }}
         />
       </Tabs>
@@ -49,18 +48,18 @@ export default function RootLayout() {
 
 const styles = StyleSheet.create({
   tabBarBackground: {
+    alignSelf: "center",
     backgroundColor: COLORS.CREAM[0],
-    width: "95%",
     borderRadius: "5%",
     flex: 1,
-    alignSelf: "center",
-    top: "-20%",
     shadowColor: "#000000",
     shadowOffset: {
       width: 0,
-      height: 3,
+      height: 3
     },
-    shadowRadius: 5,
     shadowOpacity: OPACITY[0],
-  },
+    shadowRadius: 5,
+    top: "-20%",
+    width: "95%"
+  }
 });

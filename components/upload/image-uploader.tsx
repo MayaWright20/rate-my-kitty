@@ -37,7 +37,6 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
 
   const onImagePicked = useCallback(
     (result: ImagePicker.ImagePickerSuccessResult) => {
-      console.log("onPock", result.assets[0].uri);
       setImage(result.assets[0].uri);
       getImage(result.assets[0].uri);
     },

@@ -1,0 +1,56 @@
+import { COLORS } from "@/constants/colors";
+import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
+import { Icon } from "@/types";
+import { SupermercadoOne_400Regular } from "@expo-google-fonts/supermercado-one/400Regular";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import {
+    GestureResponderEvent,
+    StyleSheet,
+    TouchableOpacity,
+} from "react-native";
+import { CustomFont } from "../fonts/custom-fonts";
+
+interface Props {
+  title: string;
+  icon?: Icon;
+  onPress: ((event: GestureResponderEvent) => void) | undefined;
+}
+
+export default function CTA_BTN({ title, icon, onPress }: Props) {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.container}>
+      {icon && (
+        <Ionicons
+          style={styles.icon}
+          name={icon?.name}
+          color={icon?.color}
+          size={icon?.size}
+        />
+      )}
+      <CustomFont font={SupermercadoOne_400Regular} style={styles.title}>
+        {title}
+      </CustomFont>
+    </TouchableOpacity>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: COLORS.PURPLE[3],
+    width: SCREEN_WIDTH_MARGIN,
+    borderRadius: 150,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+  },
+  title: {
+    fontSize: 30,
+    textAlign: "center",
+    color: COLORS.WHITE[0],
+    textTransform: "uppercase",
+  },
+  icon: {
+    marginRight: 5,
+  },
+});

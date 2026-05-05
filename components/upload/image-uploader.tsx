@@ -4,14 +4,27 @@ import CartoonGenerator from "@/helpers/cartoon-generator";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
 const defaultStar = require("../../assets/images/sparcles/star-purple.png");
 
-export default function ImageUploader() {
+interface Props {
+  getImage: (value: string | null) => void;
+}
+
+export default function ImageUploader({ getImage }: Props) {
   const [image, setImage] = useState<string | null>(null);
   const [cartoon, setCartoon] = useState(CartoonGenerator());
+
+  const onImagePicked = useCallback(
+    (result: ImagePicker.ImagePickerSuccessResult) => {
+      console.log("onPock", result.assets[0].uri);
+      setImage(result.assets[0].uri);
+      getImage(result.assets[0].uri);
+    },
+    [getImage],
+  );
 
   const pickImage = async () => {
     const permissionResult =
@@ -33,10 +46,8 @@ export default function ImageUploader() {
     });
     setCartoon(CartoonGenerator());
 
-    console.log(result);
-
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      onImagePicked(result);
     }
   };
 

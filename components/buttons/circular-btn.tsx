@@ -1,4 +1,5 @@
 import { COLORS } from "@/constants/colors";
+import { Icon } from "@/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React from "react";
 import {
@@ -9,12 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-type Icon = {
-  name: React.ComponentProps<typeof Ionicons>["name"];
-  size: number;
-  color: string | OpaqueColorValue;
-};
 
 interface Props {
   icon?: Icon;

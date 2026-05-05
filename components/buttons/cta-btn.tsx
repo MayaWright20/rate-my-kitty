@@ -4,9 +4,9 @@ import { Icon } from "@/types";
 import { SupermercadoOne_400Regular } from "@expo-google-fonts/supermercado-one/400Regular";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
-    GestureResponderEvent,
-    StyleSheet,
-    TouchableOpacity,
+  GestureResponderEvent,
+  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import { CustomFont } from "../fonts/custom-fonts";
 
@@ -14,11 +14,19 @@ interface Props {
   title: string;
   icon?: Icon;
   onPress: ((event: GestureResponderEvent) => void) | undefined;
+  isDisabled?: boolean;
 }
 
-export default function CTA_BTN({ title, icon, onPress }: Props) {
+export default function CTA_BTN({ title, icon, onPress, isDisabled }: Props) {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.container}>
+    <TouchableOpacity
+      onPress={onPress}
+      disabled={isDisabled}
+      style={[
+        styles.container,
+        { backgroundColor: isDisabled ? COLORS.BLACK[1] : COLORS.PURPLE[3] },
+      ]}
+    >
       {icon && (
         <Ionicons
           style={styles.icon}
@@ -36,7 +44,6 @@ export default function CTA_BTN({ title, icon, onPress }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.PURPLE[3],
     width: SCREEN_WIDTH_MARGIN,
     borderRadius: 150,
     height: 50,

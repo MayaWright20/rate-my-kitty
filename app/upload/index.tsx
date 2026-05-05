@@ -6,7 +6,7 @@ import ImageUploader from "@/components/upload/image-uploader";
 import { COLORS } from "@/constants/colors";
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
 import { router } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -17,6 +17,8 @@ type UploadResult = {
 
 export default function Index() {
   const [image, setImage] = useState<null | string>(null);
+  const isSubmitBtnDisabled = useMemo(() => !image, [image]);
+
   const onChangeImage = useCallback(
     (value: string | null) => {
       setImage(value);
@@ -49,6 +51,7 @@ export default function Index() {
           />
           <ImageUploader getImage={(value) => onChangeImage(value)} />
           <CTA_BTN
+            isDisabled={isSubmitBtnDisabled}
             title="Submit"
             icon={{
               name: "paw",

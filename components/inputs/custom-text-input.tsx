@@ -1,5 +1,5 @@
 import { COLORS } from "@/constants/colors";
-import { OPACITY } from "@/constants/styles";
+import { OPACITY, SCREEN_WIDTH_MARGIN } from "@/constants/styles";
 import { useState } from "react";
 import { StyleSheet, TextInput } from "react-native";
 
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: COLORS.PURPLE[0],
     opacity: OPACITY[1],
-    width: "90%",
+    width: SCREEN_WIDTH_MARGIN,
     aspectRatio: 2 / 0.4,
     paddingHorizontal: 15,
     borderRadius: 15,

@@ -1,5 +1,5 @@
 import { COLORS } from "@/constants/colors";
-import { OPACITY } from "@/constants/styles";
+import { OPACITY, SCREEN_WIDTH_MARGIN } from "@/constants/styles";
 import CartoonGenerator from "@/helpers/cartoon-generator";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     aspectRatio: 2 / 0.5,
   },
   containerLarge: {
-    width: "90%",
+    width: SCREEN_WIDTH_MARGIN,
     borderColor: COLORS.PURPLE[1],
     backgroundColor: COLORS.PURPLE[0],
     aspectRatio: 2 / 1.5,
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   },
   image: {
     aspectRatio: 1 / 1,
-    width: "90%",
+    width: SCREEN_WIDTH_MARGIN,
     marginTop: 25,
     borderRadius: 15,
     borderWidth: 5,

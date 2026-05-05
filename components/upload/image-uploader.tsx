@@ -82,7 +82,11 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
             source={defaultStar}
             style={[styles.star, styles.startTrailing]}
           />
-          <Image source={cartoon && cartoon[0]} style={[styles.cartoon]} />
+          <Image
+            source={cartoon && cartoon[0]}
+            contentFit="contain"
+            style={[styles.cartoon]}
+          />
           <Image
             source={cartoon && cartoon[1]}
             style={[styles.badge]}

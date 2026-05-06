@@ -1,14 +1,7 @@
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
 import { useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View
-} from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import getUploadedImages, {
@@ -16,45 +9,55 @@ import getUploadedImages, {
   toggleFavouriteItem
 } from "@/api/api";
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
-import TitleHeader from "@/components/headers/title-header";
-import CatImageCard from "@/components/images/cat-image-card";
+import CustomFont from "@/components/headers/title-header";
+import CatImageGallery from "@/components/images/cat-image-gallery";
 import { COLORS } from "@/constants/colors";
 import { CatImage } from "@/types";
 
-const GRID_GAP = 12;
-const HORIZONTAL_PADDING = 16;
-
 export default function Index() {
-  const { width } = useWindowDimensions();
   const [favouriteImages, setFavouriteImages] = useState<CatImage[]>([]);
+  const [favouriteImageIds, setFavouriteImageIds] = useState<
+    Record<string, boolean>
+  >({});
   const [isLoading, setIsLoading] = useState(false);
-  const [unfavouritingImageIds, setUnfavouritingImageIds] = useState<
+  const [favouriteLoadingImageIds, setFavouriteLoadingImageIds] = useState<
     Record<string, boolean>
   >({});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const imageWidth = (width - HORIZONTAL_PADDING * 2 - GRID_GAP) / 2;
+  const favouriteImagesById = useMemo(
+    () =>
+      favouriteImages.reduce<Record<string, boolean>>(
+        (favouriteIds, image) => ({
+          ...favouriteIds,
+          [image.id]: favouriteImageIds[image.id] ?? true
+        }),
+        {}
+      ),
+    [favouriteImageIds, favouriteImages]
+  );
 
   const loadFavouriteImages = useCallback(async () => {
     setIsLoading(true);
     setErrorMessage(null);
 
     try {
-      const favourites = await getFavourites();
-      const needsUploadedImages = favourites.some(
-        (favourite) => !favourite.image?.url
+      const [uploadedImages, favourites] = await Promise.all([
+        getUploadedImages(),
+        getFavourites()
+      ]);
+      const nextFavouriteImageIds = favourites.reduce<Record<string, boolean>>(
+        (favouriteIds, favourite) => ({
+          ...favouriteIds,
+          [favourite.image_id]: true
+        }),
+        {}
       );
-      const uploadedImagesById = needsUploadedImages
-        ? new Map((await getUploadedImages()).map((image) => [image.id, image]))
-        : new Map<string, CatImage>();
-      const images = favourites
-        .map(
-          (favourite) =>
-            favourite.image ?? uploadedImagesById.get(favourite.image_id)
-        )
-        .filter((image): image is CatImage => !!image?.url);
 
-      setFavouriteImages(images);
+      setFavouriteImageIds(nextFavouriteImageIds);
+      setFavouriteImages(
+        uploadedImages.filter((image) => nextFavouriteImageIds[image.id])
+      );
     } catch (e) {
       const message =
         e instanceof Error ? e.message : "Failed to fetch favourites";
@@ -71,74 +74,61 @@ export default function Index() {
     }, [loadFavouriteImages])
   );
 
-  const unfavouriteImage = useCallback(
+  const toggleFavourite = useCallback(
     async (imageId: string) => {
-      if (unfavouritingImageIds[imageId]) {
+      if (favouriteLoadingImageIds[imageId]) {
         return;
       }
 
-      setUnfavouritingImageIds((currentIds) => ({
+      setFavouriteLoadingImageIds((currentIds) => ({
         ...currentIds,
         [imageId]: true
       }));
       setErrorMessage(null);
 
       try {
-        await toggleFavouriteItem(imageId);
-        setFavouriteImages((currentImages) =>
-          currentImages.filter((image) => image.id !== imageId)
-        );
+        const result = await toggleFavouriteItem(imageId);
+        setFavouriteImageIds((currentFavouriteImageIds) => ({
+          ...currentFavouriteImageIds,
+          [imageId]: result.isFavourite
+        }));
+
+        if (!result.isFavourite) {
+          setFavouriteImages((currentImages) =>
+            currentImages.filter((image) => image.id !== imageId)
+          );
+        }
       } catch (e) {
         const message =
-          e instanceof Error ? e.message : "Failed to unfavourite image";
+          e instanceof Error ? e.message : "Failed to update favourite";
         setErrorMessage(message);
       } finally {
-        setUnfavouritingImageIds((currentIds) => ({
+        setFavouriteLoadingImageIds((currentIds) => ({
           ...currentIds,
           [imageId]: false
         }));
       }
     },
-    [unfavouritingImageIds]
-  );
-
-  const renderImage = ({ item }: { item: CatImage }) => (
-    <CatImageCard
-      image={item}
-      contentFit="scale-down"
-      wrapperStyle={[
-        styles.imageWrapper,
-        {
-          height: imageWidth,
-          width: imageWidth
-        }
-      ]}
-      imageStyle={styles.image}
-      favouriteButton={{
-        accessibilityLabel: "Unfavourite image",
-        disabled: !!unfavouritingImageIds[item.id],
-        isFavourite: true,
-        onPress: () => unfavouriteImage(item.id)
-      }}
-    />
+    [favouriteLoadingImageIds]
   );
 
   return (
     <ImageBackgroundScreen>
       <SafeAreaView edges={["top"]} style={styles.container}>
-        <TitleHeader title={"Favourites"} font={LilitaOne_400Regular} />
+        <CustomFont header font={LilitaOne_400Regular}>
+          Favourites
+        </CustomFont>
         {isLoading && favouriteImages.length === 0 ? (
           <ActivityIndicator style={styles.loader} />
         ) : (
-          <FlatList
-            data={favouriteImages}
-            numColumns={2}
-            keyExtractor={(item) => item.id}
-            renderItem={renderImage}
-            showsVerticalScrollIndicator={false}
-            columnWrapperStyle={styles.row}
+          <CatImageGallery
+            images={favouriteImages}
+            isGrid
+            favouriteImageIds={favouriteImagesById}
+            favouriteLoadingImageIds={favouriteLoadingImageIds}
+            onToggleFavourite={toggleFavourite}
             contentContainerStyle={styles.listContent}
-            ListEmptyComponent={
+            listEmptyComponent={
               <View style={styles.emptyWrapper}>
                 <Text style={styles.emptyTitle}>No favourites yet!</Text>
                 <Text style={styles.emptyText}>
@@ -146,7 +136,7 @@ export default function Index() {
                 </Text>
               </View>
             }
-            ListHeaderComponent={
+            listHeaderComponent={
               <>
                 {isLoading && <ActivityIndicator style={styles.inlineLoader} />}
                 {errorMessage && (
@@ -187,27 +177,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     textAlign: "center"
   },
-  image: {
-    borderRadius: 8,
-    borderWidth: 2,
-    height: "100%",
-    width: "100%"
-  },
-  imageWrapper: {
-    marginBottom: GRID_GAP
-  },
   inlineLoader: {
     marginBottom: 12
   },
   listContent: {
     paddingBottom: 120,
-    paddingHorizontal: HORIZONTAL_PADDING,
     paddingTop: 24
   },
   loader: {
     marginTop: 80
-  },
-  row: {
-    gap: GRID_GAP
   }
 });

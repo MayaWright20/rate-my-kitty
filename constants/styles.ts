@@ -6,3 +6,9 @@ export const OPACITY = {
 };
 
 export const SCREEN_WIDTH_MARGIN: DimensionValue | undefined = "90%";
+
+export const BORDER_RADIUS = {
+  SMALL: 8,
+  MEDIUM: 12,
+  LARGE: 100
+};

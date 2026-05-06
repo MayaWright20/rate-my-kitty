@@ -63,7 +63,7 @@ export default function CircularBTN({
 const styles = StyleSheet.create({
   circle: {
     alignItems: "center",
-    borderColor: COLORS.CREAM[0],
+    borderColor: COLORS.BLACK[3],
     borderRadius: 100,
     borderWidth: 7,
     justifyContent: "center",

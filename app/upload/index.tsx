@@ -1,4 +1,5 @@
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
+import { ImagePickerAsset } from "expo-image-picker";
 import { router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";
@@ -7,13 +8,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { uploadImage } from "@/api/api";
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CTA_BTN from "@/components/buttons/cta-btn";
-import TitleHeader from "@/components/headers/title-header";
+import CustomFont from "@/components/headers/title-header";
 import ImageUploader from "@/components/upload/image-uploader";
 import { COLORS } from "@/constants/colors";
 import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
 
 export default function Index() {
-  const [image, setImage] = useState<null | string>(null);
+  const [image, setImage] = useState<ImagePickerAsset | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>();
   const isSubmitBtnDisabled = useMemo(
     () => !image || !!errorMessage,
@@ -21,7 +22,7 @@ export default function Index() {
   );
 
   const onChangeImage = useCallback(
-    (value: string | null) => {
+    (value: ImagePickerAsset | null) => {
       setImage(value);
       setErrorMessage(undefined);
     },
@@ -29,6 +30,10 @@ export default function Index() {
   );
 
   const uploadImageHandler = async () => {
+    if (!image) {
+      return;
+    }
+
     const result = await uploadImage({ file: image });
 
     if (typeof result === "object" && result && result.approved === 1) {
@@ -50,11 +55,13 @@ export default function Index() {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.scrollView}
         >
-          <TitleHeader
-            title={"Submit your cat"}
+          <CustomFont
+            header
             font={LilitaOne_400Regular}
             subheading="Upload a photo of your cat to put them in the vote!"
-          />
+          >
+            Submit your cat
+          </CustomFont>
           <ImageUploader
             resetImages={image === null}
             getImage={(value) => onChangeImage(value)}

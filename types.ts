@@ -1,8 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ImagePickerAsset } from "expo-image-picker";
 import { OpaqueColorValue } from "react-native";
 
 export interface ImageUpload {
-  file: any;
+  file: ImagePickerAsset;
   sub_id?: string;
   breed_ids?: string[];
 }

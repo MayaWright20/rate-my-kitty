@@ -53,6 +53,22 @@ const buildFavouritesUrl = (subId?: string) => {
   return url.toString();
 };
 
+const appendImageUploadFile = (
+  formData: FormData,
+  file: ImageUpload["file"]
+) => {
+  if (file.file) {
+    formData.append("file", file.file);
+    return;
+  }
+
+  formData.append("file", {
+    uri: file.uri,
+    name: file.fileName ?? "cat.jpg",
+    type: file.mimeType ?? "image/jpeg"
+  } as any);
+};
+
 export const uploadImage = async ({
   file,
   sub_id,
@@ -60,11 +76,7 @@ export const uploadImage = async ({
 }: ImageUpload): Promise<ImageUploadResult> => {
   const formData = new FormData();
 
-  formData.append("file", {
-    uri: file,
-    name: "cat.jpg",
-    type: "image/jpeg"
-  } as any);
+  appendImageUploadFile(formData, file);
 
   try {
     const response = await fetch(`${BASE_URL}/images/upload`, {

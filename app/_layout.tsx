@@ -5,91 +5,95 @@ import { StyleSheet, View } from "react-native";
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CircularBTN from "@/components/buttons/circular-btn";
 import { COLORS } from "@/constants/colors";
-import { OPACITY } from "@/constants/styles";
+import { BORDER_RADIUS, OPACITY } from "@/constants/styles";
+import { ScreenOrientationProvider } from "@/context/screen-orientation-context";
 
 export default function RootLayout() {
   const pathname = usePathname();
   return (
-    <ImageBackgroundScreen>
-      <Tabs
-        screenOptions={{
-          headerShown: false,
-          tabBarBackground: () => {
-            return <View style={styles.tabBarBackground}></View>;
-          }
-        }}
-      >
-        <Tabs.Screen
-          name="upload/index"
-          options={{
-            title: "UPLOAD",
-            tabBarLabelStyle: {
-              color: COLORS.BLACK[3]
-            },
-
-            tabBarIcon: ({ focused }) => (
-              <Ionicons
-                name={"cloud-upload"}
-                color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
-                size={30}
-              />
-            )
-          }}
-        />
-        <Tabs.Screen
-          name="index"
-          options={{
-            tabBarButton: () => {
-              const onPress = () => {
-                router.push("/");
-              };
-
-              return (
-                <CircularBTN
-                  onPress={onPress}
-                  title={"PAWFILE"}
-                  style={styles.container}
-                  icon={{
-                    name: "paw",
-                    size: 60,
-                    color: pathname === "/" ? COLORS.PINK[0] : COLORS.BLACK[0]
-                  }}
-                />
-              );
+    <ScreenOrientationProvider>
+      <ImageBackgroundScreen>
+        <Tabs
+          screenOptions={{
+            headerShown: false,
+            tabBarBackground: () => {
+              return <View style={styles.tabBarBackground}></View>;
             }
           }}
-        />
-        <Tabs.Screen
-          name="favourites/index"
-          options={{
-            title: "FAVOURITES",
-            tabBarLabelStyle: {
-              color: COLORS.BLACK[3]
-            },
+        >
+          <Tabs.Screen
+            name="upload/index"
+            options={{
+              title: "UPLOAD",
+              tabBarLabelStyle: {
+                color: COLORS.BLACK[3]
+              },
 
-            tabBarIcon: ({ focused }) => (
-              <Ionicons
-                name={"heart"}
-                color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
-                size={30}
-              />
-            )
-          }}
-        />
-      </Tabs>
-    </ImageBackgroundScreen>
+              tabBarIcon: ({ focused }) => (
+                <Ionicons
+                  name={"cloud-upload"}
+                  color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
+                  size={30}
+                />
+              )
+            }}
+          />
+          <Tabs.Screen
+            name="index"
+            options={{
+              tabBarButton: () => {
+                const onPress = () => {
+                  router.push("/");
+                };
+
+                return (
+                  <CircularBTN
+                    onPress={onPress}
+                    title={"PAWFILE"}
+                    style={styles.container}
+                    icon={{
+                      name: "paw",
+                      size: 60,
+                      color: pathname === "/" ? COLORS.PINK[0] : COLORS.BLACK[0]
+                    }}
+                  />
+                );
+              }
+            }}
+          />
+          <Tabs.Screen
+            name="favourites/index"
+            options={{
+              title: "FAVOURITES",
+              tabBarLabelStyle: {
+                color: COLORS.BLACK[3]
+              },
+
+              tabBarIcon: ({ focused }) => (
+                <Ionicons
+                  name={"heart"}
+                  color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
+                  size={30}
+                />
+              )
+            }}
+          />
+        </Tabs>
+      </ImageBackgroundScreen>
+    </ScreenOrientationProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
+    backgroundColor: "red",
     top: "-70%"
   },
   tabBarBackground: {
     alignSelf: "center",
     backgroundColor: COLORS.CREAM[0],
-    borderRadius: "5%",
+    borderRadius: BORDER_RADIUS.MEDIUM,
     flex: 1,
     shadowColor: "#000000",
     shadowOffset: {

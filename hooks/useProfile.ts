@@ -4,7 +4,7 @@ import getUploadedImages from "@/api/api";
 import { CatImage } from "@/types";
 
 export default function useProfile() {
-  const [images, setImages] = useState<null | CatImage[]>(null);
+  const [images, setImages] = useState<[] | CatImage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<null | string>(null);
 

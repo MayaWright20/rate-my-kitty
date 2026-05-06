@@ -20,35 +20,38 @@ export default function RootLayout() {
         }}
       >
         <Tabs.Screen
-          name="index"
+          name="upload/index"
           options={{
-            title: "PAWFILE",
+            title: "UPLOAD",
+            tabBarLabelStyle: {
+              color: COLORS.BLACK[3]
+            },
+
             tabBarIcon: ({ focused }) => (
               <Ionicons
-                name={focused ? "paw-sharp" : "paw-outline"}
-                color={focused ? COLORS.GREEN[0] : COLORS.BLACK[0]}
-                size={24}
+                name={"add"}
+                color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
+                size={30}
               />
             )
           }}
         />
         <Tabs.Screen
-          name="upload/index"
+          name="index"
           options={{
             tabBarButton: () => {
               const onPress = () => {
-                router.push("/upload");
+                router.push("/");
               };
 
               return (
                 <CircularBTN
                   onPress={onPress}
-                  title={"Submit cat"}
+                  title={"PAWFILE"}
                   icon={{
-                    name: "add",
+                    name: "paw",
                     size: 60,
-                    color:
-                      pathname === "/upload" ? COLORS.GREEN[0] : COLORS.BLACK[0]
+                    color: pathname === "/" ? COLORS.PINK[0] : COLORS.BLACK[0]
                   }}
                 />
               );

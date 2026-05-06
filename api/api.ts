@@ -1,17 +1,13 @@
-import { CatImage, ImageUpload } from "../types";
+import {
+  CatImage,
+  Favourite,
+  FavouriteResult,
+  ImageUpload,
+  ImageUploadResult
+} from "../types";
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 const API_KEY = process.env.EXPO_PUBLIC_API_KEY;
-
-type ImageUploadResult = { approved?: number } | string | false;
-type FavouriteResult = { id?: number; message: string };
-
-export type Favourite = {
-  id: number;
-  image_id: string;
-  image?: CatImage;
-  sub_id?: string;
-};
 
 const parseResponseBody = async (response: Response) => {
   const responseText = await response.text();

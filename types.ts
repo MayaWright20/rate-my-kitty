@@ -31,3 +31,14 @@ export interface CatImage {
   animals: string[];
   categories: string[];
 }
+
+export type Favourite = {
+  id: number;
+  image_id: string;
+  image?: CatImage;
+  sub_id?: string;
+};
+
+export type ImageUploadResult = { approved?: number } | string | false;
+
+export type FavouriteResult = { id?: number; message: string };

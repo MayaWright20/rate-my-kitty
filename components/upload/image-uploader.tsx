@@ -20,7 +20,7 @@ import {
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 import CartoonGenerator from "@/helpers/cartoon-generator";
 
-const defaultStar = require("../../assets/images/sparcles/star-purple.png");
+const STAR = require("../../assets/images/sparcles/star-purple.png");
 
 interface Props {
   getImage: (value: ImagePicker.ImagePickerAsset | null) => void;
@@ -107,11 +107,8 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
       {image && (
         <View style={styles.previewWrapper}>
           <Image source={{ uri: image }} style={styles.image} />
-          <Image source={defaultStar} style={styles.star} />
-          <Image
-            source={defaultStar}
-            style={[styles.star, styles.startTrailing]}
-          />
+          <Image source={STAR} style={styles.star} />
+          <Image source={STAR} style={[styles.star, styles.startTrailing]} />
           <Image
             source={cartoon && cartoon[0]}
             contentFit="contain"

@@ -10,6 +10,7 @@ import { ScreenOrientationProvider } from "@/context/screen-orientation-context"
 
 export default function RootLayout() {
   const pathname = usePathname();
+
   return (
     <ScreenOrientationProvider>
       <ImageBackgroundScreen>

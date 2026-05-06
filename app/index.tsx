@@ -189,7 +189,6 @@ const styles = StyleSheet.create({
   },
   noImagesPlaceholderWrapper: {
     alignSelf: "center",
-    // backgroundColor: "pink",
     height: "60%",
     width: "100%"
   },

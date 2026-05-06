@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import React from "react";
+import React, { useContext } from "react";
 import {
   GestureResponderEvent,
   OpaqueColorValue,
@@ -12,6 +12,7 @@ import {
 
 import { COLORS } from "@/constants/colors";
 import { BORDER_RADIUS } from "@/constants/styles";
+import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 import { Icon } from "@/types";
 
 interface Props {
@@ -35,6 +36,8 @@ export default function CircularBTN({
   isLarge,
   isOval
 }: Props) {
+  const isScreenPortrait = useContext(IsScreenPortraitContext);
+
   return (
     <TouchableOpacity onPress={onPress} style={style}>
       <View
@@ -42,7 +45,7 @@ export default function CircularBTN({
           styles.circle,
           {
             backgroundColor,
-            width: isLarge ? "100%" : "70%",
+            width: isScreenPortrait ? "70%" : "40%",
             aspectRatio: isOval ? 1 / 1.2 : 1
           }
         ]}

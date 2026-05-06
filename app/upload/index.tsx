@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CTA_BTN from "@/components/buttons/cta-btn";
 import CustomFont from "@/components/headers/title-header";
+import CatLoader from "@/components/loaders/cat-loader";
 import ImageUploader from "@/components/upload/image-uploader";
 import { COLORS } from "@/constants/colors";
 import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
@@ -17,7 +18,8 @@ export default function Index() {
     image,
     isSubmitBtnDisabled,
     onChangeImage,
-    uploadSelectedImage
+    uploadSelectedImage,
+    isUploading
   } = useUploadImage();
 
   const uploadImageHandler = async () => {
@@ -43,6 +45,7 @@ export default function Index() {
           >
             Submit your cat
           </CustomFont>
+          {isUploading && <CatLoader />}
           <ImageUploader
             resetImages={image === null}
             getImage={(value) => onChangeImage(value)}

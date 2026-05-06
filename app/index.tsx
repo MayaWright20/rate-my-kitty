@@ -44,7 +44,7 @@ export default function Index() {
   const thumbnailImages = images?.slice(1) ?? [];
   const listImages = isGrid ? thumbnailImages : (images ?? []);
   const availableWidth = width - HORIZONTAL_PADDING * 2;
-  const numColumns = useMemo(() => (isGrid ? 4 : 1), [isGrid]);
+  const numColumns = useMemo(() => (isGrid ? 2 : 1), [isGrid]);
   const HEADER_CONTENT_OFFSET = useMemo(() => (isGrid ? 330 : 200), [isGrid]);
   const thumbnailWidth =
     (availableWidth - GRID_GAP * (numColumns - 1)) / numColumns;

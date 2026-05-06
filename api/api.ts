@@ -58,7 +58,10 @@ export const uploadImage = async ({
     let data = await parseResponseBody(response);
 
     if (!response.ok) {
-      data = getErrorMessage(data, `Request failed with status ${response.status}`);
+      data = getErrorMessage(
+        data,
+        `Request failed with status ${response.status}`
+      );
     }
 
     return data as ImageUploadResult;

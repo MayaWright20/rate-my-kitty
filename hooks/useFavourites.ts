@@ -4,6 +4,7 @@ import getUploadedImages, {
   getFavourites,
   toggleFavouriteItem
 } from "@/api/api";
+import { prefetchCatImages } from "@/helpers/image-cache";
 import { CatImage } from "@/types";
 
 export default function useFavourites() {
@@ -70,10 +71,13 @@ export default function useFavourites() {
         {}
       );
 
-      setFavouriteImageIds(nextFavouriteImageIds);
-      setFavouriteImages(
-        uploadedImages.filter((image) => nextFavouriteImageIds[image.id])
+      const nextFavouriteImages = uploadedImages.filter(
+        (image) => nextFavouriteImageIds[image.id]
       );
+
+      await prefetchCatImages(nextFavouriteImages);
+      setFavouriteImageIds(nextFavouriteImageIds);
+      setFavouriteImages(nextFavouriteImages);
       return uploadedImages;
     } catch (e) {
       const message =

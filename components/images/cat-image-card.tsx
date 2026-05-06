@@ -63,14 +63,17 @@ export default function CatImageCard({
 
   const imageElement = (
     <Image
+      cachePolicy="memory-disk"
       contentFit={contentFit}
       contentPosition={contentPosition}
+      recyclingKey={image.id}
       source={{ uri: image.url }}
       style={[
         styles.image,
         { borderColor: getImageBorderColor(image.id) },
         imageStyle
       ]}
+      transition={0}
     />
   );
 

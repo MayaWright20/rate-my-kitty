@@ -1,3 +1,4 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, Tabs, usePathname } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
@@ -19,6 +20,19 @@ export default function RootLayout() {
         }}
       >
         <Tabs.Screen
+          name="index"
+          options={{
+            title: "PAWFILE",
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={focused ? "paw-sharp" : "paw-outline"}
+                color={focused ? COLORS.GREEN[0] : COLORS.BLACK[0]}
+                size={24}
+              />
+            )
+          }}
+        />
+        <Tabs.Screen
           name="upload/index"
           options={{
             tabBarButton: () => {
@@ -34,7 +48,7 @@ export default function RootLayout() {
                     name: "add",
                     size: 60,
                     color:
-                      pathname === "/upload" ? COLORS.GREEN[0] : COLORS.WHITE[0]
+                      pathname === "/upload" ? COLORS.GREEN[0] : COLORS.BLACK[0]
                   }}
                 />
               );

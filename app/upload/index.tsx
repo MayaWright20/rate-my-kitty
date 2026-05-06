@@ -31,12 +31,14 @@ export default function Index() {
   const uploadImageHandler = async () => {
     const result = await uploadImage({ file: image });
 
-    if (result["approved"] === 1) {
+    if (typeof result === "object" && result && result.approved === 1) {
       router.push("/");
       setImage(null);
       onChangeImage(null);
     } else {
-      setErrorMessage(result);
+      setErrorMessage(
+        typeof result === "string" ? result : "Image upload failed"
+      );
     }
   };
   return (

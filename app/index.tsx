@@ -12,7 +12,7 @@ import CustomFont from "@/components/headers/title-header";
 import CatImageGallery from "@/components/images/cat-image-gallery";
 import useProfile from "@/hooks/useProfile";
 
-const noImages = require("../assets/images/backgrounds/boa-cat.png");
+const NO_IMAGES_PLACEHOLDER = require("../assets/images/backgrounds/boa-cat.png");
 
 export default function Index() {
   const { getProfileImages, images, isLoading, errorMessage } = useProfile();
@@ -119,13 +119,12 @@ export default function Index() {
           />
         </>
       ) : (
-        <View style={styles.noImagesWrapper}>
+        <View style={styles.noImagesPlaceholderWrapper}>
           <Image
-            source={noImages}
-            style={styles.noImages}
+            source={NO_IMAGES_PLACEHOLDER}
+            style={styles.noImagesPlaceholder}
             contentFit="contain"
             contentPosition="center"
-            // pointerEvents="none"
           />
           <CustomFont
             header
@@ -136,10 +135,6 @@ export default function Index() {
           </CustomFont>
         </View>
       )}
-      {/* <View style={styles.btnsWrapper}>
-        <CircularBTN isLarge backgroundColor={COLORS.GREEN[0]} />
-        <CircularBTN isLarge backgroundColor={COLORS.PINK[1]} />
-      </View> */}
     </ImageBackgroundScreen>
   );
 }
@@ -183,16 +178,16 @@ const styles = StyleSheet.create({
   loader: {
     marginVertical: 16
   },
-  noImages: {
+  noImagesPlaceholder: {
     alignSelf: "center",
     height: "100%",
     width: "80%"
   },
-  noImagesText: {
+  noImagesPlaceholderText: {
     fontSize: 40,
     textAlign: "center"
   },
-  noImagesWrapper: {
+  noImagesPlaceholderWrapper: {
     alignSelf: "center",
     // backgroundColor: "pink",
     height: "60%",

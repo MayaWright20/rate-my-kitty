@@ -71,9 +71,7 @@ const appendImageUploadFile = (
 };
 
 export const uploadImage = async ({
-  file,
-  sub_id,
-  breed_ids
+  file
 }: ImageUpload): Promise<ImageUploadResult> => {
   const formData = new FormData();
 

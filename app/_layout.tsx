@@ -1,8 +1,9 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, Tabs, usePathname } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
+import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CircularBTN from "@/components/buttons/circular-btn";
-import ImageBackgroundScreen from "@/components/screens/image-background-screen";
 import { COLORS } from "@/constants/colors";
 import { OPACITY } from "@/constants/styles";
 
@@ -21,20 +22,37 @@ export default function RootLayout() {
         <Tabs.Screen
           name="upload/index"
           options={{
+            title: "UPLOAD",
+            tabBarLabelStyle: {
+              color: COLORS.BLACK[3]
+            },
+
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={"add"}
+                color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
+                size={30}
+              />
+            )
+          }}
+        />
+        <Tabs.Screen
+          name="index"
+          options={{
             tabBarButton: () => {
               const onPress = () => {
-                router.push("/upload");
+                router.push("/");
               };
 
               return (
                 <CircularBTN
                   onPress={onPress}
-                  title={"Submit cat"}
+                  title={"PAWFILE"}
+                  style={styles.container}
                   icon={{
-                    name: "add",
+                    name: "paw",
                     size: 60,
-                    color:
-                      pathname === "/upload" ? COLORS.GREEN[0] : COLORS.WHITE[0]
+                    color: pathname === "/" ? COLORS.PINK[0] : COLORS.BLACK[0]
                   }}
                 />
               );
@@ -47,6 +65,10 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    top: "-70%"
+  },
   tabBarBackground: {
     alignSelf: "center",
     backgroundColor: COLORS.CREAM[0],

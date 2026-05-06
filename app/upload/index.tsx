@@ -5,9 +5,9 @@ import { ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { uploadImage } from "@/api/api";
+import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CTA_BTN from "@/components/buttons/cta-btn";
 import TitleHeader from "@/components/headers/title-header";
-import ImageBackgroundScreen from "@/components/screens/image-background-screen";
 import ImageUploader from "@/components/upload/image-uploader";
 import { COLORS } from "@/constants/colors";
 import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
@@ -31,12 +31,14 @@ export default function Index() {
   const uploadImageHandler = async () => {
     const result = await uploadImage({ file: image });
 
-    if (result["approved"] === 1) {
+    if (typeof result === "object" && result && result.approved === 1) {
       router.push("/");
       setImage(null);
       onChangeImage(null);
     } else {
-      setErrorMessage(result);
+      setErrorMessage(
+        typeof result === "string" ? result : "Image upload failed"
+      );
     }
   };
   return (

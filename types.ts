@@ -12,3 +12,21 @@ export type Icon = {
   size: number;
   color: string | OpaqueColorValue;
 };
+
+interface Breed {
+  id: number;
+  name: string;
+  wikipedia_url: string;
+}
+
+export interface CatImage {
+  id: string;
+  url: string;
+  width: null | number;
+  height: null | number;
+  mime_type: string;
+  entities: string[];
+  breeds: Breed[];
+  animals: string[];
+  categories: string[];
+}

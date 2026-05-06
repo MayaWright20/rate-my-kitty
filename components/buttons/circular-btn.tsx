@@ -6,7 +6,8 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  ViewStyle
 } from "react-native";
 
 import { COLORS } from "@/constants/colors";
@@ -17,17 +18,34 @@ interface Props {
   onPress?: ((event: GestureResponderEvent) => void) | undefined;
   title?: string;
   titleColor?: string | OpaqueColorValue;
+  style?: ViewStyle;
+  backgroundColor?: string | OpaqueColorValue;
+  isLarge?: boolean;
+  isOval?: boolean;
 }
 
 export default function CircularBTN({
   icon,
   onPress,
   title,
-  titleColor
+  titleColor,
+  style,
+  backgroundColor = COLORS.PURPLE[3],
+  isLarge,
+  isOval
 }: Props) {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.container}>
-      <View style={styles.circle}>
+    <TouchableOpacity onPress={onPress} style={style}>
+      <View
+        style={[
+          styles.circle,
+          {
+            backgroundColor,
+            width: isLarge ? "100%" : "45%",
+            aspectRatio: isOval ? 1 / 1.2 : 1
+          }
+        ]}
+      >
         <Ionicons name={icon?.name} color={icon?.color} size={icon?.size} />
       </View>
       <Text
@@ -45,21 +63,14 @@ export default function CircularBTN({
 const styles = StyleSheet.create({
   circle: {
     alignItems: "center",
-    alignSelf: "center",
-    aspectRatio: 1,
-    backgroundColor: COLORS.PURPLE[3],
     borderColor: COLORS.CREAM[0],
     borderRadius: 100,
     borderWidth: 7,
     justifyContent: "center",
-    maxHeight: 100,
-    maxWidth: 100,
-    top: "-15%",
-    width: "70%"
-  },
-  container: {
-    alignItems: "center",
-    top: "-70%"
+    maxHeight: 130,
+    // maxWidth: 100,
+    top: "-15%"
+    // width: "70%"
   },
   title: {
     fontSize: 9,

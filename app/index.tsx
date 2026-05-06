@@ -1,12 +1,10 @@
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Pressable,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -18,6 +16,7 @@ import ImageBackgroundScreen from "@/components/backgrounds/image-background-scr
 import { SwitchBTN } from "@/components/buttons/switch-btn";
 import LogoHeader from "@/components/headers/logo-header";
 import TitleHeader from "@/components/headers/title-header";
+import CatImageCard from "@/components/images/cat-image-card";
 import { COLORS } from "@/constants/colors";
 import useProfile from "@/hooks/useProfile";
 import { CatImage } from "@/types";
@@ -26,21 +25,6 @@ const noImages = require("../assets/images/backgrounds/boa-cat.png");
 
 const GRID_GAP = 12;
 const HORIZONTAL_PADDING = 16;
-const IMAGE_BORDER_COLORS = [
-  COLORS.BLUE[0],
-  COLORS.PINK[1],
-  COLORS.GREEN[0],
-  COLORS.PURPLE[2],
-  COLORS.CREAM[3]
-];
-
-const getImageBorderColor = (id: string) => {
-  const colorIndex = id
-    .split("")
-    .reduce((total, character) => total + character.charCodeAt(0), 0);
-
-  return IMAGE_BORDER_COLORS[colorIndex % IMAGE_BORDER_COLORS.length];
-};
 
 export default function Index() {
   const { getProfileImages, images, isLoading, errorMessage } = useProfile();
@@ -50,17 +34,14 @@ export default function Index() {
   const [favouriteImageIds, setFavouriteImageIds] = useState<
     Record<string, boolean>
   >({});
-  const [isFavouriteLoading, setIsFavouriteLoading] = useState(false);
+  const [favouriteLoadingImageIds, setFavouriteLoadingImageIds] = useState<
+    Record<string, boolean>
+  >({});
 
-  const featuredImage = images?.[0];
-  const isFeaturedImageFavourite = !!(
-    featuredImage && favouriteImageIds[featuredImage.id]
-  );
-  const thumbnailImages = images?.slice(1) ?? [];
-  const listImages = isGrid ? thumbnailImages : (images ?? []);
+  const listImages = images ?? [];
   const availableWidth = width - HORIZONTAL_PADDING * 2;
   const numColumns = useMemo(() => (isGrid ? 2 : 1), [isGrid]);
-  const HEADER_CONTENT_OFFSET = useMemo(() => (isGrid ? 330 : 200), [isGrid]);
+  const HEADER_CONTENT_OFFSET = useMemo(() => (isGrid ? 170 : 200), [isGrid]);
   const thumbnailWidth =
     (availableWidth - GRID_GAP * (numColumns - 1)) / numColumns;
 
@@ -87,37 +68,54 @@ export default function Index() {
     }, [getProfileImages])
   );
 
-  const toggleFavourite = useCallback(async () => {
-    if (!featuredImage || isFavouriteLoading) {
-      return;
-    }
+  const toggleFavourite = useCallback(
+    async (imageId: string) => {
+      if (favouriteLoadingImageIds[imageId]) {
+        return;
+      }
 
-    setIsFavouriteLoading(true);
-
-    try {
-      const result = await toggleFavouriteItem(featuredImage.id);
-      setFavouriteImageIds((currentFavouriteImageIds) => ({
-        ...currentFavouriteImageIds,
-        [featuredImage.id]: result.isFavourite
+      setFavouriteLoadingImageIds((currentIds) => ({
+        ...currentIds,
+        [imageId]: true
       }));
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsFavouriteLoading(false);
-    }
-  }, [featuredImage, isFavouriteLoading]);
+
+      try {
+        const result = await toggleFavouriteItem(imageId);
+        setFavouriteImageIds((currentFavouriteImageIds) => ({
+          ...currentFavouriteImageIds,
+          [imageId]: result.isFavourite
+        }));
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setFavouriteLoadingImageIds((currentIds) => ({
+          ...currentIds,
+          [imageId]: false
+        }));
+      }
+    },
+    [favouriteLoadingImageIds]
+  );
 
   const renderImage = ({ item }: { item: CatImage }) => {
     const isLandscape =
       item.width && item.height && !isGrid && item.width > item.height;
     return (
-      <Image
-        source={{ uri: item.url }}
+      <CatImageCard
+        image={item}
         contentFit="cover"
         contentPosition="center"
-        style={[
+        favouriteButton={{
+          accessibilityLabel: favouriteImageIds[item.id]
+            ? "Unfavourite image"
+            : "Favourite image",
+          disabled: !!favouriteLoadingImageIds[item.id],
+          isFavourite: !!favouriteImageIds[item.id],
+          onPress: () => toggleFavourite(item.id),
+          size: isGrid ? "small" : "large"
+        }}
+        imageStyle={[
           isGrid ? styles.thumbnailImage : styles.largeListImage,
-          { borderColor: getImageBorderColor(item.id) },
           isGrid
             ? { height: thumbnailWidth, width: thumbnailWidth }
             : undefined,
@@ -147,25 +145,6 @@ export default function Index() {
         <ActivityIndicator style={styles.initialLoader} />
       ) : images.length > 0 ? (
         <>
-          <Pressable
-            accessibilityLabel="Favourite featured image"
-            accessibilityRole="button"
-            disabled={!featuredImage || isFavouriteLoading}
-            onPress={toggleFavourite}
-            style={styles.icon}
-          >
-            <Ionicons
-              name={isFeaturedImageFavourite ? "heart" : "heart-outline"}
-              color={COLORS.BLACK[3]}
-              size={53}
-              style={styles.iconOutline}
-            />
-            <Ionicons
-              name={isFeaturedImageFavourite ? "heart" : "heart-outline"}
-              color={COLORS.RED[0]}
-              size={50}
-            />
-          </Pressable>
           <FlatList
             key={numColumns}
             data={listImages}
@@ -186,18 +165,6 @@ export default function Index() {
                 {isLoading && <ActivityIndicator style={styles.loader} />}
                 {errorMessage && (
                   <Text style={styles.errorMessage}>{errorMessage}</Text>
-                )}
-                {isGrid && featuredImage && (
-                  <Image
-                    source={{ uri: featuredImage.url }}
-                    contentFit="contain"
-                    contentPosition="center"
-                    style={[
-                      styles.largeImage,
-                      styles.featuredImage,
-                      { borderColor: getImageBorderColor(featuredImage.id) }
-                    ]}
-                  />
                 )}
               </>
             }
@@ -249,17 +216,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     zIndex: 3
-  },
-  icon: {
-    left: "10%",
-    position: "absolute",
-    top: "30%",
-    zIndex: 5
-  },
-  iconOutline: {
-    // left: -2,
-    position: "absolute"
-    // top: -3
   },
   imageBackground: {
     // alignItems: "center",

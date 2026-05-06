@@ -29,7 +29,7 @@ export default function RootLayout() {
 
             tabBarIcon: ({ focused }) => (
               <Ionicons
-                name={"add"}
+                name={"cloud-upload"}
                 color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
                 size={30}
               />

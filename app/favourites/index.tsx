@@ -1,12 +1,9 @@
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { Image } from "expo-image";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Pressable,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -20,26 +17,12 @@ import getUploadedImages, {
 } from "@/api/api";
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import TitleHeader from "@/components/headers/title-header";
+import CatImageCard from "@/components/images/cat-image-card";
 import { COLORS } from "@/constants/colors";
 import { CatImage } from "@/types";
 
 const GRID_GAP = 12;
 const HORIZONTAL_PADDING = 16;
-const IMAGE_BORDER_COLORS = [
-  COLORS.BLUE[0],
-  COLORS.PINK[1],
-  COLORS.GREEN[0],
-  COLORS.PURPLE[2],
-  COLORS.CREAM[3]
-];
-
-const getImageBorderColor = (id: string) => {
-  const colorIndex = id
-    .split("")
-    .reduce((total, character) => total + character.charCodeAt(0), 0);
-
-  return IMAGE_BORDER_COLORS[colorIndex % IMAGE_BORDER_COLORS.length];
-};
 
 export default function Index() {
   const { width } = useWindowDimensions();
@@ -120,41 +103,24 @@ export default function Index() {
   );
 
   const renderImage = ({ item }: { item: CatImage }) => (
-    <View
-      style={[
+    <CatImageCard
+      image={item}
+      contentFit="scale-down"
+      wrapperStyle={[
         styles.imageWrapper,
         {
           height: imageWidth,
           width: imageWidth
         }
       ]}
-    >
-      <Image
-        contentFit="scale-down"
-        source={{ uri: item.url }}
-        style={[
-          styles.image,
-          {
-            borderColor: getImageBorderColor(item.id)
-          }
-        ]}
-      />
-      <Pressable
-        accessibilityLabel="Unfavourite image"
-        accessibilityRole="button"
-        disabled={!!unfavouritingImageIds[item.id]}
-        onPress={() => unfavouriteImage(item.id)}
-        style={styles.heartButton}
-      >
-        <Ionicons
-          name="heart"
-          color={COLORS.BLACK[3]}
-          size={31}
-          style={styles.heartOutline}
-        />
-        <Ionicons name="heart" color={COLORS.RED[0]} size={29} />
-      </Pressable>
-    </View>
+      imageStyle={styles.image}
+      favouriteButton={{
+        accessibilityLabel: "Unfavourite image",
+        disabled: !!unfavouritingImageIds[item.id],
+        isFavourite: true,
+        onPress: () => unfavouriteImage(item.id)
+      }}
+    />
   );
 
   return (
@@ -220,22 +186,6 @@ const styles = StyleSheet.create({
     color: COLORS.RED[0],
     marginBottom: 12,
     textAlign: "center"
-  },
-  heartButton: {
-    alignItems: "center",
-    backgroundColor: COLORS.CREAM[0],
-    borderColor: COLORS.WHITE[0],
-    borderRadius: 20,
-    borderWidth: 2,
-    height: 38,
-    justifyContent: "center",
-    position: "absolute",
-    right: 8,
-    top: 8,
-    width: 38
-  },
-  heartOutline: {
-    position: "absolute"
   },
   image: {
     borderRadius: 8,

@@ -22,8 +22,6 @@ interface Props {
   titleColor?: string | OpaqueColorValue;
   style?: ViewStyle;
   backgroundColor?: string | OpaqueColorValue;
-  isLarge?: boolean;
-  isOval?: boolean;
 }
 
 export default function CircularBTN({
@@ -32,9 +30,7 @@ export default function CircularBTN({
   title,
   titleColor,
   style,
-  backgroundColor = COLORS.PURPLE[3],
-  isLarge,
-  isOval
+  backgroundColor = COLORS.PURPLE[3]
 }: Props) {
   const isScreenPortrait = useContext(IsScreenPortraitContext);
 
@@ -46,7 +42,7 @@ export default function CircularBTN({
           {
             backgroundColor,
             width: isScreenPortrait ? "70%" : "40%",
-            aspectRatio: isOval ? 1 / 1.2 : 1
+            aspectRatio: 1
           }
         ]}
       >

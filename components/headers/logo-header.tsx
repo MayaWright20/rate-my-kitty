@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   container: {
     position: "absolute",
     top: -120,
-    width: "100%",
+    width: width,
     zIndex: 3
   },
   logo: {

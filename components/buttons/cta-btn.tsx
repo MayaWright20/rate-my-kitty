@@ -8,7 +8,7 @@ import {
 } from "react-native";
 
 import { COLORS } from "@/constants/colors";
-import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
+import { BORDER_RADIUS, SCREEN_WIDTH_MARGIN } from "@/constants/styles";
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 import { Icon } from "@/types";
 
@@ -52,7 +52,7 @@ export default function CTA_BTN({ title, icon, onPress, isDisabled }: Props) {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    borderRadius: 100,
+    borderRadius: BORDER_RADIUS.LARGE,
     flexDirection: "row",
     justifyContent: "center",
     width: SCREEN_WIDTH_MARGIN

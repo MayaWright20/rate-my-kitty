@@ -87,7 +87,6 @@ export default function RootLayout() {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    backgroundColor: "red",
     top: "-70%"
   },
   tabBarBackground: {

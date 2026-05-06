@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import { COLORS } from "@/constants/colors";
+import { BORDER_RADIUS } from "@/constants/styles";
 import { Icon } from "@/types";
 
 interface Props {
@@ -64,7 +65,7 @@ const styles = StyleSheet.create({
   circle: {
     alignItems: "center",
     borderColor: COLORS.BLACK[3],
-    borderRadius: 100,
+    borderRadius: BORDER_RADIUS.LARGE,
     borderWidth: 7,
     justifyContent: "center",
     maxHeight: 130,

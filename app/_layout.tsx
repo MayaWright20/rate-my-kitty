@@ -1,18 +1,21 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, Tabs, usePathname } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { useMemo } from "react";
+import { StyleSheet, useWindowDimensions, View } from "react-native";
 
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CircularBTN from "@/components/buttons/circular-btn";
 import { COLORS } from "@/constants/colors";
 import { BORDER_RADIUS, OPACITY } from "@/constants/styles";
-import { ScreenOrientationProvider } from "@/context/screen-orientation-context";
+import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 
 export default function RootLayout() {
   const pathname = usePathname();
+  const { height, width } = useWindowDimensions();
+  const isScreenPortrait = useMemo(() => height >= width, [height, width]);
 
   return (
-    <ScreenOrientationProvider>
+    <IsScreenPortraitContext.Provider value={isScreenPortrait}>
       <ImageBackgroundScreen>
         <Tabs
           screenOptions={{
@@ -34,7 +37,7 @@ export default function RootLayout() {
                 <Ionicons
                   name={"cloud-upload"}
                   color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
-                  size={30}
+                  size={isScreenPortrait ? 30 : 20}
                 />
               )
             }}
@@ -54,7 +57,7 @@ export default function RootLayout() {
                     style={styles.container}
                     icon={{
                       name: "paw",
-                      size: 60,
+                      size: 55,
                       color: pathname === "/" ? COLORS.PINK[0] : COLORS.BLACK[0]
                     }}
                   />
@@ -74,14 +77,14 @@ export default function RootLayout() {
                 <Ionicons
                   name={"heart"}
                   color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
-                  size={30}
+                  size={isScreenPortrait ? 30 : 20}
                 />
               )
             }}
           />
         </Tabs>
       </ImageBackgroundScreen>
-    </ScreenOrientationProvider>
+    </IsScreenPortraitContext.Provider>
   );
 }
 

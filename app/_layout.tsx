@@ -29,7 +29,7 @@ export default function RootLayout() {
 
             tabBarIcon: ({ focused }) => (
               <Ionicons
-                name={"add"}
+                name={"cloud-upload"}
                 color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
                 size={30}
               />
@@ -57,6 +57,23 @@ export default function RootLayout() {
                 />
               );
             }
+          }}
+        />
+        <Tabs.Screen
+          name="favourites/index"
+          options={{
+            title: "FAVOURITES",
+            tabBarLabelStyle: {
+              color: COLORS.BLACK[3]
+            },
+
+            tabBarIcon: ({ focused }) => (
+              <Ionicons
+                name={"heart"}
+                color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
+                size={30}
+              />
+            )
           }}
         />
       </Tabs>

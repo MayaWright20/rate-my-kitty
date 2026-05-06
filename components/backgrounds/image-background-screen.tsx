@@ -1,12 +1,13 @@
 import { SharedRef } from "expo";
 import { Image, ImageSource } from "expo-image";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 
 const defaultBackground = require("../../assets/images/backgrounds/cream-patterned-background.png");
 
 interface Props {
   children?: React.ReactNode;
+  style?: ViewStyle;
   source?:
     | string
     | number
@@ -18,7 +19,11 @@ interface Props {
     | undefined;
 }
 
-export default function ImageBackgroundScreen({ children, source }: Props) {
+export default function ImageBackgroundScreen({
+  children,
+  style,
+  source
+}: Props) {
   return (
     <View style={styles.container}>
       <Image
@@ -27,7 +32,7 @@ export default function ImageBackgroundScreen({ children, source }: Props) {
         contentFit="cover"
         pointerEvents="none"
       />
-      <View style={styles.content}>{children}</View>
+      <View style={[styles.content, style]}>{children}</View>
     </View>
   );
 }

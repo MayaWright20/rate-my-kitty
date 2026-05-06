@@ -41,7 +41,7 @@ export default function CircularBTN({
           styles.circle,
           {
             backgroundColor,
-            width: isLarge ? "100%" : "45%",
+            width: isLarge ? "100%" : "70%",
             aspectRatio: isOval ? 1 / 1.2 : 1
           }
         ]}
@@ -68,9 +68,8 @@ const styles = StyleSheet.create({
     borderWidth: 7,
     justifyContent: "center",
     maxHeight: 130,
-    // maxWidth: 100,
+    maxWidth: 100,
     top: "-15%"
-    // width: "70%"
   },
   title: {
     fontSize: 9,

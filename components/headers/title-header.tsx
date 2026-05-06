@@ -31,6 +31,7 @@ export default function TitleHeader({ title, font, subheading }: Props) {
 
 const styles = StyleSheet.create({
   container: {
+    alignSelf: "center",
     flexDirection: "row"
   },
   image: {
@@ -43,7 +44,8 @@ const styles = StyleSheet.create({
   },
   subheading: {
     fontWeight: "semibold",
-    marginTop: 12
+    marginTop: 12,
+    textAlign: "center"
   },
   title: {
     fontSize: 40,

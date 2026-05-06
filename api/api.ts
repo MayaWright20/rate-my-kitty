@@ -5,6 +5,7 @@ const API_KEY = process.env.EXPO_PUBLIC_API_KEY;
 
 type ImageUploadResult = { approved?: number } | string | false;
 type FavouriteResult = { id?: number; message: string };
+
 export type Favourite = {
   id: number;
   image_id: string;

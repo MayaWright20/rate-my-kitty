@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
+import { SwitchBTN } from "@/components/buttons/switch-btn";
 import LogoHeader from "@/components/headers/logo-header";
 import { COLORS } from "@/constants/colors";
 import useProfile from "@/hooks/useProfile";
@@ -17,7 +18,6 @@ import { CatImage } from "@/types";
 
 const GRID_GAP = 12;
 const HORIZONTAL_PADDING = 16;
-const HEADER_CONTENT_OFFSET = 330;
 const IMAGE_BORDER_COLORS = [
   COLORS.BLUE[0],
   COLORS.PINK[1],
@@ -37,10 +37,15 @@ const getImageBorderColor = (id: string) => {
 export default function Index() {
   const { getProfileImages, images, isLoading, errorMessage } = useProfile();
   const { width } = useWindowDimensions();
+
+  const [isGrid, setIsGrid] = useState<boolean>(false);
+
   const featuredImage = images?.[0];
   const thumbnailImages = images?.slice(1) ?? [];
+  const listImages = isGrid ? thumbnailImages : (images ?? []);
   const availableWidth = width - HORIZONTAL_PADDING * 2;
-  const numColumns = 4;
+  const numColumns = useMemo(() => (isGrid ? 4 : 1), [isGrid]);
+  const HEADER_CONTENT_OFFSET = useMemo(() => (isGrid ? 330 : 200), [isGrid]);
   const thumbnailWidth =
     (availableWidth - GRID_GAP * (numColumns - 1)) / numColumns;
 
@@ -52,9 +57,9 @@ export default function Index() {
     <Image
       source={{ uri: item.url }}
       style={[
-        styles.thumbnailImage,
+        isGrid ? styles.thumbnailImage : styles.largeListImage,
         { borderColor: getImageBorderColor(item.id) },
-        { height: thumbnailWidth, width: thumbnailWidth }
+        isGrid ? { height: thumbnailWidth, width: thumbnailWidth } : undefined
       ]}
     />
   );
@@ -63,14 +68,17 @@ export default function Index() {
     <ImageBackgroundScreen>
       <FlatList
         key={numColumns}
-        data={thumbnailImages}
+        data={listImages}
         style={styles.list}
         numColumns={numColumns}
         keyExtractor={(item) => item.id}
         renderItem={renderImage}
         showsVerticalScrollIndicator={false}
         columnWrapperStyle={numColumns > 1 ? styles.thumbnailRow : undefined}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingTop: HEADER_CONTENT_OFFSET }
+        ]}
         ListHeaderComponent={
           <>
             {isLoading && <ActivityIndicator style={styles.loader} />}
@@ -79,10 +87,11 @@ export default function Index() {
               <Text style={styles.errorMessage}>{errorMessage}</Text>
             )}
 
-            {featuredImage && (
+            {isGrid && featuredImage && (
               <Image
                 source={{ uri: featuredImage.url }}
                 style={[
+                  styles.largeImage,
                   styles.featuredImage,
                   { borderColor: getImageBorderColor(featuredImage.id) }
                 ]}
@@ -91,7 +100,8 @@ export default function Index() {
           </>
         }
       />
-      <View pointerEvents="none" style={styles.headerOverlay}>
+      <View pointerEvents="box-none" style={styles.headerOverlay}>
+        <SwitchBTN style={styles.switch} value={isGrid} onChange={setIsGrid} />
         <LogoHeader />
       </View>
     </ImageBackgroundScreen>
@@ -103,11 +113,7 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   featuredImage: {
-    aspectRatio: 1 / 1.5,
-    borderRadius: 15,
-    borderWidth: 5,
-    top: -100,
-    width: "100%"
+    top: -120
   },
   headerOverlay: {
     left: 0,
@@ -116,20 +122,39 @@ const styles = StyleSheet.create({
     top: 0,
     zIndex: 3
   },
+  largeImage: {
+    aspectRatio: 1 / 1.5,
+    borderRadius: 15,
+    borderWidth: 5,
+    width: "100%"
+  },
+  largeListImage: {
+    aspectRatio: 1 / 1.5,
+    borderRadius: 15,
+    borderWidth: 5,
+    marginBottom: GRID_GAP,
+    width: "100%"
+  },
   list: {
     flex: 1,
     zIndex: 1
   },
   listContent: {
     paddingBottom: 32,
-    paddingHorizontal: HORIZONTAL_PADDING,
-    paddingTop: HEADER_CONTENT_OFFSET
+    paddingHorizontal: HORIZONTAL_PADDING
   },
   loader: {
     marginVertical: 16
   },
   safeAreaView: {
     flex: 1
+  },
+  switch: {
+    bottom: "35%",
+    marginRight: 5,
+    position: "absolute",
+    right: 0,
+    zIndex: 10
   },
   thumbnailImage: {
     borderRadius: 8,

@@ -66,6 +66,10 @@ export default function Index() {
 
   return (
     <ImageBackgroundScreen>
+      <View pointerEvents="box-none" style={styles.headerOverlay}>
+        <SwitchBTN style={styles.switch} value={isGrid} onChange={setIsGrid} />
+        <LogoHeader />
+      </View>
       <FlatList
         key={numColumns}
         data={listImages}
@@ -100,15 +104,24 @@ export default function Index() {
           </>
         }
       />
-      <View pointerEvents="box-none" style={styles.headerOverlay}>
-        <SwitchBTN style={styles.switch} value={isGrid} onChange={setIsGrid} />
-        <LogoHeader />
-      </View>
+      {/* <View style={styles.btnsWrapper}>
+        <CircularBTN isLarge backgroundColor={COLORS.GREEN[0]} />
+        <CircularBTN isLarge backgroundColor={COLORS.PINK[1]} />
+      </View> */}
     </ImageBackgroundScreen>
   );
 }
 
 const styles = StyleSheet.create({
+  btnsWrapper: {
+    alignSelf: "center",
+    bottom: "5%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    position: "absolute",
+    width: "80%",
+    zIndex: 10
+  },
   errorMessage: {
     textAlign: "center"
   },

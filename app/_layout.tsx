@@ -48,6 +48,7 @@ export default function RootLayout() {
                 <CircularBTN
                   onPress={onPress}
                   title={"PAWFILE"}
+                  style={styles.container}
                   icon={{
                     name: "paw",
                     size: 60,
@@ -64,6 +65,10 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    top: "-70%"
+  },
   tabBarBackground: {
     alignSelf: "center",
     backgroundColor: COLORS.CREAM[0],

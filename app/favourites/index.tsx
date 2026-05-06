@@ -1,12 +1,13 @@
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
 import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CustomFont from "@/components/headers/title-header";
 import CatImageGallery from "@/components/images/cat-image-gallery";
+import CatLoader from "@/components/loaders/cat-loader";
 import { COLORS } from "@/constants/colors";
 import useFavourites from "@/hooks/useFavourites";
 
@@ -34,7 +35,8 @@ export default function Index() {
           Favourites
         </CustomFont>
         {isLoading && favouriteImages.length === 0 ? (
-          <ActivityIndicator style={styles.loader} />
+          // <ActivityIndicator style={styles.loader} />
+          <CatLoader />
         ) : (
           <CatImageGallery
             images={favouriteImages}
@@ -53,7 +55,8 @@ export default function Index() {
             }
             listHeaderComponent={
               <>
-                {isLoading && <ActivityIndicator style={styles.inlineLoader} />}
+                {isLoading && <CatLoader />}
+                {/* {isLoading && <ActivityIndicator style={styles.inlineLoader} />} */}
                 {errorMessage && (
                   <Text style={styles.errorMessage}>{errorMessage}</Text>
                 )}

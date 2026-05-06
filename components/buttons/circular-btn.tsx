@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import React from "react";
+import React, { useContext } from "react";
 import {
   GestureResponderEvent,
   OpaqueColorValue,
@@ -11,6 +11,8 @@ import {
 } from "react-native";
 
 import { COLORS } from "@/constants/colors";
+import { BORDER_RADIUS } from "@/constants/styles";
+import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 import { Icon } from "@/types";
 
 interface Props {
@@ -20,8 +22,6 @@ interface Props {
   titleColor?: string | OpaqueColorValue;
   style?: ViewStyle;
   backgroundColor?: string | OpaqueColorValue;
-  isLarge?: boolean;
-  isOval?: boolean;
 }
 
 export default function CircularBTN({
@@ -30,10 +30,10 @@ export default function CircularBTN({
   title,
   titleColor,
   style,
-  backgroundColor = COLORS.PURPLE[3],
-  isLarge,
-  isOval
+  backgroundColor = COLORS.PURPLE[3]
 }: Props) {
+  const isScreenPortrait = useContext(IsScreenPortraitContext);
+
   return (
     <TouchableOpacity onPress={onPress} style={style}>
       <View
@@ -41,8 +41,8 @@ export default function CircularBTN({
           styles.circle,
           {
             backgroundColor,
-            width: isLarge ? "100%" : "70%",
-            aspectRatio: isOval ? 1 / 1.2 : 1
+            width: isScreenPortrait ? "70%" : "40%",
+            aspectRatio: 1
           }
         ]}
       >
@@ -63,8 +63,8 @@ export default function CircularBTN({
 const styles = StyleSheet.create({
   circle: {
     alignItems: "center",
-    borderColor: COLORS.CREAM[0],
-    borderRadius: 100,
+    borderColor: COLORS.BLACK[3],
+    borderRadius: BORDER_RADIUS.LARGE,
     borderWidth: 7,
     justifyContent: "center",
     maxHeight: 130,

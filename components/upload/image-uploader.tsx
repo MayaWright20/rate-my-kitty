@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   Alert,
   ImageSourcePropType,
@@ -12,35 +12,64 @@ import {
 } from "react-native";
 
 import { COLORS } from "@/constants/colors";
-import { OPACITY, SCREEN_WIDTH_MARGIN } from "@/constants/styles";
+import {
+  BORDER_RADIUS,
+  OPACITY,
+  SCREEN_WIDTH_MARGIN
+} from "@/constants/styles";
+import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 import CartoonGenerator from "@/helpers/cartoon-generator";
 
-const defaultStar = require("../../assets/images/sparcles/star-purple.png");
+const STAR = require("../../assets/images/sparcles/star-purple.png");
 
 interface Props {
-  getImage: (value: string | null) => void;
+  getImage: (value: ImagePicker.ImagePickerAsset | null) => void;
   resetImages?: boolean;
 }
 
 export default function ImageUploader({ getImage, resetImages }: Props) {
+  const isScreenPortrait = useContext(IsScreenPortraitContext);
   const [image, setImage] = useState<string | null>(null);
   const [cartoon, setCartoon] = useState<null | ImageSourcePropType[]>(
     CartoonGenerator()
   );
+  const objectUrlRef = useRef<string | null>(null);
+
+  const clearObjectUrl = useCallback(() => {
+    if (objectUrlRef.current && typeof URL !== "undefined") {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     if (resetImages) {
+      clearObjectUrl();
       setImage(null);
       setCartoon(null);
     }
-  }, [resetImages]);
+  }, [clearObjectUrl, resetImages]);
+
+  useEffect(() => clearObjectUrl, [clearObjectUrl]);
 
   const onImagePicked = useCallback(
     (result: ImagePicker.ImagePickerSuccessResult) => {
-      setImage(result.assets[0].uri);
-      getImage(result.assets[0].uri);
+      const pickedImage = result.assets[0];
+      const previewUri =
+        pickedImage.file && typeof URL !== "undefined"
+          ? URL.createObjectURL(pickedImage.file)
+          : pickedImage.uri;
+
+      clearObjectUrl();
+
+      if (previewUri !== pickedImage.uri) {
+        objectUrlRef.current = previewUri;
+      }
+
+      setImage(previewUri);
+      getImage(pickedImage);
     },
-    [getImage]
+    [clearObjectUrl, getImage]
   );
 
   const pickImage = async () => {
@@ -69,19 +98,17 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
   };
 
   return (
-    <>
+    <View
+      style={[
+        styles.wrapper,
+        isScreenPortrait === false ? styles.wrapperHorizontal : undefined
+      ]}
+    >
       {image && (
-        <View
-          style={{
-            flexDirection: "row"
-          }}
-        >
+        <View style={styles.previewWrapper}>
           <Image source={{ uri: image }} style={styles.image} />
-          <Image source={defaultStar} style={styles.star} />
-          <Image
-            source={defaultStar}
-            style={[styles.star, styles.startTrailing]}
-          />
+          <Image source={STAR} style={styles.star} />
+          <Image source={STAR} style={[styles.star, styles.startTrailing]} />
           <Image
             source={cartoon && cartoon[0]}
             contentFit="contain"
@@ -117,7 +144,7 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
           </Text>
         </View>
       </Pressable>
-    </>
+    </View>
   );
 }
 
@@ -140,7 +167,7 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: "center",
-    borderRadius: 15,
+    borderRadius: BORDER_RADIUS.MEDIUM,
     borderStyle: "dotted",
     borderWidth: 5,
     justifyContent: "center",
@@ -169,7 +196,7 @@ const styles = StyleSheet.create({
   image: {
     aspectRatio: 1 / 1,
     borderColor: COLORS.PURPLE[1],
-    borderRadius: 15,
+    borderRadius: BORDER_RADIUS.MEDIUM,
     borderWidth: 5,
     marginTop: 25,
     width: SCREEN_WIDTH_MARGIN
@@ -180,6 +207,11 @@ const styles = StyleSheet.create({
   labelSmall: {
     color: COLORS.CREAM[3],
     marginTop: -10
+  },
+  previewWrapper: {
+    alignItems: "center",
+    position: "relative",
+    width: "100%"
   },
   star: {
     aspectRatio: 1,
@@ -207,5 +239,12 @@ const styles = StyleSheet.create({
     color: COLORS.CREAM[3],
     fontSize: 15,
     marginBottom: 10
+  },
+  wrapper: {
+    alignItems: "center",
+    width: "100%"
+  },
+  wrapperHorizontal: {
+    maxWidth: "40%"
   }
 });

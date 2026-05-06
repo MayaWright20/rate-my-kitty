@@ -1,24 +1,50 @@
+import { useFonts } from "@expo-google-fonts/lilita-one";
 import { Image } from "expo-image";
-import { StyleSheet, Text, View } from "react-native";
-
-import { CustomFont } from "../fonts/custom-fonts";
+import React from "react";
+import { StyleSheet, Text, TextProps, View } from "react-native";
 
 const purpleSparcle = require("../../assets/images/sparcles/sparcle-purple.png");
 
-interface Props {
-  title: string;
+type Props = TextProps & {
   font: any;
+  header?: boolean;
   subheading?: string;
-}
+};
 
-export default function TitleHeader({ title, font, subheading }: Props) {
+export default function CustomFont({
+  children,
+  font,
+  header,
+  style,
+  subheading,
+  ...props
+}: Props) {
+  const [fontLoaded] = useFonts({
+    fontFamily: font
+  });
+
+  const text = (
+    <Text
+      {...props}
+      style={[
+        fontLoaded ? { fontFamily: "fontFamily" } : styles.defaultFont,
+        header ? styles.title : undefined,
+        style
+      ]}
+    >
+      {children}
+    </Text>
+  );
+
+  if (!header) {
+    return text;
+  }
+
   return (
     <>
       <View style={styles.container}>
         <Image source={purpleSparcle} style={styles.image} />
-        <CustomFont font={font} style={styles.title}>
-          {title}
-        </CustomFont>
+        {text}
         <Image
           source={purpleSparcle}
           style={[styles.image, styles.imageTrailing]}
@@ -33,6 +59,9 @@ const styles = StyleSheet.create({
   container: {
     alignSelf: "center",
     flexDirection: "row"
+  },
+  defaultFont: {
+    fontWeight: "bold"
   },
   image: {
     aspectRatio: 1,

@@ -57,21 +57,23 @@ export default function CatImageCard({
 }: Props) {
   const favouriteButtonSize = favouriteButton?.size ?? "small";
   const favouriteIconSize = favouriteButtonSize === "large" ? 50 : 29;
-  const favouriteIconOutlineSize = favouriteButtonSize === "large" ? 53 : 31;
   const favouriteIconName = favouriteButton?.isFavourite
     ? "heart"
     : "heart-outline";
 
   const imageElement = (
     <Image
+      cachePolicy="memory-disk"
       contentFit={contentFit}
       contentPosition={contentPosition}
+      recyclingKey={image.id}
       source={{ uri: image.url }}
       style={[
         styles.image,
         { borderColor: getImageBorderColor(image.id) },
         imageStyle
       ]}
+      transition={0}
     />
   );
 

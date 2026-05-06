@@ -1,21 +1,23 @@
 import { Image } from "expo-image";
-import React from "react";
+import React, { useContext } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import Svg, { Defs, LinearGradient, Path, Stop } from "react-native-svg";
 
-const { width } = Dimensions.get("window");
-const HEADER_HEIGHT = 320;
-// const HEADER_TOP_OFFSET = -120;
-// const VISIBLE_HEADER_HEIGHT = HEADER_HEIGHT + HEADER_TOP_OFFSET;
+import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
+
+const { width, height } = Dimensions.get("window");
+const HEADER_HEIGHT = width < height ? 320 : 250;
 
 const logo = require("../../assets/images/logo/logo.png");
 
 function PurpleHeader() {
-  const height = HEADER_HEIGHT;
-
   return (
     <View style={styles.container}>
-      <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+      <Svg
+        width={width}
+        height={HEADER_HEIGHT}
+        viewBox={`0 0 ${width} ${HEADER_HEIGHT}`}
+      >
         <Defs>
           <LinearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
             <Stop offset="0" stopColor="#6B5CF6" />
@@ -26,15 +28,15 @@ function PurpleHeader() {
           d={`
             M0 0
             H${width}
-            V${height - 60}
+            V${HEADER_HEIGHT - 60}
 
-            C${width * 0.85} ${height - 60},
-             ${width * 0.85} ${height - 30},
-             ${width / 1.5} ${height - 30}
+            C${width * 0.85} ${HEADER_HEIGHT - 60},
+             ${width * 0.85} ${HEADER_HEIGHT - 30},
+             ${width / 1.5} ${HEADER_HEIGHT - 30}
 
-            C${width * 0.25} ${height - 40},
-             ${width * 0.25} ${height - 90},
-             0 ${height - 10}
+            C${width * 0.25} ${HEADER_HEIGHT - 40},
+             ${width * 0.25} ${HEADER_HEIGHT - 90},
+             0 ${HEADER_HEIGHT - 10}
 
             Z
           `}
@@ -42,10 +44,10 @@ function PurpleHeader() {
         />
         <Path
           d={`
-            M0 ${height - 160}
-            C40 ${height - 180}, 60 ${height - 120}, 80 ${height - 100}
-            C100 ${height - 80}, 120 ${height - 120}, 110 ${height - 60}
-            C90 ${height - 20}, 40 ${height - 40}, 0 ${height - 30}
+            M0 ${HEADER_HEIGHT - 160}
+            C40 ${HEADER_HEIGHT - 180}, 60 ${HEADER_HEIGHT - 120}, 80 ${HEADER_HEIGHT - 100}
+            C100 ${HEADER_HEIGHT - 80}, 120 ${HEADER_HEIGHT - 120}, 110 ${HEADER_HEIGHT - 60}
+            C90 ${HEADER_HEIGHT - 20}, 40 ${HEADER_HEIGHT - 40}, 0 ${HEADER_HEIGHT - 30}
             Z
           `}
           fill="rgba(255,255,255,0.08)"
@@ -53,10 +55,10 @@ function PurpleHeader() {
 
         <Path
           d={`
-            M${width} ${height - 170}
-            C${width - 40} ${height - 190}, ${width - 60} ${height - 130}, ${width - 90} ${height - 110}
-            C${width - 120} ${height - 90}, ${width - 100} ${height - 60}, ${width - 110} ${height - 40}
-            C${width - 130} ${height - 10}, ${width - 50} ${height - 30}, ${width} ${height - 20}
+            M${width} ${HEADER_HEIGHT - 170}
+            C${width - 40} ${HEADER_HEIGHT - 190}, ${width - 60} ${HEADER_HEIGHT - 130}, ${width - 90} ${HEADER_HEIGHT - 110}
+            C${width - 120} ${HEADER_HEIGHT - 90}, ${width - 100} ${HEADER_HEIGHT - 60}, ${width - 110} ${HEADER_HEIGHT - 40}
+            C${width - 130} ${HEADER_HEIGHT - 10}, ${width - 50} ${HEADER_HEIGHT - 30}, ${width} ${HEADER_HEIGHT - 20}
             Z
           `}
           fill="rgba(255,255,255,0.08)"
@@ -67,10 +69,21 @@ function PurpleHeader() {
 }
 
 export default function LogoHeader() {
+  const isScreenPortraitContext = useContext(IsScreenPortraitContext);
   return (
     <View style={styles.wrapper}>
       <PurpleHeader />
-      <Image style={styles.logo} source={logo} contentFit="contain" />
+      <Image
+        style={[
+          styles.logo,
+          {
+            top: isScreenPortraitContext ? 0 : 0,
+            width: isScreenPortraitContext ? "55%" : "15%"
+          }
+        ]}
+        source={logo}
+        contentFit="scale-down"
+      />
     </View>
   );
 }
@@ -79,19 +92,12 @@ const styles = StyleSheet.create({
   container: {
     position: "absolute",
     top: -120,
-    width: "100%",
+    width: width,
     zIndex: 3
   },
   logo: {
-    alignSelf: "center",
-    height: "100%",
-    position: "relative",
-    top: -55,
-    width: "55%",
+    aspectRatio: 1,
     zIndex: 3
-  },
-  safeAreaView: {
-    flex: 1
   },
   wrapper: {
     alignItems: "center",

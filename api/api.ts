@@ -1,16 +1,13 @@
-import { CatImage, ImageUpload } from "../types";
+import {
+  CatImage,
+  Favourite,
+  FavouriteResult,
+  ImageUpload,
+  ImageUploadResult
+} from "../types";
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 const API_KEY = process.env.EXPO_PUBLIC_API_KEY;
-
-type ImageUploadResult = { approved?: number } | string | false;
-type FavouriteResult = { id?: number; message: string };
-export type Favourite = {
-  id: number;
-  image_id: string;
-  image?: CatImage;
-  sub_id?: string;
-};
 
 const parseResponseBody = async (response: Response) => {
   const responseText = await response.text();
@@ -53,18 +50,28 @@ const buildFavouritesUrl = (subId?: string) => {
   return url.toString();
 };
 
+const appendImageUploadFile = (
+  formData: FormData,
+  file: ImageUpload["file"]
+) => {
+  if (file.file) {
+    formData.append("file", file.file);
+    return;
+  }
+
+  formData.append("file", {
+    uri: file.uri,
+    name: file.fileName ?? "cat.jpg",
+    type: file.mimeType ?? "image/jpeg"
+  } as any);
+};
+
 export const uploadImage = async ({
-  file,
-  sub_id,
-  breed_ids
+  file
 }: ImageUpload): Promise<ImageUploadResult> => {
   const formData = new FormData();
 
-  formData.append("file", {
-    uri: file,
-    name: "cat.jpg",
-    type: "image/jpeg"
-  } as any);
+  appendImageUploadFile(formData, file);
 
   try {
     const response = await fetch(`${BASE_URL}/images/upload`, {

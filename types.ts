@@ -1,8 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ImagePickerAsset } from "expo-image-picker";
 import { OpaqueColorValue } from "react-native";
 
 export interface ImageUpload {
-  file: any;
+  file: ImagePickerAsset;
   sub_id?: string;
   breed_ids?: string[];
 }
@@ -30,3 +31,14 @@ export interface CatImage {
   animals: string[];
   categories: string[];
 }
+
+export type Favourite = {
+  id: number;
+  image_id: string;
+  image?: CatImage;
+  sub_id?: string;
+};
+
+export type ImageUploadResult = { approved?: number } | string | false;
+
+export type FavouriteResult = { id?: number; message: string };

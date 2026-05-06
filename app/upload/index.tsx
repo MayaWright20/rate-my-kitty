@@ -1,44 +1,32 @@
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
 import { router } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { uploadImage } from "@/api/api";
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CTA_BTN from "@/components/buttons/cta-btn";
-import TitleHeader from "@/components/headers/title-header";
+import CustomFont from "@/components/headers/title-header";
+import CatLoader from "@/components/loaders/cat-loader";
 import ImageUploader from "@/components/upload/image-uploader";
 import { COLORS } from "@/constants/colors";
 import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
+import useUploadImage from "@/hooks/useUploadImage";
 
 export default function Index() {
-  const [image, setImage] = useState<null | string>(null);
-  const [errorMessage, setErrorMessage] = useState<string>();
-  const isSubmitBtnDisabled = useMemo(
-    () => !image || !!errorMessage,
-    [image, errorMessage]
-  );
-
-  const onChangeImage = useCallback(
-    (value: string | null) => {
-      setImage(value);
-      setErrorMessage(undefined);
-    },
-    [setImage]
-  );
+  const {
+    errorMessage,
+    image,
+    isSubmitBtnDisabled,
+    onChangeImage,
+    uploadSelectedImage,
+    isUploading
+  } = useUploadImage();
 
   const uploadImageHandler = async () => {
-    const result = await uploadImage({ file: image });
+    const isUploaded = await uploadSelectedImage();
 
-    if (typeof result === "object" && result && result.approved === 1) {
+    if (isUploaded) {
       router.push("/");
-      setImage(null);
-      onChangeImage(null);
-    } else {
-      setErrorMessage(
-        typeof result === "string" ? result : "Image upload failed"
-      );
     }
   };
   return (
@@ -50,11 +38,14 @@ export default function Index() {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.scrollView}
         >
-          <TitleHeader
-            title={"Submit your cat"}
+          <CustomFont
+            header
             font={LilitaOne_400Regular}
             subheading="Upload a photo of your cat to put them in the vote!"
-          />
+          >
+            Submit your cat
+          </CustomFont>
+          {isUploading && <CatLoader />}
           <ImageUploader
             resetImages={image === null}
             getImage={(value) => onChangeImage(value)}

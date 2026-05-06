@@ -3,7 +3,7 @@
     "name": "rate-my-kitty",
     "slug": "rate-my-kitty",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "horizontal",
     "icon": "./assets/images/icon.png",
     "scheme": "ratemykitty",
     "userInterfaceStyle": "automatic",

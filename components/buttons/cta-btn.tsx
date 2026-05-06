@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { SupermercadoOne_400Regular } from "@expo-google-fonts/supermercado-one/400Regular";
+import { useContext } from "react";
 import {
   GestureResponderEvent,
   StyleSheet,
@@ -7,10 +8,11 @@ import {
 } from "react-native";
 
 import { COLORS } from "@/constants/colors";
-import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
+import { BORDER_RADIUS, SCREEN_WIDTH_MARGIN } from "@/constants/styles";
+import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 import { Icon } from "@/types";
 
-import { CustomFont } from "../fonts/custom-fonts";
+import CustomFont from "../headers/title-header";
 
 interface Props {
   title: string;
@@ -20,12 +22,15 @@ interface Props {
 }
 
 export default function CTA_BTN({ title, icon, onPress, isDisabled }: Props) {
+  const isScreenPortrait = useContext(IsScreenPortraitContext);
+
   return (
     <TouchableOpacity
       onPress={onPress}
       disabled={isDisabled}
       style={[
         styles.container,
+        isScreenPortrait === false ? styles.containerHorizontal : undefined,
         { backgroundColor: isDisabled ? COLORS.BLACK[1] : COLORS.PURPLE[3] }
       ]}
     >
@@ -47,11 +52,13 @@ export default function CTA_BTN({ title, icon, onPress, isDisabled }: Props) {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    borderRadius: 150,
+    borderRadius: BORDER_RADIUS.LARGE,
     flexDirection: "row",
-    height: 50,
     justifyContent: "center",
     width: SCREEN_WIDTH_MARGIN
+  },
+  containerHorizontal: {
+    maxWidth: "40%"
   },
   icon: {
     marginRight: 5

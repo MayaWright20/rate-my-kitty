@@ -1,5 +1,3 @@
-import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
-import { Image } from "expo-image";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -7,13 +5,11 @@ import { StyleSheet, Text, View } from "react-native";
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import { SwitchBTN } from "@/components/buttons/switch-btn";
 import LogoHeader from "@/components/headers/logo-header";
-import CustomFont from "@/components/headers/title-header";
 import CatImageGallery from "@/components/images/cat-image-gallery";
+import CatPlaceholder from "@/components/images/placeholder";
 import CatLoader from "@/components/loaders/cat-loader";
 import useFavourites from "@/hooks/useFavourites";
 import useProfile from "@/hooks/useProfile";
-
-const NO_IMAGES_PLACEHOLDER = require("../assets/images/backgrounds/boa-cat.png");
 
 export default function Index() {
   const { getProfileImages, images, isLoading, errorMessage } = useProfile();
@@ -52,7 +48,6 @@ export default function Index() {
         <LogoHeader />
       </View>
       {isLoading && images.length === 0 ? (
-        // <ActivityIndicator style={styles.initialLoader} />
         <CatLoader />
       ) : images.length > 0 ? (
         <>
@@ -71,7 +66,6 @@ export default function Index() {
             listHeaderComponent={
               <>
                 {isLoading && <CatLoader />}
-                {/* {isLoading && <ActivityIndicator style={styles.loader} />} */}
                 {errorMessage && (
                   <Text style={styles.errorMessage}>{errorMessage}</Text>
                 )}
@@ -80,21 +74,10 @@ export default function Index() {
           />
         </>
       ) : (
-        <View style={styles.noImagesPlaceholderWrapper}>
-          <Image
-            source={NO_IMAGES_PLACEHOLDER}
-            style={styles.noImagesPlaceholder}
-            contentFit="contain"
-            contentPosition="center"
-          />
-          <CustomFont
-            header
-            font={LilitaOne_400Regular}
-            subheading="Go to the upload screen to get started!"
-          >
-            No Kitties yet!
-          </CustomFont>
-        </View>
+        <CatPlaceholder
+          title="No Kitties yet!"
+          subheading="Go to the upload screen to get started!"
+        />
       )}
     </ImageBackgroundScreen>
   );
@@ -126,9 +109,6 @@ const styles = StyleSheet.create({
   imageBackground: {
     justifyContent: "center"
   },
-  initialLoader: {
-    alignSelf: "center"
-  },
   list: {
     flex: 1,
     zIndex: 1
@@ -136,17 +116,10 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 32
   },
-  loader: {
-    marginVertical: 16
-  },
   noImagesPlaceholder: {
     alignSelf: "center",
     height: "100%",
     width: "80%"
-  },
-  noImagesPlaceholderText: {
-    fontSize: 40,
-    textAlign: "center"
   },
   noImagesPlaceholderWrapper: {
     alignSelf: "center",

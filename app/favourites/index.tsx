@@ -1,12 +1,13 @@
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
 import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CustomFont from "@/components/headers/title-header";
 import CatImageGallery from "@/components/images/cat-image-gallery";
+import CatPlaceholder from "@/components/images/placeholder";
 import CatLoader from "@/components/loaders/cat-loader";
 import { COLORS } from "@/constants/colors";
 import useFavourites from "@/hooks/useFavourites";
@@ -35,7 +36,6 @@ export default function Index() {
           Favourites
         </CustomFont>
         {isLoading && favouriteImages.length === 0 ? (
-          // <ActivityIndicator style={styles.loader} />
           <CatLoader />
         ) : (
           <CatImageGallery
@@ -46,17 +46,14 @@ export default function Index() {
             onToggleFavourite={toggleFavourite}
             contentContainerStyle={styles.listContent}
             listEmptyComponent={
-              <View style={styles.emptyWrapper}>
-                <Text style={styles.emptyTitle}>No favourites yet!</Text>
-                <Text style={styles.emptyText}>
-                  Tap the heart on a kitty to save it here.
-                </Text>
-              </View>
+              <CatPlaceholder
+                title="No favourites yet!"
+                subheading="Tap the heart on a kitty to save it here."
+              />
             }
             listHeaderComponent={
               <>
                 {isLoading && <CatLoader />}
-                {/* {isLoading && <ActivityIndicator style={styles.inlineLoader} />} */}
                 {errorMessage && (
                   <Text style={styles.errorMessage}>{errorMessage}</Text>
                 )}
@@ -73,23 +70,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  emptyText: {
-    color: COLORS.BLACK[2],
-    fontSize: 14,
-    marginTop: 6,
-    textAlign: "center"
-  },
-  emptyTitle: {
-    color: COLORS.BLACK[3],
-    fontSize: 22,
-    fontWeight: "bold",
-    textAlign: "center"
-  },
-  emptyWrapper: {
-    alignItems: "center",
-    paddingHorizontal: 24,
-    paddingTop: 80
-  },
   errorMessage: {
     color: COLORS.RED[0],
     marginBottom: 12,
@@ -101,8 +81,5 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 120,
     paddingTop: 24
-  },
-  loader: {
-    marginTop: 80
   }
 });

@@ -1,49 +1,30 @@
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
-import { ImagePickerAsset } from "expo-image-picker";
 import { router } from "expo-router";
-import { useCallback, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { uploadImage } from "@/api/api";
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CTA_BTN from "@/components/buttons/cta-btn";
 import CustomFont from "@/components/headers/title-header";
 import ImageUploader from "@/components/upload/image-uploader";
 import { COLORS } from "@/constants/colors";
 import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
+import useUploadImage from "@/hooks/useUploadImage";
 
 export default function Index() {
-  const [image, setImage] = useState<ImagePickerAsset | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string>();
-  const isSubmitBtnDisabled = useMemo(
-    () => !image || !!errorMessage,
-    [image, errorMessage]
-  );
-
-  const onChangeImage = useCallback(
-    (value: ImagePickerAsset | null) => {
-      setImage(value);
-      setErrorMessage(undefined);
-    },
-    [setImage]
-  );
+  const {
+    errorMessage,
+    image,
+    isSubmitBtnDisabled,
+    onChangeImage,
+    uploadSelectedImage
+  } = useUploadImage();
 
   const uploadImageHandler = async () => {
-    if (!image) {
-      return;
-    }
+    const isUploaded = await uploadSelectedImage();
 
-    const result = await uploadImage({ file: image });
-
-    if (typeof result === "object" && result && result.approved === 1) {
+    if (isUploaded) {
       router.push("/");
-      setImage(null);
-      onChangeImage(null);
-    } else {
-      setErrorMessage(
-        typeof result === "string" ? result : "Image upload failed"
-      );
     }
   };
   return (

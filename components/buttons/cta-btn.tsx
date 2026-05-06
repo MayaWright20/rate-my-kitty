@@ -1,5 +1,5 @@
-import { SupermercadoOne_400Regular } from "@expo-google-fonts/supermercado-one/400Regular";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { SupermercadoOne_400Regular } from "@expo-google-fonts/supermercado-one/400Regular";
 import { useContext } from "react";
 import {
   GestureResponderEvent,

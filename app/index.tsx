@@ -4,26 +4,26 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
-import { getFavourites, toggleFavouriteItem } from "@/api/api";
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import { SwitchBTN } from "@/components/buttons/switch-btn";
 import LogoHeader from "@/components/headers/logo-header";
 import CustomFont from "@/components/headers/title-header";
 import CatImageGallery from "@/components/images/cat-image-gallery";
+import useFavourites from "@/hooks/useFavourites";
 import useProfile from "@/hooks/useProfile";
 
 const NO_IMAGES_PLACEHOLDER = require("../assets/images/backgrounds/boa-cat.png");
 
 export default function Index() {
   const { getProfileImages, images, isLoading, errorMessage } = useProfile();
+  const {
+    favouriteImageIds,
+    favouriteLoadingImageIds,
+    loadFavouriteImageIds,
+    toggleFavourite
+  } = useFavourites();
 
   const [isGrid, setIsGrid] = useState<boolean>(false);
-  const [favouriteImageIds, setFavouriteImageIds] = useState<
-    Record<string, boolean>
-  >({});
-  const [favouriteLoadingImageIds, setFavouriteLoadingImageIds] = useState<
-    Record<string, boolean>
-  >({});
 
   const listImages = images ?? [];
   const HEADER_CONTENT_OFFSET = useMemo(() => (isGrid ? 170 : 200), [isGrid]);
@@ -31,53 +31,11 @@ export default function Index() {
   useFocusEffect(
     useCallback(() => {
       const loadImagesAndFavourites = async () => {
-        const [, favourites] = await Promise.all([
-          getProfileImages(),
-          getFavourites()
-        ]);
-
-        setFavouriteImageIds(
-          favourites.reduce<Record<string, boolean>>(
-            (favouriteIds, favourite) => ({
-              ...favouriteIds,
-              [favourite.image_id]: true
-            }),
-            {}
-          )
-        );
+        await Promise.all([getProfileImages(), loadFavouriteImageIds()]);
       };
 
       loadImagesAndFavourites();
-    }, [getProfileImages])
-  );
-
-  const toggleFavourite = useCallback(
-    async (imageId: string) => {
-      if (favouriteLoadingImageIds[imageId]) {
-        return;
-      }
-
-      setFavouriteLoadingImageIds((currentIds) => ({
-        ...currentIds,
-        [imageId]: true
-      }));
-
-      try {
-        const result = await toggleFavouriteItem(imageId);
-        setFavouriteImageIds((currentFavouriteImageIds) => ({
-          ...currentFavouriteImageIds,
-          [imageId]: result.isFavourite
-        }));
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setFavouriteLoadingImageIds((currentIds) => ({
-          ...currentIds,
-          [imageId]: false
-        }));
-      }
-    },
-    [favouriteLoadingImageIds]
+    }, [getProfileImages, loadFavouriteImageIds])
   );
 
   return (

@@ -2,8 +2,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, Tabs, usePathname } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
+import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CircularBTN from "@/components/buttons/circular-btn";
-import ImageBackgroundScreen from "@/components/screens/image-background-screen";
 import { COLORS } from "@/constants/colors";
 import { OPACITY } from "@/constants/styles";
 

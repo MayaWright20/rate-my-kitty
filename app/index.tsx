@@ -9,8 +9,8 @@ import {
   View
 } from "react-native";
 
+import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import LogoHeader from "@/components/headers/logo-header";
-import ImageBackgroundScreen from "@/components/screens/image-background-screen";
 import { COLORS } from "@/constants/colors";
 import useProfile from "@/hooks/useProfile";
 import { CatImage } from "@/types";

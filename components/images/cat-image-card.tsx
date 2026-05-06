@@ -57,7 +57,6 @@ export default function CatImageCard({
 }: Props) {
   const favouriteButtonSize = favouriteButton?.size ?? "small";
   const favouriteIconSize = favouriteButtonSize === "large" ? 50 : 29;
-  const favouriteIconOutlineSize = favouriteButtonSize === "large" ? 53 : 31;
   const favouriteIconName = favouriteButton?.isFavourite
     ? "heart"
     : "heart-outline";

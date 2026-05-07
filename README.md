@@ -1,50 +1,97 @@
-# Welcome to your Expo app 👋
+# Rate My Kitty
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Rate My Kitty is a playful Expo app where users can submit cat photos, browse uploaded kitties, vote on them, and save their favourites.
 
-## Get started
+<p align="center">
+  <img src="./assets/images/logo/logo.png" alt="Rate My Kitty logo" width="240" />
+</p>
 
-1. Install dependencies
+## App Preview
 
-   ```bash
-   npm install
-   ```
+### Video
 
-2. Start the app
+Place a demo recording at `docs/media/rate-my-kitty-demo.mp4` to show the app in action.
 
-   ```bash
-   npx expo start
-   ```
+<video src="./docs/media/rate-my-kitty-demo.mp4" controls width="320">
+  Your browser does not support embedded videos.
+</video>
 
-In the output, you'll find options to open the app in a
+### Images
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+<p align="center">
+  <img src="./assets/images/backgrounds/boa-cat.png" alt="Cat app background" width="220" />
+  <img src="./assets/images/cartoons/cartoon-1.png" alt="Cartoon cat" width="150" />
+  <img src="./assets/images/badges/badge-10.png" alt="Rating badge" width="120" />
+</p>
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Features
 
-## Get a fresh project
+- Upload cat images from your device.
+- Browse uploaded cats in a swipeable gallery or grid layout.
+- Upvote and downvote each cat.
+- Save cats to a favourites tab.
+- View custom empty, loading, and error states.
+- Uses The Cat API for uploads, favourites, and votes.
 
-When you're ready, run:
+## Built With
+
+- [Expo](https://expo.dev/)
+- [Expo Router](https://docs.expo.dev/router/introduction/)
+- [React Native](https://reactnative.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [The Cat API](https://thecatapi.com/)
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js
+- npm
+- Expo Go, an iOS simulator, or an Android emulator
+- A The Cat API key
+
+### Installation
+
+Install the project dependencies:
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Create a `.env` file in the project root:
 
-## Learn more
+```bash
+EXPO_PUBLIC_BASE_URL=https://api.thecatapi.com/v1
+EXPO_PUBLIC_API_KEY=your_api_key_here
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Start the development server:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm start
+```
 
-## Join the community
+Then follow the Expo terminal instructions to open the app on your preferred device or simulator.
 
-Join our community of developers creating universal apps.
+## Scripts
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npm start        # Start the Expo development server
+npm run ios      # Start the app in an iOS simulator
+npm run android  # Start the app in an Android emulator
+npm run web      # Start the app on web
+npm run lint     # Run Expo linting
+```
+
+## Project Structure
+
+```text
+app/          App routes and tab navigation
+api/          The Cat API helpers
+assets/       Images, icons, backgrounds, and animations
+components/   Reusable UI components
+constants/    Shared colors and layout values
+context/      App-wide voting, favourites, and orientation state
+hooks/        Feature hooks for uploads, profile images, votes, and favourites
+helpers/      Image caching and helper utilities
+```

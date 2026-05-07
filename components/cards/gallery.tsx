@@ -19,9 +19,13 @@ const HORIZONTAL_PADDING = 16;
 const GRID_MIN_THUMBNAIL_WIDTH = 140; // Change to 340
 const GRID_MAX_COLUMNS = 4;
 const GRID_MAX_PORTRAIT_COLUMNS = 2;
+const ACCESSIBILITY_LABEL_FAVOURITE = "Favourite cat";
+const ACCESSIBILITY_LABEL_UNFAVOURITE = "Unfavourite cat";
+const HORIZONAL_WIDTH_LARGE_IMAGE = "50%";
+const LIST_CONTENT_MARGIN_TOP = 35;
+const PORTRAIT_WIDTH_LARGE_IMAGE = "100%";
 
 type Props = {
-  centerListImagesOnHorizontal?: boolean;
   contentContainerStyle?: StyleProp<ViewStyle>;
   favouriteImageIds: Record<string, boolean>;
   favouriteLoadingImageIds?: Record<string, boolean>;
@@ -34,7 +38,6 @@ type Props = {
 };
 
 export default function Gallery({
-  centerListImagesOnHorizontal,
   contentContainerStyle,
   favouriteImageIds,
   favouriteLoadingImageIds = {},
@@ -74,26 +77,16 @@ export default function Gallery({
   const renderImage = ({ item }: { item: CatImage }) => {
     const isLandscape =
       item.width && item.height && !isGrid && item.width > item.height;
-    const shouldCenterListImage =
-      centerListImagesOnHorizontal && !isGrid && !isScreenPortrait;
 
     return (
       <Card
         image={item}
         contentFit="cover"
         contentPosition="center"
-        wrapperStyle={
-          shouldCenterListImage
-            ? {
-                alignSelf: "center",
-                width: width * 0.4
-              }
-            : undefined
-        }
         favouriteButton={{
           accessibilityLabel: favouriteImageIds[item.id]
-            ? "Unfavourite image"
-            : "Favourite image",
+            ? ACCESSIBILITY_LABEL_UNFAVOURITE
+            : ACCESSIBILITY_LABEL_FAVOURITE,
           disabled: !!favouriteLoadingImageIds[item.id],
           isFavourite: !!favouriteImageIds[item.id],
           onPress: () => onToggleFavourite(item.id, item),
@@ -106,14 +99,12 @@ export default function Gallery({
                 height: thumbnailWidth,
                 width: thumbnailWidth
               }
-            : undefined,
+            : {
+                width: isScreenPortrait
+                  ? PORTRAIT_WIDTH_LARGE_IMAGE
+                  : HORIZONAL_WIDTH_LARGE_IMAGE
+              },
           {
-            width:
-              isLandscape || shouldCenterListImage
-                ? "100%"
-                : isGrid
-                  ? thumbnailWidth
-                  : "100%",
             aspectRatio: isLandscape ? 2 / 1.1 : isGrid ? 1 : 1.7 / 2
           }
         ]}
@@ -140,12 +131,15 @@ export default function Gallery({
 
 const styles = StyleSheet.create({
   largeListImage: {
+    alignSelf: "center",
     backgroundColor: COLORS.CREAM[0],
     borderRadius: BORDER_RADIUS.MEDIUM,
     borderWidth: BORDER_WIDTH.MEDIUM,
-    marginBottom: GRID_GAP
+    marginBottom: GRID_GAP,
+    position: "relative"
   },
   listContent: {
+    marginTop: LIST_CONTENT_MARGIN_TOP,
     paddingHorizontal: HORIZONTAL_PADDING
   },
   thumbnailImage: {

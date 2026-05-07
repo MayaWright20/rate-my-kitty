@@ -53,7 +53,6 @@ export default function Index() {
       ) : images.length > 0 ? (
         <>
           <Gallery
-            centerListImagesOnHorizontal
             images={listImages}
             isGrid={isGrid}
             listStyle={styles.list}

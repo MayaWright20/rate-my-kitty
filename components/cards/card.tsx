@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { ComponentProps, ReactNode } from "react";
+import { ComponentProps } from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 
 import { COLORS } from "@/constants/colors";
@@ -12,7 +12,6 @@ import VoteButton from "../buttons/voting-btn";
 type ExpoImageProps = ComponentProps<typeof Image>;
 
 interface Props {
-  children?: ReactNode;
   contentFit?: ExpoImageProps["contentFit"];
   contentPosition?: ExpoImageProps["contentPosition"];
   favouriteButton?: {
@@ -36,7 +35,6 @@ const IMAGE_BORDER_COLORS = [
 ];
 
 export default function Card({
-  children,
   contentFit = "cover",
   contentPosition = "center",
   favouriteButton,
@@ -45,48 +43,47 @@ export default function Card({
   wrapperStyle
 }: Props) {
   const { count, downvote, upvote } = useVoting(image.id);
+  const borderColor =
+    IMAGE_BORDER_COLORS[Math.floor(Math.random() * IMAGE_BORDER_COLORS.length)];
 
-  if (children || favouriteButton || wrapperStyle) {
-    return (
-      <View style={[styles.wrapper, wrapperStyle]}>
-        <Image
-          cachePolicy="memory-disk"
-          contentFit={contentFit}
-          contentPosition={contentPosition}
-          recyclingKey={image.id}
-          source={{ uri: image.url }}
-          style={[
-            styles.image,
-            {
-              borderColor:
-                IMAGE_BORDER_COLORS[
-                  Math.floor(Math.random() * IMAGE_BORDER_COLORS.length)
-                ]
-            },
-            imageStyle
-          ]}
+  return (
+    <View
+      style={[
+        styles.wrapper,
+        imageStyle as StyleProp<ViewStyle>,
+        { borderColor },
+        wrapperStyle
+      ]}
+    >
+      <Image
+        cachePolicy="memory-disk"
+        contentFit={contentFit}
+        contentPosition={contentPosition}
+        recyclingKey={image.id}
+        source={{ uri: image.url }}
+        style={styles.image}
+      />
+      {favouriteButton && (
+        <FavouriteIconButton
+          accessibilityLabel={favouriteButton.accessibilityLabel}
+          disabled={favouriteButton.disabled}
+          isFavourite={favouriteButton.isFavourite}
+          onPress={favouriteButton.onPress}
+          size={favouriteButton.size}
         />
-        {favouriteButton && (
-          <FavouriteIconButton
-            accessibilityLabel={favouriteButton.accessibilityLabel}
-            disabled={favouriteButton.disabled}
-            isFavourite={favouriteButton.isFavourite}
-            onPress={favouriteButton.onPress}
-            size={favouriteButton.size}
-          />
-        )}
-        <VoteButton count={count} onDownvote={downvote} onUpvote={upvote} />
-        {children}
-      </View>
-    );
-  }
+      )}
+      <VoteButton count={count} onDownvote={downvote} onUpvote={upvote} />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   image: {
-    backgroundColor: COLORS.CREAM[0]
+    ...StyleSheet.absoluteFillObject
   },
   wrapper: {
+    backgroundColor: COLORS.CREAM[0],
+    overflow: "hidden",
     position: "relative"
   }
 });

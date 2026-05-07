@@ -7,15 +7,11 @@ import ImageBackgroundScreen from "@/components/backgrounds/image-background-scr
 import CircularBTN from "@/components/buttons/circular-btn";
 import { COLORS } from "@/constants/colors";
 import { BORDER_RADIUS, OPACITY } from "@/constants/styles";
-import {
-  FavouritesContext,
-  useFavouritesProviderValue
-} from "@/context/favourites-context";
+import { FavouritesContext } from "@/context/favourites-context";
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
-import {
-  useVotingProviderValue,
-  VotingContext
-} from "@/context/voting-context";
+import { VotingContext } from "@/context/voting-context";
+import { useFavouritesProviderValue } from "@/hooks/useFavourites";
+import { useVotingProviderValue } from "@/hooks/useVoting";
 
 export default function RootLayout() {
   const pathname = usePathname();

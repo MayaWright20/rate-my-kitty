@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { COLORS } from "@/constants/colors";
-import { BORDER_RADIUS } from "@/constants/styles";
+import { BORDER_RADIUS, BORDER_WIDTH, FONT_SIZE } from "@/constants/styles";
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 import { Icon } from "@/types";
 
@@ -23,6 +23,9 @@ interface Props {
   style?: ViewStyle;
   backgroundColor?: string | OpaqueColorValue;
 }
+
+const PORTRAIT_SCREEN_WIDTH = "70%";
+const HORIZONAL_SCREEN_WIDTH = "40%";
 
 export default function CircularBTN({
   icon,
@@ -41,8 +44,9 @@ export default function CircularBTN({
           styles.circle,
           {
             backgroundColor,
-            width: isScreenPortrait ? "70%" : "40%",
-            aspectRatio: 1
+            width: isScreenPortrait
+              ? PORTRAIT_SCREEN_WIDTH
+              : HORIZONAL_SCREEN_WIDTH
           }
         ]}
       >
@@ -63,16 +67,17 @@ export default function CircularBTN({
 const styles = StyleSheet.create({
   circle: {
     alignItems: "center",
+    aspectRatio: 1,
     borderColor: COLORS.BLACK[3],
     borderRadius: BORDER_RADIUS.LARGE,
-    borderWidth: 7,
+    borderWidth: BORDER_WIDTH.MEDIUM,
     justifyContent: "center",
     maxHeight: 130,
     maxWidth: 100,
     top: "-15%"
   },
   title: {
-    fontSize: 9,
+    fontSize: FONT_SIZE.SMALL,
     fontWeight: "bold",
     textTransform: "uppercase",
     top: "-17%"

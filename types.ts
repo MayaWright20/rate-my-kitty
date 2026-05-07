@@ -42,3 +42,15 @@ export type Favourite = {
 export type ImageUploadResult = { approved?: number } | string | false;
 
 export type FavouriteResult = { id?: number; message: string };
+
+export type VoteValue = 1 | 0;
+
+export type Vote = {
+  country_code?: string;
+  created_at?: string;
+  id: number;
+  image?: CatImage;
+  image_id: string;
+  sub_id?: string;
+  value: VoteValue;
+};

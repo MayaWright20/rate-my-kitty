@@ -5,11 +5,12 @@ import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
+import Gallery from "@/components/cards/gallery";
+import CatPlaceholder from "@/components/cards/placeholder";
 import CustomFont from "@/components/headers/title-header";
-import CatImageGallery from "@/components/images/cat-image-gallery";
-import CatPlaceholder from "@/components/images/placeholder";
 import CatLoader from "@/components/loaders/cat-loader";
 import { COLORS } from "@/constants/colors";
+import { MARGIN } from "@/constants/styles";
 import useFavourites from "@/hooks/useFavourites";
 
 export default function Index() {
@@ -38,7 +39,7 @@ export default function Index() {
         {isLoading && favouriteImages.length === 0 ? (
           <CatLoader />
         ) : (
-          <CatImageGallery
+          <Gallery
             images={favouriteImages}
             isGrid
             favouriteImageIds={favouriteImagesById}
@@ -73,17 +74,16 @@ const styles = StyleSheet.create({
     flex: 1
   },
   emtyListWrapper: {
-    // flex: 1,
     height: "100%",
     width: "100%"
   },
   errorMessage: {
     color: COLORS.RED[0],
-    marginBottom: 12,
+    marginBottom: MARGIN.X_LARGE,
     textAlign: "center"
   },
   inlineLoader: {
-    marginBottom: 12
+    marginBottom: MARGIN.X_LARGE
   },
   listContent: {
     paddingBottom: 120,

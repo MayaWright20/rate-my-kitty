@@ -14,6 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { COLORS } from "@/constants/colors";
+import { BORDER_WIDTH, FONT_SIZE } from "@/constants/styles";
 
 type Props = {
   value: boolean;
@@ -23,10 +24,10 @@ type Props = {
   style?: StyleProp<ViewStyle>;
 };
 
-const SWITCH_W = 108;
-const SWITCH_H = 42;
+const SWITCH_WIDTH = 108;
+const SWITCH_HEIGHT = 42;
 const PADDING = 4;
-const THUMB_W = (SWITCH_W - PADDING * 2) / 2;
+const ACTIVE_BTN_WIDTH = (SWITCH_WIDTH - PADDING * 2) / 2;
 
 export function SwitchBTN({
   value,
@@ -45,8 +46,8 @@ export function SwitchBTN({
     });
   }, [value, progress]);
 
-  const thumbStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: progress.value * THUMB_W }]
+  const activeBtnStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: progress.value * ACTIVE_BTN_WIDTH }]
   }));
 
   return (
@@ -57,7 +58,7 @@ export function SwitchBTN({
       accessibilityState={{ checked: value }}
       hitSlop={12}
     >
-      <Animated.View style={[styles.thumb, thumbStyle]} />
+      <Animated.View style={[styles.active, activeBtnStyle]} />
 
       <View style={styles.labelRow}>
         <Text style={[styles.label, !value && styles.activeLabel]}>
@@ -74,16 +75,26 @@ export function SwitchBTN({
 export default memo(SwitchBTN);
 
 const styles = StyleSheet.create({
+  active: {
+    backgroundColor: COLORS.CREAM[0],
+    borderRadius: SWITCH_HEIGHT / 2,
+    borderWidth: BORDER_WIDTH.SMALL,
+    height: SWITCH_HEIGHT - PADDING * 2,
+    left: PADDING / 2,
+    position: "absolute",
+    top: PADDING / 2,
+    width: ACTIVE_BTN_WIDTH
+  },
   activeLabel: {
     color: COLORS.BLACK[3]
   },
   label: {
-    color: "rgba(255,255,255,0.55)",
-    fontSize: 11,
+    color: COLORS.CREAM[0],
+    fontSize: FONT_SIZE.SMALL,
     fontWeight: "700",
     letterSpacing: 0.8,
     textAlign: "center",
-    width: THUMB_W
+    width: ACTIVE_BTN_WIDTH
   },
   labelRow: {
     alignItems: "center",
@@ -94,21 +105,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: COLORS.GREEN[0],
     borderColor: COLORS.BLACK[3],
-    borderRadius: SWITCH_H / 2,
-    borderWidth: 2,
-    height: SWITCH_H,
+    borderRadius: SWITCH_HEIGHT / 2,
+    borderWidth: BORDER_WIDTH.SMALL,
+    height: SWITCH_HEIGHT,
     overflow: "hidden",
     padding: PADDING,
-    width: SWITCH_W
-  },
-  thumb: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: SWITCH_H / 2,
-    borderWidth: 2,
-    height: SWITCH_H - PADDING * 2,
-    left: PADDING / 2,
-    position: "absolute",
-    top: PADDING / 2,
-    width: THUMB_W
+    width: SWITCH_WIDTH
   }
 });

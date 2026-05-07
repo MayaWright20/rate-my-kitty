@@ -3,7 +3,9 @@ import {
   Favourite,
   FavouriteResult,
   ImageUpload,
-  ImageUploadResult
+  ImageUploadResult,
+  Vote,
+  VoteValue
 } from "../types";
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
@@ -17,7 +19,7 @@ const parseResponseBody = async (response: Response) => {
   }
 
   try {
-    return JSON.parse(responseText) as unknown;
+    return JSON.parse(responseText);
   } catch {
     return responseText;
   }
@@ -42,6 +44,16 @@ const isDuplicateFavouriteError = (message: string) =>
 
 const buildFavouritesUrl = (subId?: string) => {
   const url = new URL(`${BASE_URL}/favourites`);
+
+  if (subId) {
+    url.searchParams.set("sub_id", subId);
+  }
+
+  return url.toString();
+};
+
+const buildVotesUrl = (subId?: string) => {
+  const url = new URL(`${BASE_URL}/votes`);
 
   if (subId) {
     url.searchParams.set("sub_id", subId);
@@ -201,6 +213,77 @@ export const toggleFavouriteItem = async (imageId: string, subId?: string) => {
 
   await favouriteImage(imageId, subId);
   return { isFavourite: true };
+};
+
+export const voteImage = async (
+  imageId: string,
+  value: VoteValue,
+  subId?: string
+) => {
+  try {
+    const response = await fetch(`${BASE_URL}/votes`, {
+      method: "POST",
+      body: JSON.stringify({
+        image_id: imageId,
+        sub_id: subId,
+        value
+      }),
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": `${API_KEY}`
+      }
+    });
+
+    const data = await parseResponseBody(response);
+
+    if (!response.ok) {
+      throw new Error(
+        getErrorMessage(data, `Request failed with status ${response.status}`)
+      );
+    }
+
+    return data;
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
+
+export const getVotes = async (subId?: string) => {
+  try {
+    const response = await fetch(buildVotesUrl(subId), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": `${API_KEY}`
+      }
+    });
+
+    const data = await parseResponseBody(response);
+
+    if (!response.ok) {
+      throw new Error(
+        getErrorMessage(data, `Request failed with status ${response.status}`)
+      );
+    }
+
+    if (!Array.isArray(data)) {
+      throw new Error("Votes response was not a list");
+    }
+
+    return data as Vote[];
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
+
+export const getImageVoteScore = async (imageId: string, subId?: string) => {
+  const votes = await getVotes(subId);
+
+  return votes
+    .filter((vote) => vote.image_id === imageId)
+    .reduce((score, vote) => score + (vote.value === 1 ? 1 : -1), 0);
 };
 
 export default async function getUploadedImages(): Promise<CatImage[]> {

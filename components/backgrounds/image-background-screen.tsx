@@ -32,7 +32,7 @@ export default function ImageBackgroundScreen({
         contentFit="cover"
         pointerEvents="none"
       />
-      <View style={[styles.content, style]}>{children}</View>
+      {children}
     </View>
   );
 }
@@ -42,9 +42,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject
   },
   container: {
-    flex: 1
-  },
-  content: {
     flex: 1
   }
 });

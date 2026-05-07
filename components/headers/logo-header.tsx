@@ -3,12 +3,17 @@ import React, { useContext } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import Svg, { Defs, LinearGradient, Path, Stop } from "react-native-svg";
 
+import { Z_INDEX } from "@/constants/styles";
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 
-const { width, height } = Dimensions.get("window");
-const HEADER_HEIGHT = width < height ? 320 : 250;
+const HEADER_PORTRAIT_HEIGHT = 320;
+const HEADER_HORIZONTAL_HEIGHT = 250;
 
-const logo = require("../../assets/images/logo/logo.png");
+const { width, height } = Dimensions.get("window");
+const HEADER_HEIGHT =
+  width < height ? HEADER_PORTRAIT_HEIGHT : HEADER_HORIZONTAL_HEIGHT;
+
+const LOGO = require("../../assets/images/logo/logo.png");
 
 function PurpleHeader() {
   return (
@@ -70,6 +75,8 @@ function PurpleHeader() {
 
 export default function LogoHeader() {
   const isScreenPortraitContext = useContext(IsScreenPortraitContext);
+  const IMAGE_PORTRAIT_WIDTH = "55%";
+  const IMAGE_HORIZONTAL_WIDTH = "15%";
   return (
     <View style={styles.wrapper}>
       <PurpleHeader />
@@ -77,11 +84,12 @@ export default function LogoHeader() {
         style={[
           styles.logo,
           {
-            top: isScreenPortraitContext ? 0 : 0,
-            width: isScreenPortraitContext ? "55%" : "15%"
+            width: isScreenPortraitContext
+              ? IMAGE_PORTRAIT_WIDTH
+              : IMAGE_HORIZONTAL_WIDTH
           }
         ]}
-        source={logo}
+        source={LOGO}
         contentFit="scale-down"
       />
     </View>
@@ -93,11 +101,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -120,
     width: width,
-    zIndex: 3
+    zIndex: Z_INDEX[3]
   },
   logo: {
     aspectRatio: 1,
-    zIndex: 3
+    zIndex: Z_INDEX[3]
   },
   wrapper: {
     alignItems: "center",

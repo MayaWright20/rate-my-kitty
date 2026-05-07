@@ -19,6 +19,7 @@ const HORIZONTAL_PADDING = 16;
 const GRID_MIN_THUMBNAIL_WIDTH = 140; // Change to 340
 const GRID_MAX_COLUMNS = 4;
 const GRID_MAX_PORTRAIT_COLUMNS = 2;
+const LIST_CONTENT_MARGIN_TOP = 50;
 
 type Props = {
   centerListImagesOnHorizontal?: boolean;
@@ -146,6 +147,7 @@ const styles = StyleSheet.create({
     marginBottom: GRID_GAP
   },
   listContent: {
+    marginTop: LIST_CONTENT_MARGIN_TOP,
     paddingHorizontal: HORIZONTAL_PADDING
   },
   thumbnailImage: {

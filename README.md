@@ -14,6 +14,7 @@ Rate My Kitty is a playful Expo app where users can submit cat photos, browse up
   Your browser does not support embedded videos.
 </video>
 
+### Images
 
 <p align="center">
 <img src="./docs/media/demo3.png" alt="Cat app background" width="220" />

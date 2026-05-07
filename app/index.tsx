@@ -4,10 +4,11 @@ import { StyleSheet, Text, View } from "react-native";
 
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import { SwitchBTN } from "@/components/buttons/switch-btn";
+import Gallery from "@/components/cards/gallery";
+import CatPlaceholder from "@/components/cards/placeholder";
 import LogoHeader from "@/components/headers/logo-header";
-import CatImageGallery from "@/components/images/cat-image-gallery";
-import CatPlaceholder from "@/components/images/placeholder";
 import CatLoader from "@/components/loaders/cat-loader";
+import { MARGIN, Z_INDEX } from "@/constants/styles";
 import useFavourites from "@/hooks/useFavourites";
 import useProfile from "@/hooks/useProfile";
 
@@ -51,7 +52,7 @@ export default function Index() {
         <CatLoader />
       ) : images.length > 0 ? (
         <>
-          <CatImageGallery
+          <Gallery
             centerListImagesOnHorizontal
             images={listImages}
             isGrid={isGrid}
@@ -84,56 +85,31 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  btnsWrapper: {
-    alignSelf: "center",
-    bottom: "5%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    position: "absolute",
-    width: "80%",
-    zIndex: 10
-  },
   errorMessage: {
     textAlign: "center"
-  },
-  featuredImage: {
-    top: -120
   },
   headerOverlay: {
     left: 0,
     position: "absolute",
     right: 0,
     top: 0,
-    zIndex: 3
+    zIndex: Z_INDEX[1]
   },
   imageBackground: {
     justifyContent: "center"
   },
   list: {
     flex: 1,
-    zIndex: 1
+    zIndex: Z_INDEX[0]
   },
   listContent: {
     paddingBottom: 32
   },
-  noImagesPlaceholder: {
-    alignSelf: "center",
-    height: "100%",
-    width: "80%"
-  },
-  noImagesPlaceholderWrapper: {
-    alignSelf: "center",
-    height: "60%",
-    width: "100%"
-  },
-  safeAreaView: {
-    flex: 1
-  },
   switch: {
     bottom: "35%",
-    marginRight: 5,
+    marginRight: MARGIN.MEDIUM,
     position: "absolute",
     right: 0,
-    zIndex: 10
+    zIndex: Z_INDEX[5]
   }
 });

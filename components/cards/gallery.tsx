@@ -8,15 +8,15 @@ import {
 } from "react-native";
 
 import { COLORS } from "@/constants/colors";
-import { BORDER_RADIUS } from "@/constants/styles";
+import { BORDER_RADIUS, BORDER_WIDTH } from "@/constants/styles";
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 import { CatImage } from "@/types";
 
-import CatImageCard from "./cat-image-card";
+import Card from "./card";
 
 const GRID_GAP = 12;
 const HORIZONTAL_PADDING = 16;
-const GRID_MIN_THUMBNAIL_WIDTH = 140;
+const GRID_MIN_THUMBNAIL_WIDTH = 140; // Change to 340
 const GRID_MAX_COLUMNS = 4;
 const GRID_MAX_PORTRAIT_COLUMNS = 2;
 
@@ -30,10 +30,10 @@ type Props = {
   listEmptyComponent?: ReactElement;
   listHeaderComponent?: ReactElement;
   listStyle?: StyleProp<ViewStyle>;
-  onToggleFavourite: (imageId: string) => void;
+  onToggleFavourite: (imageId: string, image?: CatImage) => void;
 };
 
-export default function CatImageGallery({
+export default function Gallery({
   centerListImagesOnHorizontal,
   contentContainerStyle,
   favouriteImageIds,
@@ -47,12 +47,6 @@ export default function CatImageGallery({
 }: Props) {
   const isScreenPortrait = useContext(IsScreenPortraitContext);
   const { width } = useWindowDimensions();
-
-  if (isScreenPortrait === null) {
-    throw new Error(
-      "IsScreenPortraitContext must be used inside ScreenOrientationProvider"
-    );
-  }
 
   const availableWidth = width - HORIZONTAL_PADDING * 2;
   const numColumns = useMemo(() => {
@@ -84,7 +78,7 @@ export default function CatImageGallery({
       centerListImagesOnHorizontal && !isGrid && !isScreenPortrait;
 
     return (
-      <CatImageCard
+      <Card
         image={item}
         contentFit="cover"
         contentPosition="center"
@@ -102,7 +96,7 @@ export default function CatImageGallery({
             : "Favourite image",
           disabled: !!favouriteLoadingImageIds[item.id],
           isFavourite: !!favouriteImageIds[item.id],
-          onPress: () => onToggleFavourite(item.id),
+          onPress: () => onToggleFavourite(item.id, item),
           size: isGrid ? "small" : "large"
         }}
         imageStyle={[
@@ -148,7 +142,7 @@ const styles = StyleSheet.create({
   largeListImage: {
     backgroundColor: COLORS.CREAM[0],
     borderRadius: BORDER_RADIUS.MEDIUM,
-    borderWidth: 5,
+    borderWidth: BORDER_WIDTH.MEDIUM,
     marginBottom: GRID_GAP
   },
   listContent: {
@@ -157,7 +151,7 @@ const styles = StyleSheet.create({
   thumbnailImage: {
     backgroundColor: COLORS.CREAM[0],
     borderRadius: BORDER_RADIUS.SMALL,
-    borderWidth: 2,
+    borderWidth: BORDER_WIDTH.SMALL,
     marginBottom: GRID_GAP
   },
   thumbnailRow: {

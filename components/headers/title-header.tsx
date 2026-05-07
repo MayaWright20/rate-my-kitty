@@ -3,6 +3,8 @@ import { Image } from "expo-image";
 import React from "react";
 import { StyleSheet, Text, TextProps, View } from "react-native";
 
+import { FONT_SIZE, MARGIN } from "@/constants/styles";
+
 const purpleSparcle = require("../../assets/images/sparcles/sparcle-purple.png");
 
 type Props = TextProps & {
@@ -73,11 +75,11 @@ const styles = StyleSheet.create({
   },
   subheading: {
     fontWeight: "semibold",
-    marginTop: 12,
+    marginTop: MARGIN.X_LARGE,
     textAlign: "center"
   },
   title: {
-    fontSize: 40,
+    fontSize: FONT_SIZE.XX_LARGE,
     textAlign: "center",
     textTransform: "capitalize"
   }

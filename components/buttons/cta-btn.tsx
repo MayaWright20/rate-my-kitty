@@ -1,5 +1,5 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { SupermercadoOne_400Regular } from "@expo-google-fonts/supermercado-one/400Regular";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useContext } from "react";
 import {
   GestureResponderEvent,
@@ -8,7 +8,12 @@ import {
 } from "react-native";
 
 import { COLORS } from "@/constants/colors";
-import { BORDER_RADIUS, SCREEN_WIDTH_MARGIN } from "@/constants/styles";
+import {
+  BORDER_RADIUS,
+  FONT_SIZE,
+  MARGIN,
+  SCREEN_WIDTH_MARGIN
+} from "@/constants/styles";
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 import { Icon } from "@/types";
 
@@ -61,11 +66,11 @@ const styles = StyleSheet.create({
     maxWidth: "40%"
   },
   icon: {
-    marginRight: 5
+    marginRight: MARGIN.MEDIUM
   },
   title: {
     color: COLORS.WHITE[0],
-    fontSize: 30,
+    fontSize: FONT_SIZE.X_LARGE,
     textAlign: "center",
     textTransform: "uppercase"
   }

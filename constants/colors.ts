@@ -7,23 +7,22 @@ export const COLORS = {
   },
   PINK: {
     0: "#FFC1DE",
-    1: "#FF6DBD",
-    2: "#FF4FA3"
+    1: "#FF6DBD"
   },
   RED: {
     0: "#ef4545"
   },
   CREAM: {
     0: "#FFF9E6",
-    1: "#FFF2CC",
-    2: "#FFD64D",
-    3: "#FFC107"
+    1: "#FFD64D",
+    2: "#FFC107"
   },
   WHITE: {
     0: "#FFFFFF"
   },
   GREEN: {
-    0: "#AEE43A"
+    0: "#AEE43A",
+    1: "#84e43a"
   },
   BLUE: {
     0: "#8ED0FF"

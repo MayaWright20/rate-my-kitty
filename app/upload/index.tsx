@@ -9,7 +9,7 @@ import CustomFont from "@/components/headers/title-header";
 import CatLoader from "@/components/loaders/cat-loader";
 import ImageUploader from "@/components/upload/image-uploader";
 import { COLORS } from "@/constants/colors";
-import { SCREEN_WIDTH_MARGIN } from "@/constants/styles";
+import { MARGIN, SCREEN_WIDTH_MARGIN } from "@/constants/styles";
 import useUploadImage from "@/hooks/useUploadImage";
 
 export default function Index() {
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   errorMessage: {
     color: COLORS.RED[0],
     fontWeight: "bold",
-    marginTop: 15,
+    marginTop: MARGIN.X_LARGE,
     textAlign: "right",
     width: SCREEN_WIDTH_MARGIN
   },
@@ -86,13 +86,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexGrow: 1,
     paddingBottom: 90
-  },
-  subheader: {
-    fontSize: 20,
-    marginBottom: 15
-  },
-  title: {
-    fontSize: 20,
-    textTransform: "uppercase"
   }
 });

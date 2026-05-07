@@ -5,7 +5,7 @@ import { StyleSheet, useWindowDimensions, View } from "react-native";
 
 import CustomFont from "../headers/title-header";
 
-const defaultPlaceholder = require("../../assets/images/backgrounds/boa-cat.png");
+const DEFAULT_PLACEHOLDER = require("../../assets/images/backgrounds/boa-cat.png");
 
 interface Props {
   source?:
@@ -23,16 +23,14 @@ interface Props {
 
 export default function CatPlaceholder({ source, title, subheading }: Props) {
   const { height, width } = useWindowDimensions();
-  const imageHeight = Math.min(height * 0.42, 440);
-  const imageWidth = Math.min(width * 0.72, imageHeight * (2 / 3));
 
   return (
     <View style={styles.noImagesPlaceholderWrapper}>
       <Image
-        source={source ? source : defaultPlaceholder}
+        source={source ? source : DEFAULT_PLACEHOLDER}
         style={[
           styles.noImagesPlaceholder,
-          { height: imageHeight, width: imageWidth }
+          { height: height / 2, width: width }
         ]}
         contentFit="contain"
         contentPosition="center"

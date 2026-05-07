@@ -14,8 +14,12 @@ import {
 import { COLORS } from "@/constants/colors";
 import {
   BORDER_RADIUS,
+  BORDER_WIDTH,
+  FONT_SIZE,
+  MARGIN,
   OPACITY,
-  SCREEN_WIDTH_MARGIN
+  SCREEN_WIDTH_MARGIN,
+  Z_INDEX
 } from "@/constants/styles";
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 import CartoonGenerator from "@/helpers/cartoon-generator";
@@ -34,6 +38,9 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
     CartoonGenerator()
   );
   const objectUrlRef = useRef<string | null>(null);
+
+  const CAMERA_ICON_SMALL = 50;
+  const CAMERA_ICON_LARGE = 70;
 
   const clearObjectUrl = useCallback(() => {
     if (objectUrlRef.current && typeof URL !== "undefined") {
@@ -133,7 +140,7 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
           style={[styles.icon, image && styles.iconSmall]}
           name={"camera"}
           color={COLORS.PURPLE[3]}
-          size={image ? 50 : 70}
+          size={image ? CAMERA_ICON_SMALL : CAMERA_ICON_LARGE}
         />
         <View style={!image && styles.textWrapper}>
           <Text style={[styles.title, image && styles.titleSmall]}>
@@ -155,7 +162,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: "78%",
     width: "50%",
-    zIndex: 5
+    zIndex: Z_INDEX[2]
   },
   cartoon: {
     aspectRatio: 1,
@@ -163,15 +170,15 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: -15,
     top: "30%",
-    zIndex: 5
+    zIndex: Z_INDEX[2]
   },
   container: {
     alignItems: "center",
     borderRadius: BORDER_RADIUS.MEDIUM,
     borderStyle: "dotted",
-    borderWidth: 5,
+    borderWidth: BORDER_WIDTH.MEDIUM,
     justifyContent: "center",
-    margin: 15,
+    margin: MARGIN.MEDIUM,
     opacity: OPACITY[1]
   },
   containerLarge: {
@@ -183,30 +190,30 @@ const styles = StyleSheet.create({
   containerSmall: {
     aspectRatio: 2 / 0.5,
     backgroundColor: COLORS.CREAM[0],
-    borderColor: COLORS.CREAM[3],
+    borderColor: COLORS.CREAM[2],
     flexDirection: "row"
   },
   icon: {
-    marginBottom: 5
+    marginBottom: MARGIN.MEDIUM
   },
   iconSmall: {
-    color: COLORS.CREAM[3],
-    marginRight: 15
+    color: COLORS.CREAM[2],
+    marginRight: MARGIN.X_LARGE
   },
   image: {
     aspectRatio: 1 / 1,
     borderColor: COLORS.PURPLE[1],
     borderRadius: BORDER_RADIUS.MEDIUM,
-    borderWidth: 5,
-    marginTop: 25,
+    borderWidth: BORDER_WIDTH.MEDIUM,
+    marginTop: MARGIN.XX_LARGE,
     width: SCREEN_WIDTH_MARGIN
   },
   label: {
     color: COLORS.BLACK[3]
   },
   labelSmall: {
-    color: COLORS.CREAM[3],
-    marginTop: -10
+    color: COLORS.CREAM[2],
+    marginTop: MARGIN.X_SMALL
   },
   previewWrapper: {
     alignItems: "center",
@@ -218,7 +225,7 @@ const styles = StyleSheet.create({
     height: 50,
     position: "absolute",
     top: -5,
-    zIndex: 5
+    zIndex: Z_INDEX[2]
   },
   startTrailing: {
     right: 0,
@@ -232,13 +239,13 @@ const styles = StyleSheet.create({
   },
   titleLarge: {
     color: COLORS.PURPLE[3],
-    fontSize: 25,
-    marginBottom: 15
+    fontSize: FONT_SIZE.LARGE,
+    marginBottom: MARGIN.X_LARGE
   },
   titleSmall: {
-    color: COLORS.CREAM[3],
-    fontSize: 15,
-    marginBottom: 10
+    color: COLORS.CREAM[2],
+    fontSize: FONT_SIZE.MEDIUM,
+    marginBottom: MARGIN.LARGE
   },
   wrapper: {
     alignItems: "center",

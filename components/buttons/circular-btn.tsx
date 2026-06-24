@@ -38,7 +38,7 @@ export default function CircularBTN({
   const isScreenPortrait = useContext(IsScreenPortraitContext);
 
   return (
-    <TouchableOpacity onPress={onPress} style={style}>
+    <TouchableOpacity testID="circular-btn" onPress={onPress} style={style}>
       <View
         style={[
           styles.circle,

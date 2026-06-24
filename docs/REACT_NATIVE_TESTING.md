@@ -1,0 +1,873 @@
+# 🐱 React Native Testing Guide - Rate My Kitty
+
+> *A friendly, step-by-step guide to mastering unit testing in Expo React Native!*
+
+---
+
+## 📋 Table of Contents
+
+1. [What is Testing & Why Do We Care?](#1-what-is-testing--why-do-we-care)
+2. [Setting Up Your Testing Environment](#2-setting-up-your-testing-environment)
+3. [Your First Test - Testing a Pure Function](#3-your-first-test---testing-a-pure-function)
+4. [Testing a Simple Component](#4-testing-a-simple-component)
+5. [Testing Components with Props](#5-testing-components-with-props)
+6. [Testing User Interactions](#6-testing-user-interactions)
+7. [Testing Components with Context](#7-testing-components-with-context)
+8. [Mocking API Calls](#8-mocking-api-calls)
+9. [Testing Custom Hooks](#9-testing-custom-hooks)
+10. [Testing Context Providers](#10-testing-context-providers)
+11. [Testing Async Operations & Error States](#11-testing-async-operations--error-states)
+12. [Integration Testing](#12-integration-testing)
+13. [Testing Best Practices & Patterns](#13-testing-best-practices--patterns)
+
+---
+
+## 1. What is Testing & Why Do We Care?
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What is Testing?</div>
+
+Testing is like having a robot assistant that checks your code for you! Instead of manually clicking through your app every time you make a change, you write **tests** - little programs that verify your code works correctly.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Do We Test?</div>
+
+- **🛡️ Catch bugs early** - Find problems before your users do!
+- **🔄 Refactor with confidence** - Change code knowing your tests will catch mistakes
+- **📝 Living documentation** - Tests show exactly how your code is *supposed* to work
+- **🧠 Mental safety net** - Sleep better knowing your app won't break randomly
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**Unit Test**</span> - Testing one small piece of code in isolation (like a single function or component)
+- <span style="color: #50C878;">**Assertion**</span> - A statement that checks if something is true (e.g., "this button should be red")
+- <span style="color: #50C878;">**Test Runner**</span> - The tool that finds and runs your tests (we use **Jest**)
+- <span style="color: #50C878;">**Mock**</span> - A fake version of a real thing (like a pretend API that doesn't make real network calls)
+- <span style="color: #50C878;">**Coverage</span> - How much of your code is covered by tests
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">When to Use It</div>
+
+✅ Always! Every feature you build should have tests.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">When NOT to Use It</div>
+
+❌ Don't test things that never change (like third-party libraries)
+❌ Don't test obvious framework behavior (React already tested their own code)
+
+---
+
+### 📊 Difficulty Levels
+
+| Level | Color | Description |
+|-------|-------|-------------|
+| 🐣 **Junior** | 🟢 Green | Basic concepts, following patterns |
+| 🧑‍💻 **Mid** | 🟡 Yellow | Understanding *why*, handling edge cases |
+| 🧙 **Senior** | 🟠 Orange | Architecture decisions, mocking strategies |
+| 🏆 **Principal** | 🔴 Red | Testing philosophy, trade-offs, team patterns |
+
+---
+
+## 2. Setting Up Your Testing Environment
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+Before we can write tests, we need to make sure our testing tools are installed and configured. Think of this like setting up your kitchen before you start cooking!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why We Need This</div>
+
+Without the right setup, your tests won't run, or worse - they'll give you false confidence by passing when they shouldn't!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What's Already Set Up</div>
+
+Looking at your `package.json`, I can see you already have:
+
+- ✅ **jest-expo** - The Expo-specific Jest preset
+- ✅ **@testing-library/react-native** - Tools for testing React Native components
+- ✅ **@types/jest** - TypeScript types for Jest (so your editor gives you autocomplete!)
+- ✅ **jest** - The test runner itself
+- ✅ **"test": "jest"** script in package.json
+- ✅ **jest** config with `"preset": "jest-expo"`
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How to Check It Works</div>
+
+Run this command in your terminal:
+
+```bash
+npx jest --passWithNoTests
+```
+
+This will tell Jest to run but not fail if there are no tests yet.
+If you see something like "No tests found" - that's actually **good**! It means Jest is installed and working, it just can't find any test files yet.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**Preset**</span> - A pre-configured setup so you don't have to configure everything from scratch
+- <span style="color: #50C878;">**Test Environment**</span> - The simulated browser/device where tests run
+
+---
+
+### 🐣 Junior Level
+
+Just know that `npx jest` runs all your tests. Test files are any files ending in `.test.ts` or `.test.tsx` or `.spec.ts`.
+
+### 🧑‍💻 Mid Level
+
+Understand that `jest-expo` preset handles:
+- Mocking React Native's native modules (like `AsyncStorage`, `Dimensions`)
+- Setting up the right test environment
+- Configuring module resolution for Expo projects
+
+### 🧙 Senior Level
+
+Know that you can add a `jest.config.js` file for more control:
+
+```javascript
+module.exports = {
+  preset: "jest-expo",
+  setupFilesAfterSetup: ["./jest-setup.ts"],
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/$1"
+  }
+};
+```
+
+### 🏆 Principal Level
+
+Consider whether you need different Jest configs for different types of tests (unit vs integration vs e2e). For now, one config is perfect!
+
+---
+
+## 3. Your First Test - Testing a Pure Function
+
+> ✅ **Completed!** You created `helpers/score-calculator.ts` and `helpers/score-calculator.test.ts` with 5 passing tests! You also created `helpers/vote-calculator.ts` and `helpers/vote-calculator.test.ts` with 4 passing tests!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+We're going to write our very first test! We'll start with the easiest thing to test: a **pure function**. A pure function is a function that:
+1. Given the same input, always returns the same output
+2. Has no side effects (doesn't change anything outside itself)
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Start Here?</div>
+
+Pure functions are the **easiest** thing to test because:
+- No setup needed
+- No mocking needed
+- No async waiting needed
+- Just "input goes in, output comes out"
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Concepts Explained</div>
+
+### What is a test file?
+A test file is just a normal TypeScript file with a special name. Jest automatically finds any file ending with:
+- `.test.ts` (for regular functions)
+- `.test.tsx` (for React components)
+- `.spec.ts` (another common pattern)
+
+Test files should live **next to the file they test** in the same folder. This makes it easy to find tests for a specific file.
+
+### The Three Parts of a Test (AAA Pattern)
+Every test follows the same structure:
+1. **Arrange** - Set up the data you need
+2. **Act** - Do the thing you're testing
+3. **Assert** - Check that the result is correct
+
+Example: Testing a vending machine:
+- **Arrange**: Put a coke in slot A3, put £1 in the coin slot
+- **Act**: Press button A3
+- **Assert**: Check that a coke comes out
+
+### What is `describe` and `it`?
+Think of `describe` like a folder on your computer, and `it` like a file inside that folder:
+```
+📁 describe("calculateScore")
+  ├── 📄 it("returns 0 when no votes")
+  ├── 📄 it("returns 100 when all upvotes")
+  └── 📄 it("returns 50 when equal")
+```
+
+### What is `expect` and `toBe`?
+- `expect(value)` wraps the value you want to check
+- `.toBe(expected)` is a **matcher** that checks strict equality (`===`)
+
+```typescript
+expect(2 + 2).toBe(4)   // ✅ Passes
+expect(2 + 2).toBe(5)   // ❌ Fails
+```
+
+### Writing Good Test Names
+Your test name should complete the sentence: "It **should** ..."
+- ❌ Bad: `it("test the function")` - What does "test" mean?
+- ✅ Good: `it("returns 0 when there are no votes")` - Clear and specific!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Function We Tested</div>
+
+```typescript
+// helpers/score-calculator.ts
+export function calculateScore(upvotes: number, downvotes: number): number {
+  const total = upvotes + downvotes;
+  if (total === 0) return 0;
+  return Math.round((upvotes / total) * 100);
+}
+```
+
+This is a **pure function** because:
+- Same inputs ALWAYS give the same output
+- It doesn't change anything outside itself (no side effects)
+
+### Input/Output Table
+
+| upvotes | downvotes | total | calculation | result |
+|---------|-----------|-------|-------------|--------|
+| 0       | 0         | 0     | (early return) | **0** |
+| 10      | 0         | 10    | (10/10) × 100 = 100 | **100** |
+| 5       | 5         | 10    | (5/10) × 100 = 50 | **50** |
+| 3       | 1         | 4     | (3/4) × 100 = 75 | **75** |
+| 1       | 3         | 4     | (1/4) × 100 = 25 | **25** |
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Tests We Wrote</div>
+
+```typescript
+import { calculateScore } from "./score-calculator";
+
+describe("calculateScore", () => {
+  it("should return 0 if upvotes and downvotes are 0", () => {
+    expect(calculateScore(0, 0)).toBe(0);
+  });
+
+  it("should return 100 if upvotes are 10 and downvotes are 0", () => {
+    expect(calculateScore(10, 0)).toBe(100);
+  });
+
+  it("should return 50 when upvotes and downvotes are equal (5 and 5)", () => {
+    expect(calculateScore(5, 5)).toBe(50);
+  });
+
+  it("should return 75 if upvotes are 3 and downvotes are 1", () => {
+    expect(calculateScore(3, 1)).toBe(75);
+  });
+
+  it("should return 25 if upvotes are 1 and downvotes are 3", () => {
+    expect(calculateScore(1, 3)).toBe(25);
+  });
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Code Review Learnings</div>
+
+**Gotcha! 🚨** Always make sure your test name matches what the code actually does. A misleading test name is worse than no test name - it will send you in the wrong direction when debugging!
+
+Example of a misleading name:
+```typescript
+it("should return 5 if upvotes are 5 and downvotes are 50", () => {
+    expect(calculateScore(5, 5)).toBe(50); // Name says downvotes=50, code uses downvotes=5!
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**describe**</span> - A way to group related tests together
+- <span style="color: #50C878;">**it**</span> or <span style="color: #50C878;">**test**</span> - Defines an individual test case
+- <span style="color: #50C878;">**expect**</span> - The assertion - what we expect to be true
+- <span style="color: #50C878;">**toBe**</span> - A matcher that checks exact equality (like `===`)
+- <span style="color: #50C878;">**Pure Function**</span> - Same inputs always give same outputs, no side effects
+- <span style="color: #50C878;">**AAA Pattern**</span> - Arrange, Act, Assert - the three parts of every test
+
+---
+
+### 🐣 Junior Level
+
+Just follow the pattern: `describe → it → expect → toBe`. Think of it like writing a sentence: "I expect that calculateScore(0,0) **to be** 0". Test names should complete the sentence "It should...".
+
+### 🧑‍💻 Mid Level
+
+Know the difference between matchers:
+- `toBe()` - for primitives (numbers, strings, booleans) - uses `===`
+- `toEqual()` - for objects and arrays (checks value, not reference)
+- `toStrictEqual()` - like toEqual but stricter (checks types too)
+
+Always make sure your test names accurately describe what the code does. A misleading test name is a bug in your documentation!
+
+### 🧙 Senior Level
+
+Think about **edge cases**:
+- What if someone passes negative numbers?
+- What if someone passes decimals?
+- What if someone passes `null` or `undefined`?
+- Does every test name accurately reflect the test logic?
+
+Consider whether a function is worth testing. Does it contain real business logic, or is it just wrapping a simple operator?
+
+### 🏆 Principal Level
+
+Consider **property-based testing** where you test properties that should always be true:
+- Score should always be between 0 and 100
+- Score should be 100 when downvotes is 0 and upvotes > 0
+- Score should be 0 when upvotes is 0 and downvotes > 0
+
+Think about **testability** when designing functions - pure functions are easier to test than impure ones.
+
+
+## 4. Testing a Simple Component
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+Now we're going to test a React Native component! Components are the building blocks of your app - they're the buttons, cards, headers, and screens that users see and interact with.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test Components?</div>
+
+Components are where your UI logic lives. Testing them ensures:
+- They render correctly with different props
+- They show the right text, colors, and icons
+- They respond correctly to user interactions
+- They handle different states (loading, error, empty)
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Component We'll Test</div>
+
+Let's look at your `CircularBTN` component:
+
+```typescript
+export default function CircularBTN({
+  icon, onPress, title, titleColor, style,
+  backgroundColor = COLORS.PURPLE[3]
+}: Props) {
+  const isScreenPortrait = useContext(IsScreenPortraitContext);
+
+  return (
+    <TouchableOpacity testID="circular-btn" onPress={onPress} style={style}>
+      <View style={[styles.circle, { backgroundColor, width: isScreenPortrait ? "70%" : "40%" }]}>
+        <Ionicons name={icon?.name} color={icon?.color} size={icon?.size} />
+      </View>
+      <Text style={[styles.title, { color: titleColor || COLORS.BLACK[2] }]}>
+        {title}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha! 🚨</div>
+
+This component uses `useContext(IsScreenPortraitContext)`! That means it needs a **context provider** to render. If we try to render it without wrapping it in the context, it will crash because the context value will be `null`.
+
+We'll learn how to handle this in a later step. For now, let's start with a simpler component that doesn't use context!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">A Simpler Example First</div>
+
+Let's look at a component that doesn't use context - like your `CtaBTN` or `TitleHeader`. But actually, let's create a test for a component that's already in your project. Let me check what else you have...
+
+Actually, let's start with the `CircularBTN` but we'll **mock the context** to make it work. This is a common pattern!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How to Test It</div>
+
+```typescript
+import { render, screen } from "@testing-library/react-native";
+import CircularBTN from "./circular-btn";
+
+// Mock the context module
+jest.mock("@/context/screen-orientation-context", () => ({
+  IsScreenPortraitContext: {
+    Consumer: ({ children }: any) => children(true),
+    Provider: ({ children }: any) => children
+  }
+}));
+
+describe("CircularBTN", () => {
+  it("renders the title", () => {
+    render(<CircularBTN title="VOTE" />);
+    expect(screen.getByText("VOTE")).toBeTruthy();
+  });
+
+  it("renders without crashing when no props are provided", () => {
+    render(<CircularBTN />);
+    // If it doesn't throw, the test passes!
+  });
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**render**</span> - Renders a React component into a virtual DOM for testing
+- <span style="color: #50C878;">**screen**</span> - An object that helps you find rendered elements
+- <span style="color: #50C878;">**getByText**</span> - Finds an element by its text content
+- <span style="color: #50C878;">**toBeTruthy**</span> - Asserts that something exists/is not null or undefined
+- <span style="color: #50C878;">**jest.mock**</span> - Replaces a module with a fake version for testing
+
+---
+
+### 🐣 Junior Level
+
+Remember: `render(<Component />)` is like putting your component on a stage. Then you use `screen` to look at what's on that stage!
+
+### 🧑‍💻 Mid Level
+
+Know the query methods:
+- `getByText()` - throws if not found (for when element MUST exist)
+- `queryByText()` - returns null if not found (for checking absence)
+- `findByText()` - returns a Promise, waits for element to appear (for async)
+
+### 🧙 Senior Level
+
+Use `testID` props for complex queries:
+```typescript
+expect(screen.getByTestId("circular-btn")).toBeTruthy();
+```
+
+### 🏆 Principal Level
+
+Prefer testing like a user would (by text, by role) rather than by testID. This makes tests more resilient to refactoring.
+
+---
+
+## 5. Testing Components with Props
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+Props are like settings you pass to a component. Testing with different props ensures your component behaves correctly in all its different configurations.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test Props?</div>
+
+Components often change their appearance or behavior based on props. For example:
+- A button might have different colors for "primary" vs "secondary"
+- A card might show different content based on data passed to it
+- A header might show a back button only if `showBack` is true
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Testing CircularBTN with Different Props</div>
+
+```typescript
+import { render, screen } from "@testing-library/react-native";
+import CircularBTN from "./circular-btn";
+import { COLORS } from "@/constants/colors";
+
+// Mock context
+jest.mock("@/context/screen-orientation-context", () => ({
+  IsScreenPortraitContext: {
+    Consumer: ({ children }: any) => children(true),
+    Provider: ({ children }: any) => children
+  }
+}));
+
+describe("CircularBTN", () => {
+  it("renders with a title", () => {
+    render(<CircularBTN title="MEOW" />);
+    expect(screen.getByText("MEOW")).toBeTruthy();
+  });
+
+  it("renders with a custom title color", () => {
+    render(<CircularBTN title="VOTE" titleColor="red" />);
+    const title = screen.getByText("VOTE");
+    expect(title.props.style.color).toBe("red");
+  });
+
+  it("renders with an icon", () => {
+    const icon = { name: "heart", size: 24, color: "red" };
+    render(<CircularBTN icon={icon} />);
+    // The icon renders as an Ionicons component
+    expect(screen.getByTestId("circular-btn")).toBeTruthy();
+  });
+
+  it("uses the default background color when none is provided", () => {
+    render(<CircularBTN title="TEST" />);
+    // We'd need to check the View's style - this is trickier
+    // For now, just verify it renders
+    expect(screen.getByText("TEST")).toBeTruthy();
+  });
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha! 🚨</div>
+
+Checking styles on React Native components can be tricky because styles are applied differently than in web React. You might need to use `getByTestId` and then check `props.style` on the result.
+
+---
+
+### 🐣 Junior Level
+
+Test the obvious stuff first: does the component render with different props? Does it show the right text?
+
+### 🧑‍💻 Mid Level
+
+Test **default values** - what happens when a prop isn't provided? Does the component use the right default?
+
+### 🧙 Senior Level
+
+Test **edge cases**:
+- What if `title` is an empty string?
+- What if `icon` is `undefined`?
+- What if `backgroundColor` is an invalid color?
+
+### 🏆 Principal Level
+
+Think about **prop combinations** - test that certain combinations of props work correctly together. Use `describe.each` for data-driven tests!
+
+---
+
+## 6. Testing User Interactions
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+Now we're going to test what happens when a user interacts with a component - pressing buttons, typing text, swiping, etc.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test Interactions?</div>
+
+The whole point of your app is that users interact with it! Testing interactions ensures:
+- Buttons actually call the right functions
+- Forms submit the right data
+- Toggles actually toggle
+- Error states show when something goes wrong
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Testing Button Presses</div>
+
+```typescript
+import { render, screen, fireEvent } from "@testing-library/react-native";
+import CircularBTN from "./circular-btn";
+
+jest.mock("@/context/screen-orientation-context", () => ({
+  IsScreenPortraitContext: {
+    Consumer: ({ children }: any) => children(true),
+    Provider: ({ children }: any) => children
+  }
+}));
+
+describe("CircularBTN - Interactions", () => {
+  it("calls onPress when pressed", () => {
+    const onPressMock = jest.fn();
+    render(<CircularBTN title="PRESS ME" onPress={onPressMock} />);
+    
+    fireEvent.press(screen.getByText("PRESS ME"));
+    
+    expect(onPressMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not crash when onPress is not provided", () => {
+    render(<CircularBTN title="NO PRESS" />);
+    
+    // This should not throw
+    fireEvent.press(screen.getByText("NO PRESS"));
+  });
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**jest.fn()**</span> - Creates a mock function that records how it was called
+- <span style="color: #50C878;">**fireEvent**</span> - Simulates a user event (press, changeText, etc.)
+- <span style="color: #50C878;">**toHaveBeenCalledTimes**</span> - Checks how many times a mock was called
+
+---
+
+### 🐣 Junior Level
+
+Think of `jest.fn()` as a spy that watches your function. After the interaction, you ask the spy "did our function get called?"
+
+### 🧑‍💻 Mid Level
+
+Know other fireEvent methods:
+- `fireEvent.press(element)` - for buttons
+- `fireEvent.changeText(element, text)` - for text inputs
+- `fireEvent.scroll(element, data)` - for scroll views
+
+### 🧙 Senior Level
+
+Use `userEvent` from testing library for more realistic interactions:
+```typescript
+import { userEvent } from "@testing-library/react-native";
+// Simulates a more realistic press with timing
+await userEvent.press(screen.getByText("PRESS ME"));
+```
+
+### 🏆 Principal Level
+
+Consider testing **interaction sequences** - what happens when a user presses a button, then another button, then types something? Complex user flows can reveal bugs that simple tests miss.
+
+---
+
+## 7. Testing Components with Context
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+Your `CircularBTN` component uses React Context to know if the screen is portrait or landscape. We need to test how it behaves in both orientations.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test Context?</div>
+
+Context is a form of **dependency injection** - your component depends on something outside itself. Testing with different context values ensures your component works in all situations.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Better Way to Mock Context</div>
+
+Instead of mocking the entire module, we can create a **wrapper component** that provides the context value:
+
+```typescript
+import { render, screen } from "@testing-library/react-native";
+import CircularBTN from "./circular-btn";
+import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
+
+// A helper wrapper that provides context
+function renderWithContext(component: React.ReactElement, isPortrait: boolean) {
+  return render(
+    <IsScreenPortraitContext.Provider value={isPortrait}>
+      {component}
+    </IsScreenPortraitContext.Provider>
+  );
+}
+
+describe("CircularBTN with Context", () => {
+  it("uses portrait width when in portrait mode", () => {
+    renderWithContext(<CircularBTN title="TEST" />, true);
+    // The circle View should have width "70%"
+    const btn = screen.getByTestId("circular-btn");
+    // We'd check the child View's style
+    expect(screen.getByText("TEST")).toBeTruthy();
+  });
+
+  it("uses landscape width when in landscape mode", () => {
+    renderWithContext(<CircularBTN title="TEST" />, false);
+    expect(screen.getByText("TEST")).toBeTruthy();
+  });
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha! 🚨</div>
+
+The `IsScreenPortraitContext` has a default value of `null`! If you forget to provide the context, your component will crash because `isScreenPortrait` will be `null`, and you can't use `null` in a ternary like `isScreenPortrait ? "70%" : "40%"`.
+
+This is actually a **design issue** - the context should probably have a default value of `true` instead of `null`!
+
+---
+
+### 🐣 Junior Level
+
+Always wrap components that use context in a provider when testing. Think of it like giving your component the "context" it needs to work.
+
+### 🧑‍💻 Mid Level
+
+Create reusable `renderWithContext` helpers so you don't repeat the wrapper code in every test.
+
+### 🧙 Senior Level
+
+Consider creating a custom `render` function that wraps all your tests:
+
+```typescript
+// test-utils.tsx
+import { render, RenderOptions } from "@testing-library/react-native";
+import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
+
+type CustomRenderOptions = {
+  isPortrait?: boolean;
+} & RenderOptions;
+
+function customRender(
+  ui: React.ReactElement,
+  { isPortrait = true, ...options }: CustomRenderOptions = {}
+) {
+  return render(
+    <IsScreenPortraitContext.Provider value={isPortrait}>
+      {ui}
+    </IsScreenPortraitContext.Provider>,
+    options
+  );
+}
+
+export { customRender as render };
+```
+
+### 🏆 Principal Level
+
+Consider whether your context should have sensible defaults. A context value of `null` forces every consumer to handle the null case, which is error-prone. Sometimes it's better to provide a default value that represents the "happy path."
+
+---
+
+## 8. Mocking API Calls
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+Your app makes API calls to a cat image service. When testing, we don't want to actually call the real API (that would be slow, unreliable, and might mess up real data). Instead, we **mock** the API calls.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Mock APIs?</div>
+
+- **Speed** - Mocked calls are instant, real calls take milliseconds to seconds
+- **Reliability** - Tests won't fail because the API is down or you have no internet
+- **Control** - You can test error states, edge cases, and specific responses
+- **Cost** - You won't hit API rate limits or pay for API usage during tests
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How to Mock the API Module</div>
+
+```typescript
+// __mocks__/api.ts (or inline with jest.mock)
+import { getFavourites, toggleFavouriteItem } from "@/api/api";
+
+// Mock the entire api module
+jest.mock("@/api/api", () => ({
+  getFavourites: jest.fn(),
+  toggleFavouriteItem: jest.fn(),
+  getUploadedImages: jest.fn(),
+  getImageVoteScore: jest.fn(),
+  voteImage: jest.fn(),
+  getVotes: jest.fn(),
+  deleteFavourite: jest.fn(),
+  favouriteImage: jest.fn(),
+  uploadImage: jest.fn()
+}));
+
+describe("API Mocking", () => {
+  beforeEach(() => {
+    jest.clearAllMocks(); // Reset all mocks before each test
+  });
+
+  it("returns favourites when getFavourites succeeds", async () => {
+    const mockFavourites = [
+      { id: 1, image_id: "cat1", sub_id: "user1" },
+      { id: 2, image_id: "cat2", sub_id: "user1" }
+    ];
+    
+    (getFavourites as jest.Mock).mockResolvedValue(mockFavourites);
+    
+    const result = await getFavourites();
+    expect(result).toEqual(mockFavourites);
+    expect(getFavourites).toHaveBeenCalledTimes(1);
+  });
+
+  it("throws an error when getFavourites fails", async () => {
+    (getFavourites as jest.Mock).mockRejectedValue(new Error("Network error"));
+    
+    await expect(getFavourites()).rejects.toThrow("Network error");
+  });
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**mockResolvedValue**</span> - Makes a mock function return a resolved Promise
+- <span style="color: #50C878;">**mockRejectedValue**</span> - Makes a mock function return a rejected Promise
+- <span style="color: #50C878;">**jest.clearAllMocks**</span> - Resets all mock call history and implementations
+- <span style="color: #50C878;">**rejects**</span> - Used with `expect` to test that a Promise rejects
+
+---
+
+### 🐣 Junior Level
+
+Mocking is like using a stunt double in movies! Instead of the real actor (API) doing dangerous stunts, the stunt double (mock) does them safely.
+
+### 🧑‍💻 Mid Level
+
+Always use `jest.clearAllMocks()` in `beforeEach` to prevent tests from affecting each other. Each test should start with a clean slate!
+
+### 🧙 Senior Level
+
+Use `jest.spyOn` when you want to mock a specific function while keeping the rest of the module real:
+
+```typescript
+import * as api from "@/api/api";
+
+jest.spyOn(api, "getFavourites").mockResolvedValue([]);
+```
+
+### 🏆 Principal Level
+
+Consider creating a **mock factory** that generates realistic test data:
+
+```typescript
+export function createMockFavourite(overrides = {}) {
+  return {
+    id: 1,
+    image_id: "cat_123",
+    sub_id: "test_user",
+    ...overrides
+  };
+}
+```
+
+---
+
+## 9. Testing Custom Hooks
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+Custom hooks are functions that let you use React features (like state, effects, context) in reusable ways. Your `useVoting` and `useFavourites` hooks are great examples!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test Hooks?</div>
+
+Hooks contain **business logic** - the rules and calculations that make your app work. Testing hooks ensures:
+- State updates correctly
+- Effects run at the right time
+- Error handling works
+- Edge cases are handled
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha! 🚨</div>
+
+You can't call a hook directly in a test like a normal function! Hooks must be called inside a React component. That's why we use `renderHook` from testing library.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How to Test useVoting</div>
+
+```typescript
+import { renderHook, act, waitFor } from "@testing-library/react-native";
+import useVoting from "./useVoting";
+import { VotingContext } from "@/context/voting-context";
+
+// Mock the API module
+jest.mock("@/api/api", () => ({
+  getImageVoteScore: jest.fn(),
+  voteImage: jest.fn()
+}));
+
+// Create a wrapper with mock context
+function createWrapper(votingValue: any) {
+  return ({ children }: { children: React.ReactNode }) => (
+    <VotingContext.Provider value={votingValue}>
+      {children}
+    </VotingContext.Provider>
+  );
+}
+
+describe("useVoting", () => {
+  const mockVotingContext = {
+    errorMessagesByImageId: {},
+    isLoadingVotesByImageId: {},
+    isVotingByImageId: {},
+    loadVoteScore: jest.fn(),
+    vote: jest.fn(),
+    voteCountsByImageId: {}
+  };
+
+  it("returns initial count when no votes exist", () => {
+    const { result } = renderHook(
+      () => useVoting("cat_123", { initialCount: 5 }),
+      { wrapper: createWrapper(mockVotingContext) }
+    );
+
+    expect(result.current.count).toBe(5);
+  });
+
+  it("loads vote score on mount", () => {
+    renderHook(
+      () => useVoting("cat_123"),
+      { wrapper: createWrapper(mockVotingContext) }
+    );
+
+    expect(mockVotingContext.loadVoteScore).toHaveBeenCalledWith("cat_123", undefined);
+  });
+
+  it("calls vote with the correct value when upvoting", () => {
+    const { result } = renderHook(
+      () => useVoting("cat_123"),
+      { wrapper: createWrapper(mockVotingContext) }
+    );
+
+    act(() => {
+      result.current.upvote();
+    });
+
+    expect(mockVotingContext.vote).toHaveBeenCalledWith("cat_123", 1, undefined);
+  });
+
+  it("calls vote with the correct value when downvoting", () => {
+    const { result } = renderHook(
+      () => useVoting("cat_123"),
+      { wrapper: createWrapper(mockVotingContext) }
+    );
+
+    act(() => {
+      result.current.downvote();
+    });
+
+    expect(mockVotingContext.vote).toHaveBeenCalledWith("cat_123", 0, undefined);
+  });
+});
+```
+

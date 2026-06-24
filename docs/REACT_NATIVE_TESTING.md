@@ -305,6 +305,134 @@ Consider **property-based testing** where you test properties that should always
 Think about **testability** when designing functions - pure functions are easier to test than impure ones.
 
 
+## 3.5 Bonus Challenge: Testing an Impure Function (Cartoon Generator)
+
+> ✅ **Completed!** You refactored `helpers/cartoon-generator.ts` to accept an optional `index` parameter and wrote 4 passing tests!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+We took a function that uses `Math.random()` (making it **impure** - unpredictable) and made it testable by adding an optional parameter.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why This Matters</div>
+
+In real apps, you'll often encounter functions that are hard to test because they:
+- Use random values (`Math.random()`)
+- Use the current date/time (`new Date()`, `Date.now()`)
+- Make network requests (`fetch`)
+- Read from storage (`AsyncStorage`)
+
+Learning how to make these testable is a **critical skill**!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Problem</div>
+
+```typescript
+export default function CartoonGenerator(): ImageSourcePropType[] {
+  // ... data ...
+  const randomKey = keys[Math.floor(Math.random() * keys.length)];
+  return [cartoons[randomKey], badges[randomKey]];
+}
+```
+
+`Math.random()` returns a different value every time, so we can't predict what the function will return.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Solution: Dependency Injection</div>
+
+Instead of generating the random number *inside* the function, we **inject** it as a parameter:
+
+```typescript
+export default function CartoonGenerator(index?: number): ImageSourcePropType[] {
+  // ... data ...
+  const selectedKey = index !== undefined
+    ? keys[index]           // Use the provided index (for testing)
+    : keys[Math.floor(Math.random() * keys.length)];  // Or pick randomly (in production)
+  return [cartoons[selectedKey], badges[selectedKey]];
+}
+```
+
+This is called **dependency injection** - we "inject" the function's dependency (the random choice) from the outside.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Tests We Wrote</div>
+
+```typescript
+import CartoonGenerator from "./cartoon-generator";
+
+describe("CartoonGenerator", () => {
+  it("should return an array of 2 items when index is 0", () => {
+    const result = CartoonGenerator(0);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toBeDefined();
+    expect(result[1]).toBeDefined();
+  });
+
+  it("should return an array of 2 items when index is 4", () => {
+    const result = CartoonGenerator(4);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toBeDefined();
+    expect(result[1]).toBeDefined();
+  });
+
+  it("should return an array of 2 items when index is 9", () => {
+    const result = CartoonGenerator(9);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toBeDefined();
+    expect(result[1]).toBeDefined();
+  });
+
+  it("should return an array of 2 items when called without an index", () => {
+    const result = CartoonGenerator();
+    expect(result).toHaveLength(2);
+    expect(result[0]).toBeDefined();
+    expect(result[1]).toBeDefined();
+  });
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Alternative Approaches</div>
+
+If you don't want to change the function, you can also:
+
+1. **Mock `Math.random`** using `jest.spyOn`:
+   ```typescript
+   jest.spyOn(Math, "random").mockReturnValue(0);
+   // Math.random() will now always return 0
+   // Remember to call jest.restoreAllMocks() after!
+   ```
+
+2. **Separate data from logic** - Split into a pure data function and a selection function
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**Dependency Injection**</span> - Passing dependencies into a function instead of creating them inside
+- <span style="color: #50C878;">**Impure Function**</span> - A function whose output is not solely determined by its inputs
+- <span style="color: #50C878;">**toHaveLength**</span> - Checks that an array has a specific number of items
+- <span style="color: #50C878;">**toBeDefined**</span> - Checks that a value is not `undefined`
+- <span style="color: #50C878;">**jest.spyOn**</span> - Wraps a real function to track calls and change behavior
+- <span style="color: #50C878;">**mockReturnValue**</span> - Makes a mocked function return a specific value
+- <span style="color: #50C878;">**jest.restoreAllMocks**</span> - Restores all mocked functions to original behavior
+
+---
+
+### 🐣 Junior Level
+
+Adding an optional parameter is the simplest way to make a function testable. The function still works the same way in production (when called without the parameter).
+
+### 🧑‍💻 Mid Level
+
+Understand the trade-off: adding a parameter for testing changes the function's API. Is it worth it? For internal functions, usually yes. For public APIs, maybe not.
+
+### 🧙 Senior Level
+
+Know all three approaches and when to use each:
+- **Optional parameter**: When you control the function
+- **Mock/spy**: When you can't change the function (third-party library)
+- **Separation of concerns**: When the function does two things (data + logic)
+
+### 🏆 Principal Level
+
+Design functions with testability in mind from the start. Pure functions are easier to test, compose, and reason about. The **dependency injection** pattern makes code more flexible and testable.
+
+---
+
 ## 4. Testing a Simple Component
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>

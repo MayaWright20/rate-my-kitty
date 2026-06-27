@@ -856,17 +856,28 @@ Consider testing **interaction sequences** - what happens when a user presses a 
 
 ## 7. Testing Components with Context
 
+> ✅ **Completed!** You created a `renderWithContext` helper and tested both portrait and landscape modes!
+
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
 
 Your `CircularBTN` component uses React Context to know if the screen is portrait or landscape. We need to test how it behaves in both orientations.
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test Context?</div>
 
-Context is a form of **dependency injection** - your component depends on something outside itself. Testing with different context values ensures your component works in all situations.
+Context is a form of **dependency injection** - your component depends on something outside itself. Testing with different context values ensures your component works in all situations. Without providing context, the component relies on the default value (`null`) being falsy, which means it silently uses the wrong value.
 
-<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Better Way to Mock Context</div>
+### 📖 Two Approaches: `jest.mock()` vs Wrapper Pattern
 
-Instead of mocking the entire module, we can create a **wrapper component** that provides the context value:
+| Approach | `jest.mock()` | Wrapper Pattern |
+|----------|--------------|-----------------|
+| Uses real context? | ❌ Creates a fake | ✅ Uses real Provider |
+| Can test different values? | ❌ One mock for all tests | ✅ Yes, pass different values |
+| Reusable across tests? | ❌ Must re-mock each file | ✅ Can export as utility |
+| Catches context API changes? | ❌ No | ✅ Yes |
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Wrapper Pattern</div>
+
+Instead of mocking the entire module, we create a **helper function** that wraps the component in the real context provider:
 
 ```typescript
 import { render, screen } from "@testing-library/react-native";

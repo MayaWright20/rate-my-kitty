@@ -435,9 +435,11 @@ Design functions with testability in mind from the start. Pure functions are eas
 
 ## 4. Testing a Simple Component
 
+> ✅ **Completed!** You created `components/buttons/circular-btn.test.tsx` with 2 passing tests!
+
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
 
-Now we're going to test a React Native component! Components are the building blocks of your app - they're the buttons, cards, headers, and screens that users see and interact with.
+We're testing a real React Native component - `CircularBTN`! Components are the building blocks of your app - they're the buttons, cards, headers, and screens that users see and interact with.
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test Components?</div>
 
@@ -447,9 +449,7 @@ Components are where your UI logic lives. Testing them ensures:
 - They respond correctly to user interactions
 - They handle different states (loading, error, empty)
 
-<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Component We'll Test</div>
-
-Let's look at your `CircularBTN` component:
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Component We Tested</div>
 
 ```typescript
 export default function CircularBTN({
@@ -471,80 +471,149 @@ export default function CircularBTN({
 }
 ```
 
-<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha! 🚨</div>
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Concepts Explained</div>
 
-This component uses `useContext(IsScreenPortraitContext)`! That means it needs a **context provider** to render. If we try to render it without wrapping it in the context, it will crash because the context value will be `null`.
+### What's Different About Testing Components vs Functions?
 
-We'll learn how to handle this in a later step. For now, let's start with a simpler component that doesn't use context!
+When you test a function, you just call it and check the return value:
+```typescript
+const result = calculateScore(5, 5);
+expect(result).toBe(50);
+```
 
-<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">A Simpler Example First</div>
+But components are different. A component:
+1. **Renders UI** - It creates views, text, buttons on the screen
+2. **Has dependencies** - It might use context, props, or other components
+3. **Responds to users** - It handles presses, typing, swipes
 
-Let's look at a component that doesn't use context - like your `CtaBTN` or `TitleHeader`. But actually, let's create a test for a component that's already in your project. Let me check what else you have...
+So instead of "calling" a component and checking a return value, we:
+1. **Render** it (like putting it on a stage)
+2. **Find** elements on the screen (like looking at what's on the stage)
+3. **Assert** they exist and look correct
 
-Actually, let's start with the `CircularBTN` but we'll **mock the context** to make it work. This is a common pattern!
+### The Tools We Use
 
-<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How to Test It</div>
+- <span style="color: #50C878;">**render**</span> - Takes a component and renders it into a virtual "screen". In v14, this is **async** and needs `await`.
+- <span style="color: #50C878;">**screen**</span> - An object that lets us look at what's on the screen after rendering
+- <span style="color: #50C878;">**getByText**</span> - Finds an element by its text content (synchronous - throws if not found)
+- <span style="color: #50C878;">**findByText**</span> - Finds an element by text, but **waits** for it to appear (async - returns a Promise)
+- <span style="color: #50C878;">**queryByText**</span> - Finds an element by text, returns `null` if not found (for checking absence)
+- <span style="color: #50C878;">**getByTestId**</span> - Finds an element by its `testID` prop
+- <span style="color: #50C878;">**toBeOnTheScreen**</span> - v14 matcher that checks if an element is in the rendered tree (better than `toBeTruthy()`)
+
+### The Gotcha #1: File Extension! 🚨
+
+Your test file must use **`.tsx`** extension, not `.ts`! Why? Because you're using JSX syntax (`<CircularBTN />`) which requires the `.tsx` extension.
+
+```
+❌ components/buttons/circular-btn.test.ts   ← SyntaxError! Can't parse JSX
+✅ components/buttons/circular-btn.test.tsx  ← Works perfectly!
+```
+
+### The Gotcha #2: v14 API Changes 🚨
+
+`@testing-library/react-native` v14 changed some APIs:
+- `render()` is now **async** - use `await render(<Component />)`
+- `screen` object works globally (unlike v13 where you had to destructure from render)
+- Use `toBeOnTheScreen()` instead of `toBeTruthy()` for checking element existence
+
+### The Gotcha #3: Context Dependencies 🚨
+
+`CircularBTN` uses `useContext(IsScreenPortraitContext)`. The context has a default value of `null`. In JavaScript, `null` is **falsy**, so the component doesn't crash - it just uses the landscape width ("40%") instead of portrait ("70%").
+
+**So do we need the mock?** It depends on what you're testing:
+
+| Scenario | Need mock? | Why |
+|----------|-----------|-----|
+| Just checking text renders | ❌ No | Component works with `null` (falsy → "40%") |
+| Checking the circle width is "70%" | ✅ **Yes** | Without mock, width defaults to "40%" |
+| Checking landscape behavior | ✅ **Yes** | Need to set context to `false` explicitly |
+
+**Senior-level insight:** This is actually a design issue! The context has a default of `null`, which means:
+1. Every component using this context has to handle `null` (or risk bugs)
+2. Tests can accidentally pass even when the context is wrong
+3. The component silently uses the wrong value
+
+**Better design:** Give the context a sensible default:
+```typescript
+// In screen-orientation-context.ts
+export const IsScreenPortraitContext = createContext(true);  // Default to true!
+```
+
+This way:
+- Components always have a valid value
+- Tests work correctly without mocking
+- The default represents the most common case (portrait)
+
+**Your Tests Are Good! ✅**
+- ✅ `await render()` - v14 async render
+- ✅ `await screen.findByText("VOTE")` - properly awaited
+- ✅ `toBeOnTheScreen()` - proper v14 matcher
+- ✅ `getByTestId("circular-btn")` - synchronous query for already-rendered element
+
+### The Tests We Wrote
 
 ```typescript
 import { render, screen } from "@testing-library/react-native";
 import CircularBTN from "./circular-btn";
 
-// Mock the context module
-jest.mock("@/context/screen-orientation-context", () => ({
-  IsScreenPortraitContext: {
-    Consumer: ({ children }: any) => children(true),
-    Provider: ({ children }: any) => children
-  }
-}));
+test("should render the title when provided", async () => {
+  await render(<CircularBTN title="VOTE" />);
+  expect(await screen.findByText("VOTE")).toBeOnTheScreen();
+});
 
-describe("CircularBTN", () => {
-  it("renders the title", () => {
-    render(<CircularBTN title="VOTE" />);
-    expect(screen.getByText("VOTE")).toBeTruthy();
-  });
-
-  it("renders without crashing when no props are provided", () => {
-    render(<CircularBTN />);
-    // If it doesn't throw, the test passes!
-  });
+test("should render without crashing when no props are provided", async () => {
+  await render(<CircularBTN />);
+  expect(screen.getByTestId("circular-btn")).toBeOnTheScreen();
 });
 ```
+
+### Query Methods Reference
+
+| Query | What it does | Needs `await`? | When to use |
+|-------|-------------|----------------|-------------|
+| `getByText()` | Finds element **now** or throws | ❌ No | Element MUST exist and is already rendered |
+| `queryByText()` | Finds element **now** or returns null | ❌ No | Checking an element is ABSENT |
+| `findByText()` | **Waits** up to 5s for element | ✅ **Yes** | Element appears after async action |
+| `getByTestId()` | Finds by `testID` prop or throws | ❌ No | When text isn't unique enough |
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
 
 - <span style="color: #50C878;">**render**</span> - Renders a React component into a virtual DOM for testing
 - <span style="color: #50C878;">**screen**</span> - An object that helps you find rendered elements
-- <span style="color: #50C878;">**getByText**</span> - Finds an element by its text content
-- <span style="color: #50C878;">**toBeTruthy**</span> - Asserts that something exists/is not null or undefined
+- <span style="color: #50C878;">**getByText**</span> - Finds an element by its text content (synchronous)
+- <span style="color: #50C878;">**findByText**</span> - Finds an element by text (async, waits for it)
+- <span style="color: #50C878;">**getByTestId**</span> - Finds an element by its `testID` prop
+- <span style="color: #50C878;">**toBeOnTheScreen**</span> - v14 matcher for checking element exists in the rendered tree
 - <span style="color: #50C878;">**jest.mock**</span> - Replaces a module with a fake version for testing
+- <span style="color: #50C878;">**.tsx**</span> - File extension needed when using JSX syntax
 
 ---
 
 ### 🐣 Junior Level
 
-Remember: `render(<Component />)` is like putting your component on a stage. Then you use `screen` to look at what's on that stage!
+Remember: `await render(<Component />)` is like putting your component on a stage. Then you use `screen` to look at what's on that stage! Always use `.tsx` extension for component tests.
 
 ### 🧑‍💻 Mid Level
 
-Know the query methods:
-- `getByText()` - throws if not found (for when element MUST exist)
-- `queryByText()` - returns null if not found (for checking absence)
-- `findByText()` - returns a Promise, waits for element to appear (for async)
+Know the difference between query methods:
+- `getBy` - throws if not found (element MUST exist)
+- `queryBy` - returns null if not found (checking absence)
+- `findBy` - returns Promise, waits for element (async rendering)
 
 ### 🧙 Senior Level
 
-Use `testID` props for complex queries:
-```typescript
-expect(screen.getByTestId("circular-btn")).toBeTruthy();
-```
+Understand that a test passing without mocking context doesn't mean the context is working correctly. The component might be using a fallback value (`null` is falsy!). Always consider what value your component is actually using in tests vs production.
 
 ### 🏆 Principal Level
 
-Prefer testing like a user would (by text, by role) rather than by testID. This makes tests more resilient to refactoring.
+Design components with testability in mind. Context defaults should be sensible (e.g., `createContext(true)` instead of `createContext(null)`). This prevents silent bugs and makes tests more reliable.
 
 ---
 
 ## 5. Testing Components with Props
+
+> ✅ **Completed!** You added 5 prop tests to `circular-btn.test.tsx` - all passing!
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
 
@@ -557,62 +626,104 @@ Components often change their appearance or behavior based on props. For example
 - A card might show different content based on data passed to it
 - A header might show a back button only if `showBack` is true
 
-<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Testing CircularBTN with Different Props</div>
+Testing props catches:
+- Wrong default values
+- Props not being applied correctly
+- Missing optional props causing crashes
+- Edge cases (empty strings, undefined values)
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #1: Styles Can Be Arrays! 🚨</div>
+
+In React Native, styles can be arrays or objects. The `Text` component has:
+```typescript
+style={[styles.title, { color: titleColor || COLORS.BLACK[2] }]}
+```
+
+This is an **array** of two style objects! So `element.props.style` gives you an array, not a single object.
+
+**Solution:** Use `StyleSheet.flatten()` to merge array styles into one object:
+```typescript
+import { StyleSheet } from "react-native";
+
+const title = screen.getByText("VOTE");
+const flatStyle = StyleSheet.flatten(title.props.style);
+expect(flatStyle.color).toBe("pink");
+```
+
+Without flattening, you'd need to know the array index:
+```typescript
+expect(title.props.style[1].color).toBe("pink"); // Works but fragile!
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #2: Adding testIDs for Testing 🚨</div>
+
+To test the icon wrapper and background color, you added a `testID` to the View component:
+```typescript
+<View testID="circular-btn-icon-wrapper" style={...}>
+```
+
+This is a **common and acceptable pattern**! Just be careful:
+- Don't use testIDs that might conflict with other components
+- Prefer testing by text/role when possible
+- testIDs are a "last resort" for hard-to-reach elements
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Tests We Wrote</div>
 
 ```typescript
 import { render, screen } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 import CircularBTN from "./circular-btn";
-import { COLORS } from "@/constants/colors";
 
-// Mock context
-jest.mock("@/context/screen-orientation-context", () => ({
-  IsScreenPortraitContext: {
-    Consumer: ({ children }: any) => children(true),
-    Provider: ({ children }: any) => children
-  }
-}));
+test("should render with custom title color if titleColor prop provided", async () => {
+  await render(<CircularBTN title="VOTE" titleColor={"pink"} />);
+  const title = screen.getByText("VOTE");
+  const flatStyle = StyleSheet.flatten(title.props.style);
+  expect(flatStyle.color).toBe("pink");
+});
 
-describe("CircularBTN", () => {
-  it("renders with a title", () => {
-    render(<CircularBTN title="MEOW" />);
-    expect(screen.getByText("MEOW")).toBeTruthy();
-  });
+test("should render with default title color if titleColor prop is not provided", async () => {
+  await render(<CircularBTN title="VOTE" />);
+  const title = screen.getByText("VOTE");
+  const flatStyle = StyleSheet.flatten(title.props.style);
+  expect(flatStyle.color).toBe("#4B4B57"); // COLORS.BLACK[2]
+});
 
-  it("renders with a custom title color", () => {
-    render(<CircularBTN title="VOTE" titleColor="red" />);
-    const title = screen.getByText("VOTE");
-    expect(title.props.style.color).toBe("red");
-  });
+test("should render with default title color if titleColor prop is undefined", async () => {
+  await render(<CircularBTN title="VOTE" titleColor={undefined} />);
+  const title = screen.getByText("VOTE");
+  const flatStyle = StyleSheet.flatten(title.props.style);
+  expect(flatStyle.color).toBe("#4B4B57");
+});
 
-  it("renders with an icon", () => {
-    const icon = { name: "heart", size: 24, color: "red" };
-    render(<CircularBTN icon={icon} />);
-    // The icon renders as an Ionicons component
-    expect(screen.getByTestId("circular-btn")).toBeTruthy();
-  });
+test("should render with an icon if icon is provided", async () => {
+  await render(<CircularBTN icon={{ name: "heart", size: 24, color: "red" }} />);
+  const icon = screen.getByTestId("circular-btn-icon-wrapper");
+  expect(icon).toBeOnTheScreen();
+});
 
-  it("uses the default background color when none is provided", () => {
-    render(<CircularBTN title="TEST" />);
-    // We'd need to check the View's style - this is trickier
-    // For now, just verify it renders
-    expect(screen.getByText("TEST")).toBeTruthy();
-  });
+test("should render with custom background color if backgroundColor prop provided", async () => {
+  await render(<CircularBTN title="VOTE" backgroundColor={"blue"} />);
+  const iconWrapper = screen.getByTestId("circular-btn-icon-wrapper");
+  const flatStyle = StyleSheet.flatten(iconWrapper.props.style);
+  expect(flatStyle.backgroundColor).toBe("blue");
 });
 ```
 
-<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha! 🚨</div>
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
 
-Checking styles on React Native components can be tricky because styles are applied differently than in web React. You might need to use `getByTestId` and then check `props.style` on the result.
+- <span style="color: #50C878;">**StyleSheet.flatten**</span> - Merges an array of style objects into one flat object
+- <span style="color: #50C878;">**props.style**</span> - Accessing the style prop of a rendered element
+- <span style="color: #50C878;">**testID**</span> - A prop used to identify elements in tests (last resort query method)
 
 ---
 
 ### 🐣 Junior Level
 
-Test the obvious stuff first: does the component render with different props? Does it show the right text?
+Test the obvious stuff first: does the component render with different props? Does it show the right text? Use `StyleSheet.flatten()` to check styles.
 
 ### 🧑‍💻 Mid Level
 
-Test **default values** - what happens when a prop isn't provided? Does the component use the right default?
+Test **default values** - what happens when a prop isn't provided? Does the component use the right default? Test `undefined` explicitly to ensure the `||` operator works correctly.
 
 ### 🧙 Senior Level
 
@@ -620,18 +731,21 @@ Test **edge cases**:
 - What if `title` is an empty string?
 - What if `icon` is `undefined`?
 - What if `backgroundColor` is an invalid color?
+- What if `titleColor` is explicitly `undefined`?
 
 ### 🏆 Principal Level
 
-Think about **prop combinations** - test that certain combinations of props work correctly together. Use `describe.each` for data-driven tests!
+Think about **prop combinations** - test that certain combinations of props work correctly together. Use `describe.each` for data-driven tests! Also consider: should you add testIDs to components during development, or only when tests need them?
 
 ---
 
 ## 6. Testing User Interactions
 
+> ✅ **Completed!** You added a `userEvent` press test to `circular-btn.test.tsx` - and discovered a false positive bug along the way!
+
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
 
-Now we're going to test what happens when a user interacts with a component - pressing buttons, typing text, swiping, etc.
+We're testing what happens when a user interacts with a component - pressing buttons, typing text, swiping, etc.
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test Interactions?</div>
 
@@ -641,69 +755,102 @@ The whole point of your app is that users interact with it! Testing interactions
 - Toggles actually toggle
 - Error states show when something goes wrong
 
-<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Testing Button Presses</div>
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #1: False Positives! 🚨</div>
+
+**You discovered a critical issue!** Your first attempt at the test passed even though it never actually pressed the button:
 
 ```typescript
-import { render, screen, fireEvent } from "@testing-library/react-native";
-import CircularBTN from "./circular-btn";
+// ❌ THIS TEST PASSES BUT DOESN'T TEST ANYTHING!
+test("should call onPress when the button is pressed", async () => {
+  const circleBtn = screen.getByTestId("circular-btn");  // Gets element BEFORE render!
+  const mockFn = jest.fn();
+  await render(<CircularBTN onPress={mockFn} />);
 
-jest.mock("@/context/screen-orientation-context", () => ({
-  IsScreenPortraitContext: {
-    Consumer: ({ children }: any) => children(true),
-    Provider: ({ children }: any) => children
-  }
-}));
+  // ... no press happens! The press code is commented out!
 
-describe("CircularBTN - Interactions", () => {
-  it("calls onPress when pressed", () => {
-    const onPressMock = jest.fn();
-    render(<CircularBTN title="PRESS ME" onPress={onPressMock} />);
-    
-    fireEvent.press(screen.getByText("PRESS ME"));
-    
-    expect(onPressMock).toHaveBeenCalledTimes(1);
-  });
-
-  it("does not crash when onPress is not provided", () => {
-    render(<CircularBTN title="NO PRESS" />);
-    
-    // This should not throw
-    fireEvent.press(screen.getByText("NO PRESS"));
-  });
+  expect(mockFn).toHaveBeenCalled();  // mockFn was NEVER called, but test passes?!
 });
 ```
+
+**Why did it pass?** Because `jest.fn()` creates a mock that starts with 0 calls. `toHaveBeenCalled()` checks if it was called **at least once**. Since it was never called, it should fail... unless there's something else going on.
+
+**The real lesson:** Always be suspicious of tests that pass too easily! A test that passes without actually testing the behavior is a **false positive** - it gives you false confidence.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #2: Order Matters! 🚨</div>
+
+```typescript
+// ❌ WRONG: Getting element BEFORE render
+const circleBtn = screen.getByTestId("circular-btn");  // Nothing rendered yet!
+await render(<CircularBTN onPress={mockFn} />);
+
+// ✅ CORRECT: Render first, THEN find elements
+await render(<CircularBTN onPress={mockFn} />);
+const circleBtn = screen.getByTestId("circular-btn");  // Component is rendered!
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Right Way: Using `userEvent` (v14 Recommended)</div>
+
+In v14 of `@testing-library/react-native`, the recommended way to simulate user interactions is `userEvent`. It's more realistic than `fireEvent` because it simulates the full touch sequence:
+
+```typescript
+import { render, screen } from "@testing-library/react-native";
+import { userEvent } from "@testing-library/react-native";
+
+test("should call onPress when the button is pressed", async () => {
+  const mockFn = jest.fn();
+  await render(<CircularBTN onPress={mockFn} />);
+
+  const user = userEvent.setup();
+  await user.press(screen.getByTestId("circular-btn"));
+
+  expect(mockFn).toHaveBeenCalledTimes(1);
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">`userEvent` vs `fireEvent`</div>
+
+| Feature | `fireEvent.press()` | `userEvent.press()` |
+|---------|-------------------|-------------------|
+| Simulates touch sequence | ❌ Just calls onPress | ✅ touchStart → touchEnd → press |
+| Async/await | ❌ No | ✅ Yes |
+| Realistic timing | ❌ Instant | ✅ Simulates real timing |
+| Recommended in v14 | ❌ Legacy | ✅ **Yes** |
+| Setup required | ❌ None | ✅ `userEvent.setup()` |
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
 
 - <span style="color: #50C878;">**jest.fn()**</span> - Creates a mock function that records how it was called
-- <span style="color: #50C878;">**fireEvent**</span> - Simulates a user event (press, changeText, etc.)
-- <span style="color: #50C878;">**toHaveBeenCalledTimes**</span> - Checks how many times a mock was called
+- <span style="color: #50C878;">**userEvent**</span> - v14's recommended way to simulate user interactions
+- <span style="color: #50C878;">**userEvent.setup()**</span> - Creates a user simulation instance
+- <span style="color: #50C878;">**user.press()**</span> - Simulates a realistic press (touchStart → touchEnd → press)
+- <span style="color: #50C878;">**toHaveBeenCalledTimes**</span> - Checks exactly how many times a mock was called
+- <span style="color: #50C878;">**toHaveBeenCalled**</span> - Checks a mock was called at least once (less specific)
+- <span style="color: #50C878;">**False Positive**</span> - A test that passes but doesn't actually verify the behavior
 
 ---
 
 ### 🐣 Junior Level
 
-Think of `jest.fn()` as a spy that watches your function. After the interaction, you ask the spy "did our function get called?"
+Think of `jest.fn()` as a spy that watches your function. After the interaction, you ask the spy "did our function get called?" Always use `toHaveBeenCalledTimes(1)` instead of `toHaveBeenCalled()` - it's more specific!
 
 ### 🧑‍💻 Mid Level
 
-Know other fireEvent methods:
-- `fireEvent.press(element)` - for buttons
-- `fireEvent.changeText(element, text)` - for text inputs
-- `fireEvent.scroll(element, data)` - for scroll views
+Always follow this order:
+1. ✅ Create mocks first
+2. ✅ Render the component
+3. ✅ Find elements on screen
+4. ✅ Simulate interactions
+5. ✅ Assert the results
+
+Never get elements before rendering!
 
 ### 🧙 Senior Level
 
-Use `userEvent` from testing library for more realistic interactions:
-```typescript
-import { userEvent } from "@testing-library/react-native";
-// Simulates a more realistic press with timing
-await userEvent.press(screen.getByText("PRESS ME"));
-```
+Use `userEvent` instead of `fireEvent` in v14. `userEvent` is more realistic and catches edge cases that `fireEvent` misses. Always be suspicious of tests that pass too easily - they might be false positives!
 
 ### 🏆 Principal Level
 
-Consider testing **interaction sequences** - what happens when a user presses a button, then another button, then types something? Complex user flows can reveal bugs that simple tests miss.
+Consider testing **interaction sequences** - what happens when a user presses a button, then another button, then types something? Complex user flows can reveal bugs that simple tests miss. Also consider: can you write tests that would fail if the interaction code is removed? That's the mark of a good test!
 
 ---
 

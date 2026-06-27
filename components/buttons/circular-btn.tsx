@@ -40,6 +40,7 @@ export default function CircularBTN({
   return (
     <TouchableOpacity testID="circular-btn" onPress={onPress} style={style}>
       <View
+        testID="circular-btn-icon-wrapper"
         style={[
           styles.circle,
           {
@@ -50,16 +51,25 @@ export default function CircularBTN({
           }
         ]}
       >
-        <Ionicons name={icon?.name} color={icon?.color} size={icon?.size} />
+        {icon && (
+          <Ionicons
+            testID="circular-btn-icon"
+            name={icon?.name}
+            color={icon?.color}
+            size={icon?.size}
+          />
+        )}
       </View>
-      <Text
-        style={[
-          styles.title,
-          { color: titleColor ? titleColor : COLORS.BLACK[2] }
-        ]}
-      >
-        {title}
-      </Text>
+      {title && (
+        <Text
+          style={[
+            styles.title,
+            { color: titleColor ? titleColor : COLORS.BLACK[2] }
+          ]}
+        >
+          {title}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 }

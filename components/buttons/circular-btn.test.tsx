@@ -1,7 +1,17 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
+import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
+
 import CircularBTN from "./circular-btn";
+
+function renderWithContext(ui: React.ReactElement, isPortrait: boolean) {
+  return render(
+    <IsScreenPortraitContext.Provider value={isPortrait}>
+      {ui}
+    </IsScreenPortraitContext.Provider>
+  );
+}
 
 test("should render the title when provided", async () => {
   await render(<CircularBTN title="VOTE" />);
@@ -72,4 +82,22 @@ test("should call onPress when the button is pressed", async () => {
   await user.press(circleBtn);
 
   expect(mockFn).toHaveBeenCalled();
+});
+
+test("should use landscape width of 70% when in landscape mode", async () => {
+  await renderWithContext(<CircularBTN />, true);
+
+  const iconWrapper = screen.getByTestId("circular-btn-icon-wrapper");
+  const flatStyle = StyleSheet.flatten(iconWrapper.props.style);
+
+  expect(flatStyle.width).toBe("70%");
+});
+
+test("should use portrait width of 40% when in portrait mode", async () => {
+  await renderWithContext(<CircularBTN />, false);
+
+  const iconWrapper = screen.getByTestId("circular-btn-icon-wrapper");
+  const flatStyle = StyleSheet.flatten(iconWrapper.props.style);
+
+  expect(flatStyle.width).toBe("40%");
 });

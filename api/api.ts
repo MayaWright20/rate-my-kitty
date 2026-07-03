@@ -1,3 +1,5 @@
+import { API_KEY, BASE_URL } from "@/constants/api";
+
 import {
   CatImage,
   Favourite,
@@ -7,9 +9,6 @@ import {
   Vote,
   VoteValue
 } from "../types";
-
-const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
-const API_KEY = process.env.EXPO_PUBLIC_API_KEY;
 
 const parseResponseBody = async (response: Response) => {
   const responseText = await response.text();

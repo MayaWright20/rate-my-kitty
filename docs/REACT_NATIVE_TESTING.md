@@ -894,26 +894,64 @@ function renderWithContext(component: React.ReactElement, isPortrait: boolean) {
 }
 
 describe("CircularBTN with Context", () => {
-  it("uses portrait width when in portrait mode", () => {
-    renderWithContext(<CircularBTN title="TEST" />, true);
-    // The circle View should have width "70%"
-    const btn = screen.getByTestId("circular-btn");
-    // We'd check the child View's style
-    expect(screen.getByText("TEST")).toBeTruthy();
+  it("uses portrait width of 70% when in portrait mode", async () => {
+    await renderWithContext(<CircularBTN />, true);
+    const iconWrapper = screen.getByTestId("circular-btn-icon-wrapper");
+    const flatStyle = StyleSheet.flatten(iconWrapper.props.style);
+    expect(flatStyle.width).toBe("70%");
   });
 
-  it("uses landscape width when in landscape mode", () => {
-    renderWithContext(<CircularBTN title="TEST" />, false);
-    expect(screen.getByText("TEST")).toBeTruthy();
+  it("uses landscape width of 40% when in landscape mode", async () => {
+    await renderWithContext(<CircularBTN />, false);
+    const iconWrapper = screen.getByTestId("circular-btn-icon-wrapper");
+    const flatStyle = StyleSheet.flatten(iconWrapper.props.style);
+    expect(flatStyle.width).toBe("40%");
   });
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Tests We Wrote</div>
+
+```typescript
+import { render, screen, userEvent } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
+import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
+import CircularBTN from "./circular-btn";
+
+function renderWithContext(ui: React.ReactElement, isPortrait: boolean) {
+  return render(
+    <IsScreenPortraitContext.Provider value={isPortrait}>
+      {ui}
+    </IsScreenPortraitContext.Provider>
+  );
+}
+
+test("should use portrait width of 70% when in portrait mode", async () => {
+  await renderWithContext(<CircularBTN />, true);
+  const iconWrapper = screen.getByTestId("circular-btn-icon-wrapper");
+  const flatStyle = StyleSheet.flatten(iconWrapper.props.style);
+  expect(flatStyle.width).toBe("70%");
+});
+
+test("should use landscape width of 40% when in landscape mode", async () => {
+  await renderWithContext(<CircularBTN />, false);
+  const iconWrapper = screen.getByTestId("circular-btn-icon-wrapper");
+  const flatStyle = StyleSheet.flatten(iconWrapper.props.style);
+  expect(flatStyle.width).toBe("40%");
 });
 ```
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha! 🚨</div>
 
-The `IsScreenPortraitContext` has a default value of `null`! If you forget to provide the context, your component will crash because `isScreenPortrait` will be `null`, and you can't use `null` in a ternary like `isScreenPortrait ? "70%" : "40%"`.
+The `IsScreenPortraitContext` has a default value of `null`! In JavaScript, `null` is **falsy**, so `null ? "70%" : "40%"` evaluates to `"40%"`. This means:
+- Without the wrapper, the component silently uses landscape width
+- The test would pass even without the context (false positive!)
+- This is a **design issue** - the context should default to `true` (portrait)
 
-This is actually a **design issue** - the context should probably have a default value of `true` instead of `null`!
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**Wrapper Pattern**</span> - Wrapping a component in a context Provider to control its dependencies
+- <span style="color: #50C878;">**renderWithContext**</span> - A custom helper function that renders with context
 
 ---
 
@@ -961,6 +999,8 @@ Consider whether your context should have sensible defaults. A context value of 
 
 ## 8. Mocking API Calls
 
+> ✅ **Completed!** You created `api/api.test.ts` with 4 passing tests using the `jest.mock()` approach!
+
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
 
 Your app makes API calls to a cat image service. When testing, we don't want to actually call the real API (that would be slow, unreliable, and might mess up real data). Instead, we **mock** the API calls.
@@ -972,67 +1012,184 @@ Your app makes API calls to a cat image service. When testing, we don't want to 
 - **Control** - You can test error states, edge cases, and specific responses
 - **Cost** - You won't hit API rate limits or pay for API usage during tests
 
-<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How to Mock the API Module</div>
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Two Approaches to API Mocking</div>
+
+There are two main approaches to mocking API calls in React Native tests:
+
+| Approach | How it works | Best for |
+|----------|-------------|----------|
+| **`jest.mock()`** | Replaces the entire API module with fake functions | Testing logic that calls API functions |
+| **MSW (Mock Service Worker)** | Intercepts actual network requests at the protocol level | Integration tests that need to verify HTTP behavior |
+
+### Approach 1: `jest.mock()` (Module-Level Mocking) ✅ RECOMMENDED
+
+This approach replaces the entire API module with fake versions of your functions. The real API functions never run - instead, your mock functions return whatever data you want.
+
+**Documentation:** [Jest Manual Mocks](https://jestjs.io/docs/manual-mocks)
 
 ```typescript
-// __mocks__/api.ts (or inline with jest.mock)
-import { getFavourites, toggleFavouriteItem } from "@/api/api";
+import { getFavourites, voteImage } from "./api";
 
 // Mock the entire api module
-jest.mock("@/api/api", () => ({
+jest.mock("./api", () => ({
   getFavourites: jest.fn(),
-  toggleFavouriteItem: jest.fn(),
-  getUploadedImages: jest.fn(),
-  getImageVoteScore: jest.fn(),
-  voteImage: jest.fn(),
-  getVotes: jest.fn(),
-  deleteFavourite: jest.fn(),
-  favouriteImage: jest.fn(),
-  uploadImage: jest.fn()
+  voteImage: jest.fn()
 }));
 
-describe("API Mocking", () => {
+describe("API functions (mocked with jest.mock)", () => {
   beforeEach(() => {
-    jest.clearAllMocks(); // Reset all mocks before each test
+    jest.clearAllMocks();  // Reset all mocks before each test
   });
 
-  it("returns favourites when getFavourites succeeds", async () => {
+  it("should return favourites data when getFavourites is called", async () => {
+    // Arrange: Set up the mock data
     const mockFavourites = [
-      { id: 1, image_id: "cat1", sub_id: "user1" },
-      { id: 2, image_id: "cat2", sub_id: "user1" }
+      { id: 1, image_id: "cat1", sub_id: "user1", created_at: "2024-01-01" },
+      { id: 2, image_id: "cat2", sub_id: "user1", created_at: "2024-01-02" }
     ];
-    
     (getFavourites as jest.Mock).mockResolvedValue(mockFavourites);
-    
+
+    // Act: Call the mocked function
     const result = await getFavourites();
+
+    // Assert: Verify the result matches our mock data
     expect(result).toEqual(mockFavourites);
     expect(getFavourites).toHaveBeenCalledTimes(1);
   });
 
-  it("throws an error when getFavourites fails", async () => {
-    (getFavourites as jest.Mock).mockRejectedValue(new Error("Network error"));
-    
-    await expect(getFavourites()).rejects.toThrow("Network error");
+  it("should handle errors when getFavourites fails", async () => {
+    // Arrange: Configure the mock to reject with an error
+    const errorMessage = "Network error";
+    (getFavourites as jest.Mock).mockRejectedValue(new Error(errorMessage));
+
+    // Act & Assert: Verify the function throws the expected error
+    await expect(getFavourites()).rejects.toThrow(errorMessage);
+    expect(getFavourites).toHaveBeenCalledTimes(1);
+  });
+
+  it("should call voteImage with correct parameters", async () => {
+    // Arrange: Set up mock data
+    const imageId = "cat123";
+    const vote = 1; // 1 = upvote, -1 = downvote, 0 = unvote
+    const mockResponse = { message: "success", image_id: imageId, value: vote };
+    (voteImage as jest.Mock).mockResolvedValue(mockResponse);
+
+    // Act: Call the mocked function with test parameters
+    const result = await voteImage(imageId, vote);
+
+    // Assert: Verify the function was called with the right arguments
+    expect(voteImage).toHaveBeenCalledWith(imageId, vote);
+    expect(voteImage).toHaveBeenCalledTimes(1);
+    expect(result).toEqual(mockResponse);
+  });
+
+  it("should handle empty favourites list", async () => {
+    // Arrange: Mock returns an empty array
+    (getFavourites as jest.Mock).mockResolvedValue([]);
+
+    // Act
+    const result = await getFavourites();
+
+    // Assert: Verify we get an empty array back
+    expect(result).toEqual([]);
+    expect(result).toHaveLength(0);
   });
 });
 ```
 
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Benefits of `jest.mock()`</div>
+
+✅ **Simple and fast** - No setup beyond the mock declaration
+✅ **No network layer needed** - Tests don't make any real HTTP requests
+✅ **Easy to control** - Just call `.mockResolvedValue()` or `.mockRejectedValue()`
+✅ **Great for unit tests** - Perfect for testing components/hooks that call API functions
+✅ **No extra dependencies** - Built into Jest, no additional packages needed
+✅ **Works with any Jest setup** - No ESM compatibility issues
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Drawbacks of `jest.mock()`</div>
+
+❌ **Doesn't test the real API function** - You're testing the mock, not the actual HTTP request logic
+❌ **Can hide bugs** - If the real API function has a bug (wrong URL, wrong headers), your mock won't catch it
+❌ **Type casting needed** - You need `as jest.Mock` to use mock methods in TypeScript
+❌ **Manual maintenance** - You must keep the mock in sync with the real module's exports
+
+### Approach 2: MSW (Mock Service Worker) ⚠️ COMPLEX SETUP
+
+MSW intercepts actual HTTP requests at the network level. This means your real API functions run, but instead of making a real network call, MSW catches the request and returns your mock data.
+
+**Documentation:** [MSW React Native Integration](https://mswjs.io/docs/integrations/react-native)
+
+```typescript
+import { http, HttpResponse } from "msw";
+import { setupServer } from "msw/native";
+
+const handlers = [
+  http.get(`${BASE_URL}/favourites*`, () => {
+    return HttpResponse.json(FAVOURITES_DATA);
+  })
+];
+
+const server = setupServer(...handlers);
+
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The MSW ESM Gotcha! 🚨</div>
+
+**MSW has a critical compatibility issue with Jest in Expo React Native projects!**
+
+MSW depends on several **pure ESM packages** (like `rettime` and `@open-draft/deferred-promise`) that Jest cannot load because Jest uses CommonJS (CJS). This causes the error:
+
+```
+SyntaxError: Cannot use import statement outside a module
+```
+
+**Why this happens:**
+1. MSW uses `rettime` (a typed event emitter) internally
+2. `rettime` is published as pure ESM (`.mjs` files only)
+3. Jest's module system is CJS-based and can't `require()` ESM modules
+4. Even with `transformIgnorePatterns` and `.mjs` transforms, the deep dependency tree of ESM packages makes this unreliable
+
+**Solutions we tried:**
+
+| Solution | Result |
+|----------|--------|
+| Adding `.mjs` transform to `jest.config.js` | ❌ Still fails on other ESM deps |
+| Mocking `rettime` with `moduleNameMapper` | ❌ Still fails on `@open-draft/deferred-promise` |
+| Adding all ESM deps to `transformIgnorePatterns` | ❌ Deep dependency chain is too complex |
+| **Using `jest.mock()` instead** | ✅ **Works perfectly!** |
+
+**The verdict:** For unit tests in Expo React Native projects, **`jest.mock()` is the recommended approach**. MSW is better suited for:
+- Integration tests in pure Node.js environments
+- End-to-end testing with React Native (using `msw/native` in development)
+- Projects using Vitest (which has better ESM support)
+
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
 
+- <span style="color: #50C878;">**jest.mock()**</span> - A Jest API that replaces a module with a fake version
 - <span style="color: #50C878;">**mockResolvedValue**</span> - Makes a mock function return a resolved Promise
 - <span style="color: #50C878;">**mockRejectedValue**</span> - Makes a mock function return a rejected Promise
 - <span style="color: #50C878;">**jest.clearAllMocks**</span> - Resets all mock call history and implementations
 - <span style="color: #50C878;">**rejects**</span> - Used with `expect` to test that a Promise rejects
+- <span style="color: #50C878;">**MSW (Mock Service Worker)**</span> - A library that intercepts network requests at the protocol level
+- <span style="color: #50C878;">**ESM (ECMAScript Modules)**</span> - The modern JavaScript module system (`import`/`export`)
+- <span style="color: #50C878;">**CJS (CommonJS)**</span> - The older JavaScript module system (`require()`)
+- <span style="color: #50C878;">**Pure ESM**</span> - A package that only provides ESM files (`.mjs`), no CJS fallback
 
 ---
 
 ### 🐣 Junior Level
 
-Mocking is like using a stunt double in movies! Instead of the real actor (API) doing dangerous stunts, the stunt double (mock) does them safely.
+Mocking is like using a stunt double in movies! Instead of the real actor (API) doing dangerous stunts, the stunt double (mock) does them safely. Always use `jest.clearAllMocks()` in `beforeEach` to prevent tests from affecting each other.
 
 ### 🧑‍💻 Mid Level
 
-Always use `jest.clearAllMocks()` in `beforeEach` to prevent tests from affecting each other. Each test should start with a clean slate!
+Understand the difference between `jest.mock()` and MSW:
+- `jest.mock()` replaces the JavaScript function - the real function never runs
+- MSW intercepts the HTTP request - the real function runs, but the network call is caught
+- For Expo React Native projects, `jest.mock()` is more reliable due to ESM compatibility issues
 
 ### 🧙 Senior Level
 
@@ -1043,6 +1200,8 @@ import * as api from "@/api/api";
 
 jest.spyOn(api, "getFavourites").mockResolvedValue([]);
 ```
+
+Also understand the **ESM/CJS compatibility problem**: When a library is "pure ESM" (only provides `.mjs` files), it cannot be loaded by Jest's CJS-based module system. This is a known limitation of Jest that the community is working on.
 
 ### 🏆 Principal Level
 
@@ -1059,7 +1218,8 @@ export function createMockFavourite(overrides = {}) {
 }
 ```
 
----
+Also consider: should you use MSW for integration tests in a separate test suite? You could configure a different Jest config with `--experimental-vm-modules` for ESM support, but this adds complexity. For most projects, `jest.mock()` is sufficient.
+
 
 ## 9. Testing Custom Hooks
 

@@ -1,6 +1,8 @@
 import { ImageSourcePropType } from "react-native";
 
-export default function CartoonGenerator(): ImageSourcePropType[] {
+export default function CartoonGenerator(
+  index?: number
+): ImageSourcePropType[] {
   const cartoons: Record<string, ImageSourcePropType> = {
     1: require(`../assets/images/cartoons/cartoon-1.png`),
     2: require(`../assets/images/cartoons/cartoon-2.png`),
@@ -28,6 +30,9 @@ export default function CartoonGenerator(): ImageSourcePropType[] {
   };
 
   const keys = Object.keys(cartoons);
-  const randomKey = keys[Math.floor(Math.random() * keys.length)];
+  const randomKey =
+    index !== undefined
+      ? keys[index]
+      : keys[Math.floor(Math.random() * keys.length)];
   return [cartoons[randomKey], badges[randomKey]];
 }

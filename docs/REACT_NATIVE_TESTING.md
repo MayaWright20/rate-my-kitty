@@ -1756,8 +1756,73 @@ expect(flatStyle.fontSize).toBe(50);
 
 **The lesson:** Coverage tells you a line is "covered" (executed), but it doesn't tell you if your test actually verifies the behavior correctly. A line can be 100% covered but still have bugs if your assertions are wrong!
 
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #3: Coverage Only Shows Tested Files! 🚨</div>
+
+**Jest's default coverage only includes files that are imported by your tests!** If a file is never imported by any test, Jest doesn't know it exists and doesn't include it in the report.
+
+This means you can see **100% coverage** even though half your project has no tests at all! The 100% is accurate for the files you've tested - the untested files just aren't in the report yet.
+
+**Example:** If you've tested `helpers/` and `components/buttons/` but NOT `hooks/` or `context/`, your coverage report will show:
+
+```
+----------------------|---------|----------|---------|---------|-------------------
+File                  | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+----------------------|---------|----------|---------|---------|-------------------
+All files             |   75.5  |    60.2  |   70.1  |   75.5  |
+ components/buttons/  |   85.7  |    75.0  |   80.0  |   85.7  | 22
+ helpers/             |  100.0  |   100.0  |  100.0  |  100.0  |
+----------------------|---------|----------|---------|---------|-------------------
+```
+
+Notice `hooks/`, `context/`, `api/` are **completely missing** from the report! They're not at 0% - they're not even listed!
+
+**Solution:** Use `collectCoverageFrom` to tell Jest which files to include:
+
+```bash
+# CLI flag (one-time use)
+npx jest --coverage --collectCoverageFrom="hooks/**/*.{ts,tsx}" --collectCoverageFrom="context/**/*.{ts,tsx}" --collectCoverageFrom="api/**/*.{ts,tsx}" --collectCoverageFrom="components/**/*.{ts,tsx}" --collectCoverageFrom="helpers/**/*.{ts,tsx}"
+```
+
+Or better, add it to your `jest.config.js`:
+
+```javascript
+// jest.config.js
+const jestConfig = require("jest-expo/jest-preset");
+
+// ... your existing config ...
+
+jestConfig.collectCoverageFrom = [
+  "**/*.{ts,tsx}",           // All TypeScript files
+  "!**/node_modules/**",     // Ignore dependencies
+  "!**/coverage/**",         // Ignore coverage output
+  "!**/*.config.*",          // Ignore config files (jest.config, tsconfig, etc.)
+  "!**/app/**",              // Ignore Expo Router files (need special setup)
+  "!**/assets/**",           // Ignore static assets
+  "!**/__mocks__/**",        // Ignore mock files
+  "!**/.expo/**",            // Ignore Expo build files
+  "!**/types.ts"             // Ignore type definition files (no logic to test)
+];
+
+module.exports = jestConfig;
+```
+
+| Pattern | Why We Exclude It |
+|---------|------------------|
+| `**/*.{ts,tsx}` | Include ALL TypeScript files |
+| `!**/node_modules/**` | Third-party code - not ours to test |
+| `!**/coverage/**` | The coverage report itself - meta! |
+| `!**/*.config.*` | Config files have no business logic |
+| `!**/app/**` | Expo Router files need native module mocks |
+| `!**/assets/**` | Images aren't code |
+| `!**/__mocks__/**` | Mock files are test infrastructure |
+| `!**/.expo/**` | Expo build artifacts |
+| `!**/types.ts` | TypeScript types compile away at runtime |
+
+**Pro tip:** Adding `collectCoverageFrom` will show you the **real** coverage picture - including all those untested files at 0%. Use it as a **roadmap** for what to test next!
+
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
 
 - <span style="color: #50C878;">**Coverage**</span> - A metric showing how much of your code is tested
 - <span style="color: #50C878;">**Branch Coverage**</span> - Percentage of if/else/ternary branches tested

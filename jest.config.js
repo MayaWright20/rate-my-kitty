@@ -7,20 +7,28 @@ jestConfig.transform["^.+\\.mjs$"] = [
 ];
 
 // Extend transformIgnorePatterns to include msw and rettime
-// These packages need to be transformed by babel-jest because:
-// - msw uses rettime internally (a typed event emitter)
-// - rettime is pure ESM (.mjs) and Jest needs to transform it
 jestConfig.transformIgnorePatterns = [
   "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|msw|@msw|rettime))/",
   "/node_modules/react-native-reanimated/plugin/"
 ];
 
 // Mock rettime - pure ESM package that Jest (CJS) cannot load directly
-// rettime uses .mjs extension which Jest struggles with even with transform
-// This mock provides a minimal Emitter implementation
 jestConfig.moduleNameMapper = {
   ...jestConfig.moduleNameMapper,
   "^rettime$": "<rootDir>/__mocks__/rettime.js"
 };
+
+// ✅ NEW: Tell Jest which files to include in coverage reports
+jestConfig.collectCoverageFrom = [
+  "**/*.{ts,tsx}", // All TypeScript files
+  "!**/node_modules/**", // Ignore dependencies
+  "!**/coverage/**", // Ignore coverage output
+  "!**/*.config.*", // Ignore config files (jest.config, tsconfig, etc.)
+  "!**/app/**", // Ignore Expo Router files (they need special setup)
+  "!**/assets/**", // Ignore static assets
+  "!**/__mocks__/**", // Ignore mock files
+  "!**/.expo/**", // Ignore Expo build files
+  "!**/types.ts" // Ignore type definition files (no logic to test)
+];
 
 module.exports = jestConfig;

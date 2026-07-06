@@ -31,6 +31,7 @@ export default function CTA_BTN({ title, icon, onPress, isDisabled }: Props) {
 
   return (
     <TouchableOpacity
+      testID="cta-btn"
       onPress={onPress}
       disabled={isDisabled}
       style={[
@@ -41,6 +42,7 @@ export default function CTA_BTN({ title, icon, onPress, isDisabled }: Props) {
     >
       {icon && (
         <Ionicons
+          testID="cta-btn-icon"
           style={styles.icon}
           name={icon?.name}
           color={icon?.color}

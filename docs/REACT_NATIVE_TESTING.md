@@ -1221,7 +1221,308 @@ export function createMockFavourite(overrides = {}) {
 Also consider: should you use MSW for integration tests in a separate test suite? You could configure a different Jest config with `--experimental-vm-modules` for ESM support, but this adds complexity. For most projects, `jest.mock()` is sufficient.
 
 
-## 9. Testing Custom Hooks
+## 9. Testing Components with Third-Party Icons (FavouriteIconButton)
+
+> ✅ **Completed!** You created `components/buttons/favourite-icon-btn.test.tsx` with 4 passing tests!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+We tested `FavouriteIconButton` - a component that uses `@expo/vector-icons/Ionicons` (a third-party icon library). This introduced new challenges because third-party components often consume props internally.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test This?</div>
+
+- **Conditional rendering** - Shows filled heart when favourited, outline when not
+- **Size variants** - Large (50px) and small (29px) sizes
+- **Accessibility** - Different labels for favourited/unfavourited states
+- **Disabled state** - Button should not respond when disabled
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #1: Third-Party Components Consume Props! 🚨</div>
+
+This is the most important lesson! When you look at how `@expo/vector-icons/Ionicons` works internally:
+
+```javascript
+// Inside Ionicons' render method:
+const { name, size, color, style, children, ...props } = this.props;
+```
+
+The `name`, `size`, `color`, `style`, and `children` props are **destructured out** and NOT passed to the underlying `<Text>` component. Only `...props` (everything else) gets passed through.
+
+This means:
+```typescript
+// ❌ This will be undefined!
+const icon = screen.getByTestId("favourite-icon");
+expect(icon.props.name).toBe("heart");  // undefined!
+expect(icon.props.size).toBe(29);       // undefined!
+
+// ✅ Instead, check the style (size becomes fontSize)
+const flatStyle = StyleSheet.flatten(icon.props.style);
+expect(flatStyle.fontSize).toBe(29);
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #2: Testing Styles on the Pressable 🚨</div>
+
+For the `FavouriteIconButton`, we tested the **Pressable's style** to verify the correct size variant was applied:
+
+```typescript
+test("should have favouriteButtonLarge styles if size is large", async () => {
+  const mockFn = jest.fn();
+  await render(
+    <FavouriteIconButton isFavourite={false} size="large" onPress={mockFn} />
+  );
+
+  const favouriteIcon = screen.getByTestId("favourite-icon-button");
+  const flatStyle = StyleSheet.flatten(favouriteIcon.props.style);
+
+  expect(flatStyle).toEqual({
+    alignItems: "center",
+    height: 58,
+    left: 14,
+    position: "absolute",
+    top: 14,
+    width: 58,
+    zIndex: 5,
+    justifyContent: "center"
+  });
+});
+```
+
+This uses `StyleSheet.flatten()` to merge the array of styles into one object, then checks the entire flattened style with `toEqual()`.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #3: Testing Accessibility Labels 🚨</div>
+
+The component has different accessibility labels based on `isFavourite`:
+- `isFavourite={true}` → `accessibilityLabel` is `"Unfavourite cat"` (press to unfavourite)
+- `isFavourite={false}` → `accessibilityLabel` is `"Favourite cat"` (press to favourite)
+
+```typescript
+test("should have 'Unfavourite cat' as accessibility label if isFavourite is true", async () => {
+  const mockFn = jest.fn();
+  await render(<FavouriteIconButton isFavourite={true} onPress={mockFn} />);
+
+  const button = screen.getByTestId("favourite-icon-button");
+  expect(button.props.accessibilityLabel).toBe("Unfavourite cat");
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Tests We Wrote</div>
+
+```typescript
+import { render, screen, userEvent } from "@testing-library/react-native";
+import * as React from "react";
+import { StyleSheet } from "react-native";
+
+import FavouriteIconButton from "./favourite-icon-btn";
+
+test("should call onPress when pressed", async () => {
+  const mockFn = jest.fn();
+  await render(<FavouriteIconButton isFavourite={true} onPress={mockFn} />);
+  const favouriteIconButton = screen.getByTestId("favourite-icon-button");
+  const user = userEvent.setup();
+  await user.press(favouriteIconButton);
+  expect(mockFn).toHaveBeenCalled();
+});
+
+test("should have 'Unfavourite cat' as accessibility label if isFavourite is true", async () => {
+  const mockFn = jest.fn();
+  await render(<FavouriteIconButton isFavourite={true} onPress={mockFn} />);
+  const favouriteIcon = screen.getByTestId("favourite-icon-button");
+  expect(favouriteIcon.props.accessibilityLabel).toBe("Unfavourite cat");
+});
+
+test("should have 'Favourite cat' as accessibility label if isFavourite is false", async () => {
+  const mockFn = jest.fn();
+  await render(<FavouriteIconButton isFavourite={false} onPress={mockFn} />);
+  const favouriteIcon = screen.getByTestId("favourite-icon-button");
+  expect(favouriteIcon.props.accessibilityLabel).toBe("Favourite cat");
+});
+
+test("should have favouriteButtonLarge styles if size is large", async () => {
+  const mockFn = jest.fn();
+  await render(
+    <FavouriteIconButton isFavourite={false} size="large" onPress={mockFn} />
+  );
+  const favouriteIcon = screen.getByTestId("favourite-icon-button");
+  const flatStyle = StyleSheet.flatten(favouriteIcon.props.style);
+  expect(flatStyle).toEqual({
+    alignItems: "center",
+    height: 58,
+    justifyContent: "center",
+    left: 14,
+    position: "absolute",
+    top: 14,
+    width: 58,
+    zIndex: 5
+  });
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**Third-Party Component**</span> - A component from an external library (like `@expo/vector-icons`)
+- <span style="color: #50C878;">**Prop Destructuring**</span> - When a component extracts props and doesn't pass them to child elements
+- <span style="color: #50C878;">**accessibilityLabel**</span> - A prop that screen readers use to describe an element
+- <span style="color: #50C878;">**StyleSheet.flatten**</span> - Merges an array of style objects into one flat object
+
+---
+
+### 🐣 Junior Level
+
+When testing third-party components, you can't always access props directly. The component might "eat" the props internally. Check the style instead!
+
+### 🧑‍💻 Mid Level
+
+Always check what props a third-party component actually passes through to its rendered output. Look at the library's source code or use `console.log(element.props)` to debug.
+
+### 🧙 Senior Level
+
+Consider whether you should add `testID` props to third-party components or wrap them in your own components. Wrapping gives you more control and makes testing easier.
+
+### 🏆 Principal Level
+
+Think about **component design** - should you wrap third-party icon libraries in your own components? This gives you:
+- A single place to change icon libraries
+- Consistent prop interfaces
+- Easier testing (test your wrapper, not the third-party component)
+
+---
+
+## 10. Using Coverage Reports
+
+> ✅ **Completed!** You ran `npx jest --coverage` and identified uncovered lines!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+Coverage reports show you how much of your code is actually being tested. They're like a heat map - green means tested, red means not tested!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Use Coverage?</div>
+
+- **Find blind spots** - See which parts of your code have no tests
+- **Track progress** - Watch coverage go up as you add tests
+- **Identify branches** - Find untested `if/else` conditions and ternaries
+- **Build confidence** - High coverage means fewer bugs escape to production
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How to Run Coverage</div>
+
+```bash
+# Terminal output
+npx jest --coverage
+
+# HTML report (opens in browser)
+npx jest --coverage --coverageDirectory=coverage
+open coverage/lcov-report/index.html
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Understanding the Coverage Report</div>
+
+```
+----------------------|---------|----------|---------|---------|-------------------
+File                  | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+----------------------|---------|----------|---------|---------|-------------------
+All files             |   75.5  |    60.2  |   70.1  |   75.5  |
+ components/buttons/  |   85.7  |    75.0  |   80.0  |   85.7  | 22
+ helpers/             |  100.0  |   100.0  |  100.0  |  100.0  |
+----------------------|---------|----------|---------|---------|-------------------
+```
+
+| Column | What it measures | Example |
+|--------|-----------------|---------|
+| **% Stmts** | Percentage of statements executed | `75.5%` means 3/4 of your code ran |
+| **% Branch** | Percentage of if/else branches tested | `60%` means some conditions weren't tested |
+| **% Funcs** | Percentage of functions called | `70%` means some functions weren't called |
+| **% Lines** | Percentage of lines executed | Same as statements, roughly |
+| **Uncovered Line #s** | Which lines are NOT covered | `22` means line 22 needs a test |
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #1: Branches Need Two Tests! 🚨</div>
+
+A **ternary operator** like this:
+```typescript
+const iconSize = size === "large" ? 50 : 29;
+```
+
+Has **two branches**:
+1. `size === "large"` → `iconSize = 50`
+2. `size !== "large"` (default) → `iconSize = 29`
+
+To get 100% branch coverage, you need **two tests**:
+```typescript
+test("uses size 50 when size is large", () => { /* pass size="large" */ });
+test("uses size 29 when size is small (default)", () => { /* don't pass size */ });
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #2: Third-Party Components Eat Props! 🚨</div>
+
+Even if you write tests for both branches, you might not be able to test the result directly! In `FavouriteIconButton`, the `iconSize` variable is passed to `@expo/vector-icons/Ionicons` as the `size` prop:
+
+```typescript
+<Ionicons name={iconName} color={COLORS.RED[0]} size={iconSize} />
+```
+
+But Ionicons **consumes the `size` prop internally** and doesn't pass it through to the rendered output:
+
+```javascript
+// Inside Ionicons' render method:
+const { name, size, color, style, children, ...props } = this.props;
+// size is destructured out and used for fontSize in style
+```
+
+So `icon.props.size` will be `undefined`! You need to check the **style** instead:
+
+```typescript
+// ❌ This won't work - size is consumed internally
+const icon = screen.getByTestId("favourite-icon");
+expect(icon.props.size).toBe(50); // undefined!
+
+// ✅ Check the fontSize in the style instead
+const flatStyle = StyleSheet.flatten(icon.props.style);
+expect(flatStyle.fontSize).toBe(50);
+```
+
+**The lesson:** Coverage tells you a line is "covered" (executed), but it doesn't tell you if your test actually verifies the behavior correctly. A line can be 100% covered but still have bugs if your assertions are wrong!
+
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**Coverage**</span> - A metric showing how much of your code is tested
+- <span style="color: #50C878;">**Branch Coverage**</span> - Percentage of if/else/ternary branches tested
+- <span style="color: #50C878;">**Statement Coverage**</span> - Percentage of code statements executed
+- <span style="color: #50C878;">**Function Coverage**</span> - Percentage of functions called in tests
+- <span style="color: #50C878;">**Line Coverage**</span> - Percentage of lines executed
+- <span style="color: #50C878;">**lcov-report**</span> - An HTML report format that shows coverage visually
+
+---
+
+### 🐣 Junior Level
+
+Run `npx jest --coverage` to see how much of your code is tested. Green is good, red means you need more tests!
+
+### 🧑‍💻 Mid Level
+
+Use the HTML report (`open coverage/lcov-report/index.html`) to see exactly which lines are covered. Click into files to see green (tested) and red (untested) lines.
+
+### 🧙 Senior Level
+
+Don't obsess over 100% coverage - it's a tool, not a goal. Focus on testing **critical paths** and **business logic**. Some code (like type definitions, constants) doesn't need testing.
+
+### 🏆 Principal Level
+
+Set coverage thresholds in your CI pipeline to prevent coverage from dropping below a certain level:
+```javascript
+// jest.config.js
+module.exports = {
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80
+    }
+  }
+};
+```
+
+---
+
+## 11. Testing Custom Hooks
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
 

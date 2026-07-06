@@ -5,28 +5,31 @@ import { COLORS } from "@/constants/colors";
 import { Z_INDEX } from "@/constants/styles";
 
 type Props = {
-  accessibilityLabel?: string;
   disabled?: boolean;
   isFavourite: boolean;
   onPress: () => void;
   size?: "large" | "small";
 };
 
-const FAVOURITE_ACCESSIBILITY_LABEL = "Favourite cat";
-
 export default function FavouriteIconButton({
-  accessibilityLabel = FAVOURITE_ACCESSIBILITY_LABEL,
   disabled,
   isFavourite,
   onPress,
   size = "small"
 }: Props) {
+  const FAVOURITE_ACCESSIBILITY_LABEL = "Favourite cat";
+  const UNFAVOURITE_ACCESSIBILITY_LABEL = "Unfavourite cat";
   const iconSize = size === "large" ? 50 : 29;
   const iconName = isFavourite ? "heart" : "heart-outline";
 
   return (
     <Pressable
-      accessibilityLabel={accessibilityLabel}
+      testID="favourite-icon-button"
+      accessibilityLabel={
+        isFavourite
+          ? UNFAVOURITE_ACCESSIBILITY_LABEL
+          : FAVOURITE_ACCESSIBILITY_LABEL
+      }
       accessibilityRole="button"
       disabled={disabled}
       onPress={onPress}
@@ -43,7 +46,12 @@ export default function FavouriteIconButton({
         size={iconSize + 2}
         style={styles.favouriteIconOutline}
       />
-      <Ionicons name={iconName} color={COLORS.RED[0]} size={iconSize} />
+      <Ionicons
+        testID="favourite-icon-button-favourite-icon"
+        name={iconName}
+        color={COLORS.RED[0]}
+        size={iconSize}
+      />
     </Pressable>
   );
 }

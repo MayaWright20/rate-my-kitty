@@ -14,11 +14,15 @@
 6. [Testing User Interactions](#6-testing-user-interactions)
 7. [Testing Components with Context](#7-testing-components-with-context)
 8. [Mocking API Calls](#8-mocking-api-calls)
-9. [Testing Custom Hooks](#9-testing-custom-hooks)
-10. [Testing Context Providers](#10-testing-context-providers)
-11. [Testing Async Operations & Error States](#11-testing-async-operations--error-states)
-12. [Integration Testing](#12-integration-testing)
-13. [Testing Best Practices & Patterns](#13-testing-best-practices--patterns)
+9. [Testing Components with Third-Party Icons (FavouriteIconButton)](#9-testing-components-with-third-party-icons-favouriteiconbutton)
+10. [Testing CTA_BTN Component](#10-testing-cta_btn-component)
+11. [Testing TitleHeader (CustomFont) Component](#11-testing-titleheader-customfont-component)
+12. [Using Coverage Reports](#12-using-coverage-reports)
+13. [Testing Custom Hooks](#13-testing-custom-hooks)
+14. [Testing Context Providers](#14-testing-context-providers)
+15. [Testing Async Operations & Error States](#15-testing-async-operations--error-states)
+16. [Integration Testing](#16-integration-testing)
+17. [Testing Best Practices & Patterns](#17-testing-best-practices--patterns)
 
 ---
 
@@ -1386,7 +1390,280 @@ Think about **component design** - should you wrap third-party icon libraries in
 
 ---
 
-## 10. Using Coverage Reports
+## 10. Testing CTA_BTN Component
+
+> ✅ **Completed!** You created `components/buttons/cta-btn.test.tsx` with 7 passing tests!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+We tested `CTA_BTN` - a Call To Action button component that uses context, icons, and has a disabled state.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test This?</div>
+
+- **Conditional icon rendering** - Icon shows/hides based on props
+- **Disabled state** - Button should not respond when disabled
+- **Context-dependent styles** - Different width in portrait vs landscape
+- **User interactions** - Press should trigger onPress handler
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Tests We Wrote</div>
+
+```typescript
+import { render, screen, userEvent } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
+import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
+import CTA_BTN from "./cta-btn";
+
+function renderWithContext(ui: React.ReactElement, isPortrait: boolean) {
+  return render(
+    <IsScreenPortraitContext.Provider value={isPortrait}>
+      {ui}
+    </IsScreenPortraitContext.Provider>
+  );
+}
+
+test("should render the title when provided", async () => {
+  const mockFn = jest.fn();
+  await render(<CTA_BTN title="title" onPress={mockFn} />);
+  expect(await screen.findByText("title")).toBeOnTheScreen();
+});
+
+test("should render the icon when provided", async () => {
+  const mockFn = jest.fn();
+  await render(
+    <CTA_BTN
+      title="title"
+      icon={{ name: "search", size: 54, color: "pink" }}
+      onPress={mockFn}
+    />
+  );
+  const icon = screen.getByTestId("cta-btn-icon");
+  expect(icon).toBeOnTheScreen();
+});
+
+test("should not render the icon when NOT provided", async () => {
+  const mockFn = jest.fn();
+  await render(<CTA_BTN title="title" onPress={mockFn} />);
+  const icon = screen.queryByTestId("cta-btn-icon");
+  expect(icon).not.toBeOnTheScreen();
+});
+
+test("should call onPress when pressed", async () => {
+  const mockFn = jest.fn();
+  await render(<CTA_BTN title="title" onPress={mockFn} />);
+  const ctaBtn = screen.getByTestId("cta-btn");
+  const user = userEvent.setup();
+  await user.press(ctaBtn);
+  expect(mockFn).toHaveBeenCalled();
+});
+
+test("should not call onPress if isDisabled is true", async () => {
+  const mockFn = jest.fn();
+  await render(<CTA_BTN title="title" onPress={mockFn} isDisabled />);
+  const ctaBtn = screen.getByTestId("cta-btn");
+  const user = userEvent.setup();
+  await user.press(ctaBtn);
+  expect(mockFn).not.toHaveBeenCalled();
+});
+
+test("should use 40% width when isPortraitContext is false", async () => {
+  const mockFn = jest.fn();
+  await renderWithContext(<CTA_BTN title="title" onPress={mockFn} />, false);
+  const ctaBtn = screen.getByTestId("cta-btn");
+  const flatStyle = StyleSheet.flatten(ctaBtn.props.style);
+  expect(flatStyle.maxWidth).toBe("40%");
+});
+
+test("should use undefined width when isPortraitContext is true", async () => {
+  const mockFn = jest.fn();
+  await renderWithContext(<CTA_BTN title="title" onPress={mockFn} />, true);
+  const ctaBtn = screen.getByTestId("cta-btn");
+  const flatStyle = StyleSheet.flatten(ctaBtn.props.style);
+  expect(flatStyle.maxWidth).toBe(undefined);
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha: Test Name Accuracy! 🚨</div>
+
+Always make sure your test name matches what the code actually does. A misleading test name is worse than no test name - it will send you in the wrong direction when debugging!
+
+```typescript
+// ❌ Misleading name - says "when provided" but tests when NOT provided
+test("should not render the icon when provided", async () => {
+
+// ✅ Clear name - says exactly what's being tested
+test("should not render the icon when NOT provided", async () => {
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**queryByTestId**</span> - Returns null if element not found (for checking absence)
+- <span style="color: #50C878;">**isDisabled**</span> - A prop that disables the button
+- <span style="color: #50C878;">**renderWithContext**</span> - Reusable helper pattern for providing context in tests
+
+---
+
+### 🐣 Junior Level
+
+Always double-check your test names! A test called "should not render when provided" is confusing - does it mean "should not render" or "should render when provided"? Be precise!
+
+### 🧑‍💻 Mid Level
+
+Use `queryByTestId` (not `getByTestId`) when checking that something is NOT on the screen. `getByTestId` throws an error if the element doesn't exist, which would fail your test before the assertion runs!
+
+### 🧙 Senior Level
+
+The `renderWithContext` pattern is reusable across test files. Consider creating a shared `test-utils.tsx` file that exports custom render functions for all your tests.
+
+### 🏆 Principal Level
+
+Think about **component design for testability** - adding `testID` props during development makes testing easier later. Some teams add testIDs to every interactive element as a standard practice.
+
+---
+
+## 11. Testing TitleHeader (CustomFont) Component
+
+> ✅ **Completed!** You created `components/headers/title-header.test.tsx` with 2 passing tests!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+We tested `CustomFont` (from `title-header.tsx`) - a component that renders text with custom fonts, optional header styling with sparcle images, and optional subheadings.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test This?</div>
+
+- **Conditional rendering** - Header mode shows sparcle images and subheading
+- **Font loading** - Uses `useFonts` which is async
+- **Style merging** - Combines default styles with header styles
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #1: Conditional Rendering with `header` Prop 🚨</div>
+
+The component has **two render paths**:
+
+```typescript
+if (!header) {
+    return text;  // Just the Text component
+}
+
+// header is true - wraps in View with sparcles and optional subheading
+return (
+    <>
+      <View style={styles.container}>
+        <Image source={purpleSparcle} />
+        {text}
+        <Image source={purpleSparcle} />
+      </View>
+      {subheading && <Text testID="custom-font-subheading">{subheading}</Text>}
+    </>
+);
+```
+
+The subheading only renders when **both** conditions are true:
+1. `header` is `true`
+2. `subheading` is provided
+
+So your test must pass BOTH props:
+```typescript
+// ✅ This works - both conditions are met
+<CustomFont header subheading="subheading" font={LilitaOne_400Regular}>
+  textGoesHere
+</CustomFont>
+
+// ❌ This fails - subheading won't render without header
+<CustomFont subheading="subheading" font={LilitaOne_400Regular}>
+  textGoesHere
+</CustomFont>
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #2: `findByTestId` vs `getByTestId` 🚨</div>
+
+```typescript
+// ❌ WRONG: findByTestId returns a Promise, not an element!
+expect(result.findByTestId("custom-font-subheading")).toBeOnTheScreen();
+
+// ✅ CORRECT: getByTestId returns the element synchronously
+const subheading = screen.getByTestId("custom-font-subheading");
+expect(subheading).toBeOnTheScreen();
+```
+
+| Method | Returns | When to use |
+|--------|---------|-------------|
+| `getByTestId` | Element or throws | Element MUST exist and is already rendered |
+| `queryByTestId` | Element or null | Checking element is ABSENT |
+| `findByTestId` | Promise (waits up to 5s) | Element appears after async action |
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #3: Async Font Loading 🚨</div>
+
+The component uses `useFonts` from `@expo-google-fonts` which is async. When the test runs:
+- Initially `fontLoaded` is `false`
+- After fonts load, `fontLoaded` becomes `true`
+
+This means the `fontFamily` style might not be applied when your assertion runs! For now, the test passes because the font mock returns `true` immediately, but this is something to be aware of.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Tests We Wrote</div>
+
+```typescript
+import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
+import { render, screen } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
+import CustomFont from "./title-header";
+
+test("should render styles.title if header is true", async () => {
+  await render(
+    <CustomFont header font={LilitaOne_400Regular}>
+      textGoesHere
+    </CustomFont>
+  );
+
+  const customFontText = screen.getByTestId("custom-font-text");
+  const flatStyle = StyleSheet.flatten(customFontText.props.style);
+
+  expect(flatStyle).toEqual({
+    fontFamily: "fontFamily",
+    fontSize: 40,
+    textAlign: "center",
+    textTransform: "capitalize"
+  });
+});
+
+test("should render subheading if subheading is provided and header is true", async () => {
+  await render(
+    <CustomFont header subheading="subheading" font={LilitaOne_400Regular}>
+      textGoesHere
+    </CustomFont>
+  );
+
+  const subheading = screen.getByTestId("custom-font-subheading");
+  expect(subheading).toBeOnTheScreen();
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**useFonts**</span> - An async hook from `@expo-google-fonts` that loads custom fonts
+- <span style="color: #50C878;">**Conditional Rendering**</span> - Rendering different JSX based on conditions (if/else, ternary)
+- <span style="color: #50C878;">**findByTestId**</span> - Async query that waits for an element to appear (returns Promise)
+- <span style="color: #50C878;">**getByTestId**</span> - Sync query that returns element or throws (not a Promise)
+
+---
+
+### 🐣 Junior Level
+
+Remember: `getByTestId` gives you the element right now. `findByTestId` waits for it. If the element is already rendered, use `getByTestId`!
+
+### 🧑‍💻 Mid Level
+
+Understand the component's render paths. `CustomFont` has two completely different outputs based on the `header` prop. Always check the component's source code to understand what conditions need to be met for each part to render.
+
+### 🧙 Senior Level
+
+Be aware of async dependencies like font loading. The `useFonts` hook is async, which means the font might not be loaded when your test runs. Consider mocking font loading for deterministic tests.
+
+### 🏆 Principal Level
+
+Think about **component API design** - should `subheading` require `header` to be true? This coupling might surprise developers. Consider making the component more composable by separating the header wrapper from the text component.
+
+---
+
+## 12. Using Coverage Reports
 
 > ✅ **Completed!** You ran `npx jest --coverage` and identified uncovered lines!
 

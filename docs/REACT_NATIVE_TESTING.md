@@ -1895,3 +1895,73 @@ describe("useVoting", () => {
 });
 ```
 
+---
+
+## 📖 Glossary of Keywords
+
+> *A comprehensive reference of all testing keywords used in this guide. Updated as new topics are added.*
+
+| # | Keyword | Description | Example Usage |
+|---|---------|-------------|---------------|
+| 1 | <span style="color: #50C878;">**AAA Pattern**</span> | Arrange, Act, Assert - the three parts of every test | `// Arrange: set up data → // Act: call function → // Assert: check result` |
+| 2 | <span style="color: #50C878;">**accessibilityLabel**</span> | A prop that screen readers use to describe an element | `expect(button.props.accessibilityLabel).toBe("Favourite cat")` |
+| 3 | <span style="color: #50C878;">**act**</span> | A function from testing library that wraps state updates in hooks | `act(() => { result.current.upvote(); })` |
+| 4 | <span style="color: #50C878;">**Branch Coverage**</span> | Percentage of if/else/ternary branches tested | A ternary `a ? b : c` needs 2 tests (one for each branch) |
+| 5 | <span style="color: #50C878;">**CJS (CommonJS)**</span> | The older JavaScript module system using `require()` | `const jest = require("@jest/globals")` |
+| 6 | <span style="color: #50C878;">**Conditional Rendering**</span> | Rendering different JSX based on conditions (if/else, ternary) | `{isFavourite ? <HeartFilled /> : <HeartOutline />}` |
+| 7 | <span style="color: #50C878;">**Coverage**</span> | A metric showing how much of your code is tested | Run `npx jest --coverage` to see a coverage report |
+| 8 | <span style="color: #50C878;">**Dependency Injection**</span> | Passing dependencies into a function instead of creating them inside | `CartoonGenerator(0)` instead of `CartoonGenerator()` with internal `Math.random()` |
+| 9 | <span style="color: #50C878;">**describe**</span> | A way to group related tests together | `describe("calculateScore", () => { ... })` |
+| 10 | <span style="color: #50C878;">**ESM (ECMAScript Modules)**</span> | The modern JavaScript module system using `import`/`export` | `import { render } from "@testing-library/react-native"` |
+| 11 | <span style="color: #50C878;">**expect**</span> | The assertion - what we expect to be true | `expect(calculateScore(5, 5)).toBe(50)` |
+| 12 | <span style="color: #50C878;">**False Positive**</span> | A test that passes but doesn't actually verify the behavior | Getting element before render, then asserting it exists |
+| 13 | <span style="color: #50C878;">**findByTestId**</span> | Async query that waits for an element to appear (returns Promise) | `const el = await screen.findByTestId("my-element")` |
+| 14 | <span style="color: #50C878;">**findByText**</span> | Finds an element by text (async, waits up to 5s) | `const el = await screen.findByText("Submit")` |
+| 15 | <span style="color: #50C878;">**Function Coverage**</span> | Percentage of functions called in tests | `% Funcs` column in coverage report |
+| 16 | <span style="color: #50C878;">**getByTestId**</span> | Sync query that returns element by testID or throws | `const btn = screen.getByTestId("circular-btn")` |
+| 17 | <span style="color: #50C878;">**getByText**</span> | Finds an element by its text content (synchronous) | `const title = screen.getByText("VOTE")` |
+| 18 | <span style="color: #50C878;">**Impure Function**</span> | A function whose output is not solely determined by its inputs | `Math.random()`, `new Date()`, API calls |
+| 19 | <span style="color: #50C878;">**isDisabled**</span> | A prop that disables a button | `<CTA_BTN isDisabled onPress={fn} />` |
+| 20 | <span style="color: #50C878;">**it**</span> or <span style="color: #50C878;">**test**</span> | Defines an individual test case | `it("returns 0 when no votes", () => { ... })` |
+| 21 | <span style="color: #50C878;">**jest.clearAllMocks**</span> | Resets all mock call history and implementations | `beforeEach(() => jest.clearAllMocks())` |
+| 22 | <span style="color: #50C878;">**jest.fn()**</span> | Creates a mock function that records how it was called | `const mockFn = jest.fn()` |
+| 23 | <span style="color: #50C878;">**jest.mock()**</span> | A Jest API that replaces a module with a fake version | `jest.mock("./api", () => ({ getFavourites: jest.fn() }))` |
+| 24 | <span style="color: #50C878;">**jest.restoreAllMocks**</span> | Restores all mocked functions to original behavior | `afterEach(() => jest.restoreAllMocks())` |
+| 25 | <span style="color: #50C878;">**jest.spyOn**</span> | Wraps a real function to track calls and change behavior | `jest.spyOn(Math, "random").mockReturnValue(0)` |
+| 26 | <span style="color: #50C878;">**lcov-report**</span> | An HTML report format that shows coverage visually | `open coverage/lcov-report/index.html` |
+| 27 | <span style="color: #50C878;">**Line Coverage**</span> | Percentage of lines executed | `% Lines` column in coverage report |
+| 28 | <span style="color: #50C878;">**Mock**</span> | A fake version of a real thing (like a pretend API) | `jest.fn()` creates a mock function |
+| 29 | <span style="color: #50C878;">**mockRejectedValue**</span> | Makes a mock function return a rejected Promise | `(getFavourites as jest.Mock).mockRejectedValue(new Error("fail"))` |
+| 30 | <span style="color: #50C878;">**mockResolvedValue**</span> | Makes a mock function return a resolved Promise | `(getFavourites as jest.Mock).mockResolvedValue(mockData)` |
+| 31 | <span style="color: #50C878;">**mockReturnValue**</span> | Makes a mocked function return a specific value (sync) | `jest.spyOn(Math, "random").mockReturnValue(0)` |
+| 32 | <span style="color: #50C878;">**MSW (Mock Service Worker)**</span> | A library that intercepts network requests at the protocol level | `http.get("/api/cats", () => HttpResponse.json([...]))` |
+| 33 | <span style="color: #50C878;">**Preset**</span> | A pre-configured setup so you don't have to configure everything from scratch | `preset: "jest-expo"` in jest config |
+| 34 | <span style="color: #50C878;">**Prop Destructuring**</span> | When a component extracts props and doesn't pass them to child elements | `const { name, size, ...props } = this.props` |
+| 35 | <span style="color: #50C878;">**Pure ESM**</span> | A package that only provides ESM files (`.mjs`), no CJS fallback | MSW depends on pure ESM packages like `rettime` |
+| 36 | <span style="color: #50C878;">**Pure Function**</span> | Same inputs always give same outputs, no side effects | `calculateScore(5, 5)` always returns `50` |
+| 37 | <span style="color: #50C878;">**queryByTestId**</span> | Returns null if element not found (for checking absence) | `expect(screen.queryByTestId("icon")).not.toBeOnTheScreen()` |
+| 38 | <span style="color: #50C878;">**queryByText**</span> | Finds element by text or returns null (for checking absence) | `expect(screen.queryByText("Loading")).toBeNull()` |
+| 39 | <span style="color: #50C878;">**rejects**</span> | Used with `expect` to test that a Promise rejects | `await expect(getFavourites()).rejects.toThrow("error")` |
+| 40 | <span style="color: #50C878;">**render**</span> | Renders a React component into a virtual DOM for testing | `await render(<CircularBTN title="VOTE" />)` |
+| 41 | <span style="color: #50C878;">**renderHook**</span> | Renders a hook in a test environment (not a component) | `const { result } = renderHook(() => useVoting("cat_123"))` |
+| 42 | <span style="color: #50C878;">**renderWithContext**</span> | A custom helper function that renders with context | `renderWithContext(<Component />, true)` |
+| 43 | <span style="color: #50C878;">**screen**</span> | An object that helps you find rendered elements | `screen.getByText("VOTE")`, `screen.getByTestId("btn")` |
+| 44 | <span style="color: #50C878;">**Statement Coverage**</span> | Percentage of code statements executed | `% Stmts` column in coverage report |
+| 45 | <span style="color: #50C878;">**StyleSheet.flatten**</span> | Merges an array of style objects into one flat object | `StyleSheet.flatten(element.props.style)` |
+| 46 | <span style="color: #50C878;">**testID**</span> | A prop used to identify elements in tests (last resort query method) | `<TouchableOpacity testID="circular-btn">` |
+| 47 | <span style="color: #50C878;">**Third-Party Component**</span> | A component from an external library (like `@expo/vector-icons`) | `Ionicons` from `@expo/vector-icons` |
+| 48 | <span style="color: #50C878;">**toBe**</span> | A matcher that checks exact equality (like `===`) | `expect(result).toBe(50)` |
+| 49 | <span style="color: #50C878;">**toBeDefined**</span> | Checks that a value is not `undefined` | `expect(result[0]).toBeDefined()` |
+| 50 | <span style="color: #50C878;">**toHaveLength**</span> | Checks that an array has a specific number of items | `expect(result).toHaveLength(2)` |
+| 51 | <span style="color: #50C878;">**toBeOnTheScreen**</span> | v14 matcher for checking element exists in the rendered tree | `expect(title).toBeOnTheScreen()` |
+| 52 | <span style="color: #50C878;">**toHaveBeenCalled**</span> | Checks a mock was called at least once | `expect(mockFn).toHaveBeenCalled()` |
+| 53 | <span style="color: #50C878;">**toHaveBeenCalledTimes**</span> | Checks exactly how many times a mock was called | `expect(mockFn).toHaveBeenCalledTimes(1)` |
+| 54 | <span style="color: #50C878;">**toEqual**</span> | A matcher that checks value equality (for objects/arrays) | `expect(flatStyle).toEqual({ fontSize: 40 })` |
+| 55 | <span style="color: #50C878;">**Unit Test**</span> | Testing one small piece of code in isolation | Testing a single function or component |
+| 56 | <span style="color: #50C878;">**useFonts**</span> | An async hook from `@expo-google-fonts` that loads custom fonts | `const [fontLoaded] = useFonts({ fontFamily: font })` |
+| 57 | <span style="color: #50C878;">**userEvent**</span> | v14's recommended way to simulate user interactions | `const user = userEvent.setup(); await user.press(btn)` |
+| 58 | <span style="color: #50C878;">**userEvent.setup()**</span> | Creates a user simulation instance | `const user = userEvent.setup()` |
+| 59 | <span style="color: #50C878;">**user.press()**</span> | Simulates a realistic press (touchStart → touchEnd → press) | `await user.press(screen.getByTestId("btn"))` |
+| 60 | <span style="color: #50C878;">**Wrapper Pattern**</span> | Wrapping a component in a context Provider to control its dependencies | `<IsScreenPortraitContext.Provider value={true}>{ui}</...>` |
+| 61 | <span style="color: #50C878;">**.tsx**</span> | File extension needed when using JSX syntax in TypeScript | `circular-btn.test.tsx` (not `.ts`) |
+

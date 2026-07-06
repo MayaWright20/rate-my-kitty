@@ -37,3 +37,11 @@ test("should render subheading if subheading is provided and header is true", as
 
   expect(subheading).toBeOnTheScreen();
 });
+
+test("should render children text content", async () => {
+  await render(
+    <CustomFont font={LilitaOne_400Regular}>Hello World</CustomFont>
+  );
+
+  expect(screen.getByText("Hello World")).toBeOnTheScreen();
+});

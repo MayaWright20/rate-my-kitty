@@ -24,9 +24,9 @@ type FavouritesContextValue = {
   toggleFavourite: ToggleFavourite;
 };
 
-export const FavouritesContext = createContext<FavouritesContextValue | null>(
-  null
-);
+export type FavouritesContextType = FavouritesContextValue | null;
+
+export const FavouritesContext = createContext<FavouritesContextType>(null);
 
 export function useFavouritesProviderValue() {
   const [favouriteImages, setFavouriteImages] = useState<CatImage[]>([]);

@@ -12,6 +12,8 @@ type VotingContextValue = {
   voteCountsByImageId: Record<string, number>;
 };
 
+export type VotingContextType = VotingContextValue | null;
+
 export const VotingContext = createContext<VotingContextValue | null>(null);
 
 export function useVotingProviderValue() {

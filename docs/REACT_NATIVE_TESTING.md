@@ -1890,11 +1890,13 @@ module.exports = {
 
 ---
 
-## 11. Testing Custom Hooks
+## 13. Testing Custom Hooks
+
+> ✅ **Completed!** You created `hooks/useVoting.test.tsx` with 4 passing tests!
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
 
-Custom hooks are functions that let you use React features (like state, effects, context) in reusable ways. Your `useVoting` and `useFavourites` hooks are great examples!
+Custom hooks are functions that let you use React features (like state, effects, context) in reusable ways. Your `useVoting` hook is a great example!
 
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test Hooks?</div>
 
@@ -1904,34 +1906,241 @@ Hooks contain **business logic** - the rules and calculations that make your app
 - Error handling works
 - Edge cases are handled
 
-<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha! 🚨</div>
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #1: Hooks Need a Home! 🚨</div>
 
 You can't call a hook directly in a test like a normal function! Hooks must be called inside a React component. That's why we use `renderHook` from testing library.
 
-<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How to Test useVoting</div>
+```typescript
+// ❌ This won't work! Hooks can't be called directly
+const result = useVoting("cat_123");
+
+// ✅ This works! renderHook creates a "component home" for the hook
+const { result } = await renderHook(() => useVoting("cat_123"));
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #2: renderHook is Async in v14! 🚨</div>
+
+In `@testing-library/react-native` v14, `renderHook` is **async** just like `render`. You must `await` it:
 
 ```typescript
-import { renderHook, act, waitFor } from "@testing-library/react-native";
+// ❌ This gives you a Promise, not the result object
+const { result } = renderHook(() => useVoting("cat_123"));
+
+// ✅ This gives you the actual result object
+const { result } = await renderHook(() => useVoting("cat_123"));
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #3: Call the Function, Don't Just Get It! 🚨</div>
+
+When testing `upvote()` or `downvote()`, you must **call** the function (with `()`), not just store it in a variable:
+
+```typescript
+// ❌ You're just GETTING the function, not CALLING it
+const upvote = result.current.upvote;
+expect(upvote as jest.fn).toHaveBeenCalledWith(1); // Never called!
+
+// ✅ CALL the function, then check the mock
+result.current.upvote();
+expect(mockContext.vote).toHaveBeenCalledWith("imageId", 1, undefined);
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Happy Path vs Unhappy Path Tests ☕</div>
+
+Think of testing like testing a **coffee machine**:
+
+### Happy Path (The "Everything Works" Scenario) 😊
+1. ✅ You put a cup under the spout
+2. ✅ You press "Espresso"
+3. ✅ Coffee comes out
+4. ✅ You get a delicious espresso
+
+These are the **happy path** tests - testing that everything works when things go right.
+
+### Unhappy Path (The "Something Goes Wrong" Scenarios) 😡
+1. ❌ What if there's no water? → Error message
+2. ❌ What if there are no coffee beans? → Error message
+3. ❌ What if you press the button without a cup? → Coffee everywhere!
+4. ❌ What if the machine is unplugged? → Nothing happens
+
+These are **edge cases** or **error path** tests - testing what happens when things go wrong.
+
+### For Your `useVoting` Hook
+
+**Happy Path Tests (Test First)** 😊
+
+| Test | What it checks | Why it matters |
+|------|---------------|----------------|
+| Returns 0 when no votes | Default count | ✅ You have this! |
+| `loadVoteScore` called on mount | Effect runs | ✅ You have this! |
+| `upvote()` calls `vote(1)` | Upvote works | ✅ You have this! |
+| `downvote()` calls `vote(0)` | Downvote works | ✅ You have this! |
+
+**Unhappy Path Tests (Add Later)** 😡
+
+| Test | What it checks | Why it matters |
+|------|---------------|----------------|
+| Throws error without context | Error handling | ✅ Now adding this! |
+| Handles API failure | Error state | Important but needs more setup |
+| Handles missing imageId | Edge case | Rare but possible |
+
+### The Rule of Thumb 📝
+
+**Always test the happy path first!** If the basic functionality doesn't work, the error handling doesn't matter. It's like making sure the coffee machine actually makes coffee before testing what happens when it runs out of water.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #4: Testing Errors with renderHook 🚨</div>
+
+When `useVoting` throws an error (because `votingContext` is `null`), it throws **synchronously** during the hook's render. But `renderHook` is **async** (returns a Promise). This creates a conflict.
+
+**The solution:** Use `.rejects.toThrow()` to catch the rejected Promise:
+
+```typescript
+test("should throw error when votingContext is null", async () => {
+  // Suppress React's noisy console.error
+  jest.spyOn(console, "error").mockImplementation(() => {});
+
+  // The error happens during renderHook, so catch it as a rejected promise
+  await expect(
+    renderHook(() => useVoting("imageId"), {
+      wrapper: ({ children }) => (
+        <RenderWithContext value={null}>{children}</RenderWithContext>
+      )
+    })
+  ).rejects.toThrow("useVoting must be used inside VotingProvider");
+});
+```
+
+**Why this works:**
+1. `renderHook` returns a Promise (it's async in v14)
+2. The hook throws synchronously during render
+3. React catches the error and rejects the Promise returned by `renderHook`
+4. `expect(...).rejects.toThrow(...)` catches the rejected Promise and checks the error message
+
+**Why we suppress console.error:**
+When React catches an error during rendering, it logs it to `console.error`. Without suppressing it, your test output will be noisy with React error messages. We use `jest.spyOn(console, "error").mockImplementation(() => {})` to silence it.
+
+### Deep Dive: What is `jest.spyOn`? 🕵️
+
+Think of `jest.spyOn` like putting a **spy camera** on a function. The spy watches everything the function does - when it's called, what arguments it receives, how many times it's called.
+
+```typescript
+const spy = jest.spyOn(console, "error");
+// Now console.error has a spy on it!
+// After the test, you can check:
+console.log(spy).toHaveBeenCalledTimes(1); // Was it called once?
+```
+
+### What is `.mockImplementation()`? 🎭
+
+`.mockImplementation()` replaces the **real behavior** of the function with your own fake behavior. It's like a **stunt double** - the function looks the same from the outside, but does something different inside.
+
+```typescript
+// Real console.error would print to the terminal:
+console.error("Something went wrong!"); // ❌ Prints: "Something went wrong!"
+
+// After mocking, it does nothing:
+jest.spyOn(console, "error").mockImplementation(() => {});
+console.error("Something went wrong!"); // ✅ Does nothing! Silent!
+```
+
+### Why We Need It for the Error Test
+
+When `useVoting` throws an error (because `votingContext` is `null`), React does two things:
+
+1. **Throws the error** - This is what we want to test
+2. **Logs to console.error** - React's way of saying "hey, something crashed!"
+
+Without suppressing `console.error`, your test output looks like this:
+
+```
+PASS  hooks/useVoting.test.tsx
+  ✓ should return 0 when imageId are no votes (17 ms)
+  ✓ should call loadVoteScore on mount (1 ms)
+  ✓ should call vote with 1 when upvote is called (1 ms)
+  ✓ should call vote with 0 when downvote is called (1 ms)
+  ✓ should throw an error when votingContext is null (5 ms)
+
+  console.error
+    The above error occurred in the <TestHook> component:
+    ...
+    Error: useVoting must be used inside VotingProvider
+```
+
+The test **passes**, but there's a big red `console.error` message that makes it look like something went wrong! It's confusing.
+
+With `jest.spyOn(console, "error").mockImplementation(() => {})`, that `console.error` message is **silenced** - the test passes cleanly with no noise.
+
+### The Two Parts Explained
+
+```typescript
+jest.spyOn(console, "error")     // 🕵️ Put a spy on console.error
+  .mockImplementation(() => {}); // 🎭 Replace it with a function that does nothing
+```
+
+| Part | What it does | Analogy |
+|------|-------------|---------|
+| `jest.spyOn(console, "error")` | Wraps `console.error` with a spy that records calls | Putting a camera on the function |
+| `.mockImplementation(() => {})` | Replaces the real behavior with an empty function | Replacing the actor with a stunt double who does nothing |
+
+### The Cleanup Gotcha! 🚨
+
+**Important:** `jest.spyOn` permanently changes `console.error` until you restore it! If you don't clean up, other tests might be affected.
+
+```typescript
+// ❌ BAD: This test silences console.error for ALL other tests too!
+test("my test", () => {
+  jest.spyOn(console, "error").mockImplementation(() => {});
+  // ... test ...
+}); // console.error is still silenced!
+
+// ✅ GOOD: Restore it after the test
+test("my test", () => {
+  jest.spyOn(console, "error").mockImplementation(() => {});
+  // ... test ...
+  jest.restoreAllMocks(); // Restore console.error to normal!
+});
+```
+
+Or use `afterEach` to restore all mocks after every test:
+```typescript
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+```
+
+### Summary
+
+| Method | What it does | When to use |
+|--------|-------------|-------------|
+| `jest.spyOn(obj, "method")` | Puts a spy on an existing function | When you want to watch or change a real function |
+| `.mockImplementation(fn)` | Replaces the function's behavior | When you want to change what the function does |
+| `.mockReturnValue(value)` | Makes the function return a specific value | When you want to control the return value |
+| `jest.restoreAllMocks()` | Restores all spied functions to original | Always clean up after spying! |
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Tests We Wrote</div>
+
+```typescript
+import { renderHook } from "@testing-library/react-native";
+import React from "react";
+
+import { VotingContext, VotingContextType } from "@/context/voting-context";
+
 import useVoting from "./useVoting";
-import { VotingContext } from "@/context/voting-context";
 
-// Mock the API module
-jest.mock("@/api/api", () => ({
-  getImageVoteScore: jest.fn(),
-  voteImage: jest.fn()
-}));
-
-// Create a wrapper with mock context
-function createWrapper(votingValue: any) {
-  return ({ children }: { children: React.ReactNode }) => (
-    <VotingContext.Provider value={votingValue}>
-      {children}
-    </VotingContext.Provider>
+// Create the wrapper component that has context
+function RenderWithContext({
+  children,
+  value
+}: {
+  children: React.ReactNode;
+  value: VotingContextType;
+}) {
+  return (
+    <VotingContext.Provider value={value}>{children}</VotingContext.Provider>
   );
 }
 
-describe("useVoting", () => {
-  const mockVotingContext = {
+test("should return 0 when imageId are no votes", async () => {
+  const mockContext = {
     errorMessagesByImageId: {},
     isLoadingVotesByImageId: {},
     isVotingByImageId: {},
@@ -1940,51 +2149,100 @@ describe("useVoting", () => {
     voteCountsByImageId: {}
   };
 
-  it("returns initial count when no votes exist", () => {
-    const { result } = renderHook(
-      () => useVoting("cat_123", { initialCount: 5 }),
-      { wrapper: createWrapper(mockVotingContext) }
-    );
-
-    expect(result.current.count).toBe(5);
+  const { result } = await renderHook(() => useVoting("imageId"), {
+    wrapper: ({ children }) => (
+      <RenderWithContext value={mockContext}>{children}</RenderWithContext>
+    )
   });
 
-  it("loads vote score on mount", () => {
-    renderHook(
-      () => useVoting("cat_123"),
-      { wrapper: createWrapper(mockVotingContext) }
-    );
+  expect(result.current.count).toBe(0);
+});
 
-    expect(mockVotingContext.loadVoteScore).toHaveBeenCalledWith("cat_123", undefined);
+test("should call loadVoteScore on mount", async () => {
+  const mockContext = {
+    errorMessagesByImageId: {},
+    isLoadingVotesByImageId: {},
+    isVotingByImageId: {},
+    loadVoteScore: jest.fn(),
+    vote: jest.fn(),
+    voteCountsByImageId: {}
+  };
+
+  await renderHook(() => useVoting("imageId"), {
+    wrapper: ({ children }) => (
+      <RenderWithContext value={mockContext}>{children}</RenderWithContext>
+    )
   });
 
-  it("calls vote with the correct value when upvoting", () => {
-    const { result } = renderHook(
-      () => useVoting("cat_123"),
-      { wrapper: createWrapper(mockVotingContext) }
-    );
+  expect(mockContext.loadVoteScore).toHaveBeenCalled();
+});
 
-    act(() => {
-      result.current.upvote();
-    });
+test("should call vote with 1 when upvote is called", async () => {
+  const mockContext = {
+    errorMessagesByImageId: {},
+    isLoadingVotesByImageId: {},
+    isVotingByImageId: {},
+    loadVoteScore: jest.fn(),
+    vote: jest.fn(),
+    voteCountsByImageId: {}
+  };
 
-    expect(mockVotingContext.vote).toHaveBeenCalledWith("cat_123", 1, undefined);
+  const { result } = await renderHook(() => useVoting("imageId"), {
+    wrapper: ({ children }) => (
+      <RenderWithContext value={mockContext}>{children}</RenderWithContext>
+    )
   });
 
-  it("calls vote with the correct value when downvoting", () => {
-    const { result } = renderHook(
-      () => useVoting("cat_123"),
-      { wrapper: createWrapper(mockVotingContext) }
-    );
+  result.current.upvote();
+  expect(mockContext.vote).toHaveBeenCalledWith("imageId", 1, undefined);
+});
 
-    act(() => {
-      result.current.downvote();
-    });
+test("should call vote with 0 when downvote is called", async () => {
+  const mockContext = {
+    errorMessagesByImageId: {},
+    isLoadingVotesByImageId: {},
+    isVotingByImageId: {},
+    loadVoteScore: jest.fn(),
+    vote: jest.fn(),
+    voteCountsByImageId: {}
+  };
 
-    expect(mockVotingContext.vote).toHaveBeenCalledWith("cat_123", 0, undefined);
+  const { result } = await renderHook(() => useVoting("imageId"), {
+    wrapper: ({ children }) => (
+      <RenderWithContext value={mockContext}>{children}</RenderWithContext>
+    )
   });
+
+  result.current.downvote();
+  expect(mockContext.vote).toHaveBeenCalledWith("imageId", 0, undefined);
 });
 ```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**renderHook**</span> - Renders a hook in a test environment (not a component)
+- <span style="color: #50C878;">**result.current**</span> - The hook's return value (updated after each render)
+- <span style="color: #50C878;">**act**</span> - Wraps state updates so React processes them synchronously
+- <span style="color: #50C878;">**Wrapper Pattern**</span> - Wrapping a hook in a context Provider to control its dependencies
+
+---
+
+### 🐣 Junior Level
+
+Think of `renderHook` like putting your hook in a tiny aquarium so it can survive in the test environment. Always `await` it in v14!
+
+### 🧑‍💻 Mid Level
+
+Remember to **call** the function (with `()`) before checking what happened. `result.current.upvote` is the function itself. `result.current.upvote()` actually runs it!
+
+### 🧙 Senior Level
+
+The `wrapper` option in `renderHook` is powerful - you can provide context, Redux stores, or any other providers your hook needs. Consider creating reusable wrapper factories.
+
+### 🏆 Principal Level
+
+Think about **hook design for testability** - hooks that depend on context are harder to test than hooks that accept parameters. Consider whether your hook's dependencies should be injected or read from context.
+
 
 ---
 
@@ -2022,37 +2280,38 @@ describe("useVoting", () => {
 | 26 | <span style="color: #50C878;">**lcov-report**</span> | An HTML report format that shows coverage visually | `open coverage/lcov-report/index.html` |
 | 27 | <span style="color: #50C878;">**Line Coverage**</span> | Percentage of lines executed | `% Lines` column in coverage report |
 | 28 | <span style="color: #50C878;">**Mock**</span> | A fake version of a real thing (like a pretend API) | `jest.fn()` creates a mock function |
-| 29 | <span style="color: #50C878;">**mockRejectedValue**</span> | Makes a mock function return a rejected Promise | `(getFavourites as jest.Mock).mockRejectedValue(new Error("fail"))` |
-| 30 | <span style="color: #50C878;">**mockResolvedValue**</span> | Makes a mock function return a resolved Promise | `(getFavourites as jest.Mock).mockResolvedValue(mockData)` |
-| 31 | <span style="color: #50C878;">**mockReturnValue**</span> | Makes a mocked function return a specific value (sync) | `jest.spyOn(Math, "random").mockReturnValue(0)` |
-| 32 | <span style="color: #50C878;">**MSW (Mock Service Worker)**</span> | A library that intercepts network requests at the protocol level | `http.get("/api/cats", () => HttpResponse.json([...]))` |
-| 33 | <span style="color: #50C878;">**Preset**</span> | A pre-configured setup so you don't have to configure everything from scratch | `preset: "jest-expo"` in jest config |
-| 34 | <span style="color: #50C878;">**Prop Destructuring**</span> | When a component extracts props and doesn't pass them to child elements | `const { name, size, ...props } = this.props` |
-| 35 | <span style="color: #50C878;">**Pure ESM**</span> | A package that only provides ESM files (`.mjs`), no CJS fallback | MSW depends on pure ESM packages like `rettime` |
-| 36 | <span style="color: #50C878;">**Pure Function**</span> | Same inputs always give same outputs, no side effects | `calculateScore(5, 5)` always returns `50` |
-| 37 | <span style="color: #50C878;">**queryByTestId**</span> | Returns null if element not found (for checking absence) | `expect(screen.queryByTestId("icon")).not.toBeOnTheScreen()` |
-| 38 | <span style="color: #50C878;">**queryByText**</span> | Finds element by text or returns null (for checking absence) | `expect(screen.queryByText("Loading")).toBeNull()` |
-| 39 | <span style="color: #50C878;">**rejects**</span> | Used with `expect` to test that a Promise rejects | `await expect(getFavourites()).rejects.toThrow("error")` |
-| 40 | <span style="color: #50C878;">**render**</span> | Renders a React component into a virtual DOM for testing | `await render(<CircularBTN title="VOTE" />)` |
-| 41 | <span style="color: #50C878;">**renderHook**</span> | Renders a hook in a test environment (not a component) | `const { result } = renderHook(() => useVoting("cat_123"))` |
-| 42 | <span style="color: #50C878;">**renderWithContext**</span> | A custom helper function that renders with context | `renderWithContext(<Component />, true)` |
-| 43 | <span style="color: #50C878;">**screen**</span> | An object that helps you find rendered elements | `screen.getByText("VOTE")`, `screen.getByTestId("btn")` |
-| 44 | <span style="color: #50C878;">**Statement Coverage**</span> | Percentage of code statements executed | `% Stmts` column in coverage report |
-| 45 | <span style="color: #50C878;">**StyleSheet.flatten**</span> | Merges an array of style objects into one flat object | `StyleSheet.flatten(element.props.style)` |
-| 46 | <span style="color: #50C878;">**testID**</span> | A prop used to identify elements in tests (last resort query method) | `<TouchableOpacity testID="circular-btn">` |
-| 47 | <span style="color: #50C878;">**Third-Party Component**</span> | A component from an external library (like `@expo/vector-icons`) | `Ionicons` from `@expo/vector-icons` |
-| 48 | <span style="color: #50C878;">**toBe**</span> | A matcher that checks exact equality (like `===`) | `expect(result).toBe(50)` |
-| 49 | <span style="color: #50C878;">**toBeDefined**</span> | Checks that a value is not `undefined` | `expect(result[0]).toBeDefined()` |
-| 50 | <span style="color: #50C878;">**toHaveLength**</span> | Checks that an array has a specific number of items | `expect(result).toHaveLength(2)` |
-| 51 | <span style="color: #50C878;">**toBeOnTheScreen**</span> | v14 matcher for checking element exists in the rendered tree | `expect(title).toBeOnTheScreen()` |
-| 52 | <span style="color: #50C878;">**toHaveBeenCalled**</span> | Checks a mock was called at least once | `expect(mockFn).toHaveBeenCalled()` |
-| 53 | <span style="color: #50C878;">**toHaveBeenCalledTimes**</span> | Checks exactly how many times a mock was called | `expect(mockFn).toHaveBeenCalledTimes(1)` |
-| 54 | <span style="color: #50C878;">**toEqual**</span> | A matcher that checks value equality (for objects/arrays) | `expect(flatStyle).toEqual({ fontSize: 40 })` |
-| 55 | <span style="color: #50C878;">**Unit Test**</span> | Testing one small piece of code in isolation | Testing a single function or component |
-| 56 | <span style="color: #50C878;">**useFonts**</span> | An async hook from `@expo-google-fonts` that loads custom fonts | `const [fontLoaded] = useFonts({ fontFamily: font })` |
-| 57 | <span style="color: #50C878;">**userEvent**</span> | v14's recommended way to simulate user interactions | `const user = userEvent.setup(); await user.press(btn)` |
-| 58 | <span style="color: #50C878;">**userEvent.setup()**</span> | Creates a user simulation instance | `const user = userEvent.setup()` |
-| 59 | <span style="color: #50C878;">**user.press()**</span> | Simulates a realistic press (touchStart → touchEnd → press) | `await user.press(screen.getByTestId("btn"))` |
-| 60 | <span style="color: #50C878;">**Wrapper Pattern**</span> | Wrapping a component in a context Provider to control its dependencies | `<IsScreenPortraitContext.Provider value={true}>{ui}</...>` |
-| 61 | <span style="color: #50C878;">**.tsx**</span> | File extension needed when using JSX syntax in TypeScript | `circular-btn.test.tsx` (not `.ts`) |
+| 29 | <span style="color: #50C878;">**mockImplementation**</span> | Replaces a function's behavior with a custom implementation | `jest.spyOn(console, "error").mockImplementation(() => {})` |
+| 30 | <span style="color: #50C878;">**mockRejectedValue**</span> | Makes a mock function return a rejected Promise | `(getFavourites as jest.Mock).mockRejectedValue(new Error("fail"))` |
+| 31 | <span style="color: #50C878;">**mockResolvedValue**</span> | Makes a mock function return a resolved Promise | `(getFavourites as jest.Mock).mockResolvedValue(mockData)` |
+| 32 | <span style="color: #50C878;">**mockReturnValue**</span> | Makes a mocked function return a specific value (sync) | `jest.spyOn(Math, "random").mockReturnValue(0)` |
+| 33 | <span style="color: #50C878;">**MSW (Mock Service Worker)**</span> | A library that intercepts network requests at the protocol level | `http.get("/api/cats", () => HttpResponse.json([...]))` |
+| 34 | <span style="color: #50C878;">**Preset**</span> | A pre-configured setup so you don't have to configure everything from scratch | `preset: "jest-expo"` in jest config |
+| 35 | <span style="color: #50C878;">**Prop Destructuring**</span> | When a component extracts props and doesn't pass them to child elements | `const { name, size, ...props } = this.props` |
+| 36 | <span style="color: #50C878;">**Pure ESM**</span> | A package that only provides ESM files (`.mjs`), no CJS fallback | MSW depends on pure ESM packages like `rettime` |
+| 37 | <span style="color: #50C878;">**Pure Function**</span> | Same inputs always give same outputs, no side effects | `calculateScore(5, 5)` always returns `50` |
+| 38 | <span style="color: #50C878;">**queryByTestId**</span> | Returns null if element not found (for checking absence) | `expect(screen.queryByTestId("icon")).not.toBeOnTheScreen()` |
+| 39 | <span style="color: #50C878;">**queryByText**</span> | Finds element by text or returns null (for checking absence) | `expect(screen.queryByText("Loading")).toBeNull()` |
+| 40 | <span style="color: #50C878;">**rejects**</span> | Used with `expect` to test that a Promise rejects | `await expect(getFavourites()).rejects.toThrow("error")` |
+| 41 | <span style="color: #50C878;">**render**</span> | Renders a React component into a virtual DOM for testing | `await render(<CircularBTN title="VOTE" />)` |
+| 42 | <span style="color: #50C878;">**renderHook**</span> | Renders a hook in a test environment (not a component) | `const { result } = renderHook(() => useVoting("cat_123"))` |
+| 43 | <span style="color: #50C878;">**renderWithContext**</span> | A custom helper function that renders with context | `renderWithContext(<Component />, true)` |
+| 44 | <span style="color: #50C878;">**screen**</span> | An object that helps you find rendered elements | `screen.getByText("VOTE")`, `screen.getByTestId("btn")` |
+| 45 | <span style="color: #50C878;">**Statement Coverage**</span> | Percentage of code statements executed | `% Stmts` column in coverage report |
+| 46 | <span style="color: #50C878;">**StyleSheet.flatten**</span> | Merges an array of style objects into one flat object | `StyleSheet.flatten(element.props.style)` |
+| 47 | <span style="color: #50C878;">**testID**</span> | A prop used to identify elements in tests (last resort query method) | `<TouchableOpacity testID="circular-btn">` |
+| 48 | <span style="color: #50C878;">**Third-Party Component**</span> | A component from an external library (like `@expo/vector-icons`) | `Ionicons` from `@expo/vector-icons` |
+| 49 | <span style="color: #50C878;">**toBe**</span> | A matcher that checks exact equality (like `===`) | `expect(result).toBe(50)` |
+| 50 | <span style="color: #50C878;">**toBeDefined**</span> | Checks that a value is not `undefined` | `expect(result[0]).toBeDefined()` |
+| 51 | <span style="color: #50C878;">**toHaveLength**</span> | Checks that an array has a specific number of items | `expect(result).toHaveLength(2)` |
+| 52 | <span style="color: #50C878;">**toBeOnTheScreen**</span> | v14 matcher for checking element exists in the rendered tree | `expect(title).toBeOnTheScreen()` |
+| 53 | <span style="color: #50C878;">**toHaveBeenCalled**</span> | Checks a mock was called at least once | `expect(mockFn).toHaveBeenCalled()` |
+| 54 | <span style="color: #50C878;">**toHaveBeenCalledTimes**</span> | Checks exactly how many times a mock was called | `expect(mockFn).toHaveBeenCalledTimes(1)` |
+| 55 | <span style="color: #50C878;">**toEqual**</span> | A matcher that checks value equality (for objects/arrays) | `expect(flatStyle).toEqual({ fontSize: 40 })` |
+| 56 | <span style="color: #50C878;">**Unit Test**</span> | Testing one small piece of code in isolation | Testing a single function or component |
+| 57 | <span style="color: #50C878;">**useFonts**</span> | An async hook from `@expo-google-fonts` that loads custom fonts | `const [fontLoaded] = useFonts({ fontFamily: font })` |
+| 58 | <span style="color: #50C878;">**userEvent**</span> | v14's recommended way to simulate user interactions | `const user = userEvent.setup(); await user.press(btn)` |
+| 59 | <span style="color: #50C878;">**userEvent.setup()**</span> | Creates a user simulation instance | `const user = userEvent.setup()` |
+| 60 | <span style="color: #50C878;">**user.press()**</span> | Simulates a realistic press (touchStart → touchEnd → press) | `await user.press(screen.getByTestId("btn"))` |
+| 61 | <span style="color: #50C878;">**Wrapper Pattern**</span> | Wrapping a component in a context Provider to control its dependencies | `<IsScreenPortraitContext.Provider value={true}>{ui}</...>` |
+| 62 | <span style="color: #50C878;">**.tsx**</span> | File extension needed when using JSX syntax in TypeScript | `circular-btn.test.tsx` (not `.ts`) |
 

@@ -1689,6 +1689,32 @@ npx jest --coverage --coverageDirectory=coverage
 open coverage/lcov-report/index.html
 ```
 
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How to See Live Updates of Coverage</div>
+
+Want to see coverage update in real-time as you write tests? Follow these steps:
+
+1. **Run Jest in watch mode** - Open a terminal and run:
+   ```bash
+   npx jest --watch --coverage
+   ```
+   This will re-run your tests (and regenerate the coverage report) every time you save a file.
+
+2. **Install the Live Server extension** - In VS Code, go to the Extensions panel (Cmd+Shift+X) and search for **"Live Server"** by Ritwick Dey. Click Install.
+
+3. **Open the coverage HTML report** - In VS Code's file explorer, navigate to:
+   ```
+   coverage/lcov-report/index.html
+   ```
+
+4. **Launch with Live Server** - Right-click on `index.html` and select **"Open with Live Server"**. This will open the coverage report in your browser and auto-refresh it whenever the file changes!
+
+Now you can:
+- Write a test → Save the file → Jest re-runs in watch mode → Coverage report auto-refreshes in the browser
+- See green (tested) and red (untested) lines update in real-time
+- Instantly know if your new test improved coverage!
+
+**Pro tip:** Keep the terminal and browser side-by-side for maximum productivity! 🚀
+
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Understanding the Coverage Report</div>
 
 ```

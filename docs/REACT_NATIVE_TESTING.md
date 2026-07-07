@@ -2243,6 +2243,166 @@ The `wrapper` option in `renderHook` is powerful - you can provide context, Redu
 
 Think about **hook design for testability** - hooks that depend on context are harder to test than hooks that accept parameters. Consider whether your hook's dependencies should be injected or read from context.
 
+---
+
+## 14. Testing useFavourites Hook
+
+> ✅ **Completed!** You created `hooks/useFavourites.test.tsx` with 2 passing tests and 100% coverage!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+We tested `useFavourites` - a simpler hook that just reads from `FavouritesContext` and returns it. Unlike `useVoting`, this hook doesn't have any custom logic - it's a straight pass-through from context.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test This?</div>
+
+Even simple hooks need testing because:
+- The error handling (throwing when context is null) needs verification
+- The return value needs to match what the context provides
+- Changes to the context type could break the hook silently
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #1: `result` vs `result.current` 🚨</div>
+
+This is the most common mistake when testing hooks! `renderHook` returns an object with a `current` property:
+
+```typescript
+const { result } = await renderHook(() => useFavourites(), {
+  wrapper: ({ children }) => (
+    <RenderWithContext value={mockContext}>{children}</RenderWithContext>
+  )
+});
+
+// ❌ WRONG: result is the wrapper object { current: {...} }
+expect(result).toEqual(mockContext);
+
+// ✅ CORRECT: result.current is the hook's return value
+expect(result.current).toEqual(mockContext);
+```
+
+Think of `renderHook` like a gift box 🎁:
+- `result` is the **box** (the wrapper object)
+- `result.current` is the **gift inside** (the hook's actual return value)
+
+| Expression | What it is | Example value |
+|-----------|-----------|---------------|
+| `result` | The wrapper object | `{ current: { errorMessage: "", ... } }` |
+| `result.current` | The hook's return value | `{ errorMessage: "", ... }` |
+| `mockContext` | What we expect the hook to return | `{ errorMessage: "", ... }` |
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Tests We Wrote</div>
+
+```typescript
+import { renderHook } from "@testing-library/react-native";
+
+import {
+  FavouritesContext,
+  FavouritesContextType
+} from "@/context/favourites-context";
+
+import useFavourites from "./useFavourites";
+
+function RenderWithContext({
+  children,
+  value
+}: {
+  children: React.ReactNode;
+  value: FavouritesContextType;
+}) {
+  return (
+    <FavouritesContext.Provider value={value}>
+      {children}
+    </FavouritesContext.Provider>
+  );
+}
+
+test("should throw a new error when there favourites context is null", async () => {
+  const mockContext = null;
+
+  jest.spyOn(console, "error").mockImplementation(() => {});
+
+  await expect(
+    renderHook(() => useFavourites(), {
+      wrapper: ({ children }) => (
+        <RenderWithContext value={mockContext}>{children}</RenderWithContext>
+      )
+    })
+  ).rejects.toThrow("useFavourites must be used inside FavouritesContext");
+
+  jest.restoreAllMocks();
+});
+
+test("should return favourite when favourite context is present", async () => {
+  const mockContext = {
+    errorMessage: "",
+    favouriteImageIds: { "": true },
+    favouriteImages: [
+      {
+        id: "",
+        url: "",
+        width: 4,
+        height: 4,
+        mime_type: "",
+        entities: [""],
+        breeds: {
+          id: 1,
+          name: "",
+          wikipedia_url: ""
+        },
+        animals: [""],
+        categories: [""]
+      }
+    ],
+    favouriteImagesById: { "": true },
+    favouriteLoadingImageIds: { "": true },
+    isLoading: false,
+    loadFavouriteImageIds: jest.fn(),
+    loadFavouriteImages: jest.fn(),
+    toggleFavourite: jest.fn()
+  };
+
+  const { result } = await renderHook(() => useFavourites(), {
+    wrapper: ({ children }) => (
+      <RenderWithContext value={mockContext}>{children}</RenderWithContext>
+    )
+  });
+
+  expect(result.current).toEqual(mockContext);
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**result.current**</span> - The hook's return value (NOT the wrapper object)
+- <span style="color: #50C878;">**toEqual**</span> - Deep equality matcher for comparing objects/arrays
+
+---
+
+### 🐣 Junior Level
+
+Always use `result.current` when checking what a hook returns. `result` is the box, `result.current` is the gift inside!
+
+### 🧑‍💻 Mid Level
+
+When a test fails with a diff like this:
+```
+- Expected  - 0
++ Received  + 2
+  Object {
++   "current": Object {
+```
+
+It means you're comparing `result` (the wrapper) instead of `result.current` (the value). The `+ 2` lines show the extra `current` wrapper.
+
+### 🧙 Senior Level
+
+Simple hooks that just return context are the easiest to test. They're also a good indicator of whether your context types are correct - if the test passes, your hook and context types match!
+
+### 🏆 Principal Level
+
+Consider whether you even need a hook that just returns context. Sometimes it's simpler to use `useContext(FavouritesContext)` directly in components. But having a hook gives you:
+- A single place to add validation (like the null check)
+- Easier refactoring if the context API changes
+- Better testability (you test the hook, not the context everywhere)
+
 
 ---
 

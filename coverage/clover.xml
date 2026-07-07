@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1783434905733" clover="3.2.0">
-  <project timestamp="1783434905733" name="All files">
+<coverage generated="1783446520180" clover="3.2.0">
+  <project timestamp="1783446520180" name="All files">
     <metrics statements="423" coveredstatements="101" conditionals="239" coveredconditionals="59" methods="96" coveredmethods="21" elements="758" coveredelements="181" complexity="0" loc="423" ncloc="423" packages="12" files="29" classes="29"/>
     <package name="rate-my-kitty">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>

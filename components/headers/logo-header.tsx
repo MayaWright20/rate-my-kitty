@@ -29,6 +29,7 @@ function PurpleHeader({
   return (
     <View style={styles.container}>
       <Svg
+        testID="logo-header-purple-svg"
         width={width}
         height={
           isScreenPortrait ? headerPortraitHeight : headerHorizontalHeight

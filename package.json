@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "test": "jest --watch && npx jest --coverage && open coverage/lcov-report/index.html",
+    "test": "jest --watch",
+    "test:all": "jest --watch && npx jest --coverage && open coverage/lcov-report/index.html",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",

@@ -22,7 +22,8 @@
 14. [Testing Context Providers](#14-testing-context-providers)
 15. [Testing Async Operations & Error States](#15-testing-async-operations--error-states)
 16. [Integration Testing](#16-integration-testing)
-17. [Testing Best Practices & Patterns](#17-testing-best-practices--patterns)
+17. [Viewing Coverage for Specific Tests](#17-viewing-coverage-for-specific-tests)
+18. [Testing Best Practices & Patterns](#18-testing-best-practices--patterns)
 
 ---
 
@@ -2734,6 +2735,331 @@ Think about **testability when designing state management**:
 - Can you prove the `?? 0` is either reachable (and tested) or unreachable (and removable)?
 
 Consider writing a **state machine diagram** for complex providers to identify all possible states and transitions. This helps ensure you have tests for every path.
+
+## 16. Integration Testing
+
+> ✅ **In Progress!** You created `context/voting-context.integration.test.tsx` to test `useVoting` with the real `VotingProvider`.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+Integration testing is testing how **multiple pieces work together**. Instead of mocking everything, we let some real pieces interact and verify they work as a team.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test Integration?</div>
+
+Unit tests prove each piece works in isolation. Integration tests prove the pieces work **together**. This catches bugs that unit tests miss:
+
+- Does the hook correctly read from the real provider?
+- Does the provider's state update when the hook calls its functions?
+- Does the context connection work end-to-end?
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Burger Analogy 🍔</div>
+
+| Test Type | What it tests | Example |
+|-----------|---------------|---------|
+| **Unit Test** | Each ingredient separately | Is the patty cooked? Is the bun fresh? Is the cheese melted? |
+| **Integration Test** | The burger assembled | Does the patty + bun + cheese + lettuce taste good together? |
+| **E2E Test** | The whole restaurant experience | Can a customer order, pay, receive, and eat the burger? |
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Unit Test vs Integration Test for VotingContext</div>
+
+| Aspect | Unit Test (Section 15) | Integration Test (This Section) |
+|--------|----------------------|----------------------------------|
+| What we test | `useVotingProviderValue()` directly | `useVoting` with real `VotingProvider` |
+| What's real | The provider's state/functions | The provider + the context connection |
+| What's mocked | API calls (`jest.mock`) | API calls (`jest.mock`) |
+| What we prove | "The provider logic works" | "The hook + provider work together" |
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The TV Remote Analogy 📺</div>
+
+Think of the integration test like testing a TV remote control:
+
+| Part | What it is | In our test |
+|------|-----------|-------------|
+| 📺 **The TV** | The provider with its state | `useVotingProviderValue()` |
+| 🎮 **The Remote** | The hook that controls the TV | `useVoting("imageId")` |
+| 🔌 **The Signal** | The context connection | `VotingContext.Provider` |
+
+We need **two** `renderHook` calls because:
+1. **First** `renderHook` creates the TV (the provider with its state)
+2. **Second** `renderHook` creates the remote (the hook) and connects it to the TV via context
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #1: No VotingProvider Component! 🚨</div>
+
+Looking at `voting-context.tsx`, there's no `VotingProvider` component! There's only:
+- `useVotingProviderValue()` - a hook that creates the state and functions
+- `VotingContext` - the context object
+
+The provider is created **inline** in `app/_layout.tsx`:
+```typescript
+const voting = useVotingProviderValue();
+// ...
+<VotingContext.Provider value={voting}>
+```
+
+So in our integration test, we replicate this pattern manually:
+```typescript
+const { result: providerResult } = await renderHook(() => useVotingProviderValue());
+
+const { result } = await renderHook(() => useVoting("imageId"), {
+  wrapper: ({ children }) => (
+    <VotingContext.Provider value={providerResult.current}>
+      {children}
+    </VotingContext.Provider>
+  )
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #2: Why Check the Provider, Not the Hook? 🚨</div>
+
+In the unit test, we checked `result.current.count` (the hook's return value). But in this integration test, we check `providerResult.current.voteCountsByImageId["imageId"]` (the provider's state).
+
+Why? Because we want to prove that the **whole chain works**:
+1. `useVoting.upvote()` calls `voteFromContext(1)`
+2. Which calls `provider.vote("imageId", 1)`
+3. Which updates `provider.voteCountsByImageId["imageId"]`
+
+If the provider's state updated, we know the hook successfully communicated with it through context!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #3: The `act()` Wrapper 🚨</div>
+
+Both `loadVoteScore` and `upvote` are async and update React state. We wrap them in `act()` to make sure all state updates are processed before we check the result:
+
+```typescript
+await act(async () => {
+  await providerResult.current.loadVoteScore("imageId");
+});
+
+await act(async () => {
+  await result.current.upvote();
+});
+```
+
+Without `act()`, you'll see this warning:
+```
+console.error
+  An update to HookContainer inside a test was not wrapped in act(...)
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Test We're Writing</div>
+
+```typescript
+import { act, renderHook } from "@testing-library/react-native";
+
+import { getImageVoteScore, voteImage } from "@/api/api";
+import useVoting from "@/hooks/useVoting";
+
+import {
+  useVotingProviderValue,
+  VotingContext
+} from "./voting-context";
+
+// Mock the API - we don't want real network calls
+jest.mock("@/api/api", () => ({
+  getImageVoteScore: jest.fn(),
+  voteImage: jest.fn()
+}));
+
+test("should update count when upvote is called (integration test)", async () => {
+  // Step 1: Make the API return a score of 0 initially
+  (getImageVoteScore as jest.Mock).mockResolvedValue(0);
+  // Make voteImage succeed
+  (voteImage as jest.Mock).mockResolvedValue({});
+
+  // Step 2: Create the REAL provider (like the TV)
+  const { result: providerResult } = await renderHook(() =>
+    useVotingProviderValue()
+  );
+
+  // Step 3: Create useVoting connected to the REAL provider (like the remote)
+  const { result } = await renderHook(() => useVoting("imageId"), {
+    wrapper: ({ children }) => (
+      <VotingContext.Provider value={providerResult.current}>
+        {children}
+      </VotingContext.Provider>
+    )
+  });
+
+  // Step 4: Wait for the initial loadVoteScore to complete
+  await act(async () => {
+    await providerResult.current.loadVoteScore("imageId");
+  });
+
+  // Step 5: Call upvote through the hook
+  await act(async () => {
+    await result.current.upvote();
+  });
+
+  // Step 6: Check the count updated in the PROVIDER (not the hook)
+  expect(providerResult.current.voteCountsByImageId["imageId"]).toBe(1);
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**Integration Test**</span> - Testing how multiple pieces work together (not in isolation)
+- <span style="color: #50C878;">**Two renderHook Pattern**</span> - Creating the provider in one renderHook and the consumer in another
+- <span style="color: #50C878;">**act**</span> - Wraps async state updates so they're processed before assertions
+
+---
+
+### 🐣 Junior Level
+
+Integration tests are like testing that the TV remote actually controls the TV. Unit tests check the remote's buttons work, integration tests check the signal reaches the TV!
+
+### 🧑‍💻 Mid Level
+
+The key difference from unit tests: in integration tests, you use the **real** provider (not a mock). Only mock external dependencies like API calls. This tests the actual connection between your components.
+
+### 🧙 Senior Level
+
+The "two renderHook" pattern is a common technique for testing context-dependent hooks. You create the provider in one renderHook, then pass its value to the consumer in another. This gives you access to both the provider's internal state and the hook's return value.
+
+### 🏆 Principal Level
+
+Consider what level of integration testing is right for your app:
+- **Shallow integration**: Test hook + real provider (what we're doing)
+- **Deep integration**: Test component + real provider + real API (with MSW)
+- **Full integration**: Test screen + all real providers + mocked API
+
+Each level gives more confidence but is harder to set up. Start shallow and go deeper as needed!
+
+
+## 17. Viewing Coverage for Specific Tests
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+When you run `npx jest --coverage`, Jest runs **all** test files and combines their coverage. But sometimes you want to see coverage for **just one test file** - like seeing what your integration test covers vs your unit test.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why View Coverage for Specific Tests?</div>
+
+- **Compare test types** - See what your integration test covers vs your unit test
+- **Identify gaps** - Find code that only one test type covers
+- **Debug coverage** - Understand why a line isn't covered
+- **Focus development** - See the impact of a single test file
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How to Run Coverage for a Single Test File</div>
+
+```bash
+# Run coverage for just the integration test
+npx jest context/voting-context.integration.test.tsx --coverage
+
+# Run coverage for just the unit test
+npx jest context/voting-context.test.tsx --coverage
+
+# Run coverage for a specific pattern
+npx jest context/ --coverage
+```
+
+Each time you run `--coverage`, it **overwrites** the previous report in the `coverage/` folder.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #1: Coverage Overwrites! 🚨</div>
+
+```bash
+# ❌ This overwrites the previous report!
+npx jest context/voting-context.test.tsx --coverage
+npx jest context/voting-context.integration.test.tsx --coverage
+# Now the coverage/ folder only shows integration test coverage!
+```
+
+**Solution:** Use `--coverageDirectory` to save reports to different folders:
+
+```bash
+# Save unit test coverage to coverage-unit/
+npx jest context/voting-context.test.tsx --coverage --coverageDirectory=coverage-unit
+
+# Save integration test coverage to coverage-integration/
+npx jest context/voting-context.integration.test.tsx --coverage --coverageDirectory=coverage-integration
+
+# Open both reports side by side!
+open coverage-unit/lcov-report/index.html
+open coverage-integration/lcov-report/index.html
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #2: Coverage Only Shows Imported Files! 🚨</div>
+
+Jest's default coverage only includes files that are **imported by your tests**. If a file is never imported, it won't appear in the report at all - not even at 0%!
+
+This is why we added `collectCoverageFrom` to `jest.config.js`:
+
+```javascript
+jestConfig.collectCoverageFrom = [
+  "**/*.{ts,tsx}",           // All TypeScript files
+  "!**/node_modules/**",     // Ignore dependencies
+  "!**/coverage/**",         // Ignore coverage output
+  "!**/*.config.*",          // Ignore config files
+  "!**/app/**",              // Ignore Expo Router files
+  "!**/assets/**",           // Ignore static assets
+  "!**/__mocks__/**",        // Ignore mock files
+  "!**/.expo/**",            // Ignore Expo build files
+  "!**/types.ts"             // Ignore type definition files
+];
+```
+
+This tells Jest: "Include ALL TypeScript files in the coverage report, even if no test imports them." Now you'll see files at 0% coverage, giving you a roadmap of what to test next!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Comparing Unit vs Integration Coverage</div>
+
+| Command | What it shows | Use case |
+|---------|---------------|----------|
+| `npx jest --coverage` | **All** tests combined | Overall project health |
+| `npx jest voting-context.test.tsx --coverage` | **Unit test only** | Does the unit test cover all branches? |
+| `npx jest voting-context.integration.test.tsx --coverage` | **Integration test only** | Does the integration test add coverage? |
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How to View the HTML Report</div>
+
+```bash
+# Open the default coverage report
+open coverage/lcov-report/index.html
+
+# Open a specific coverage report
+open coverage-unit/lcov-report/index.html
+open coverage-integration/lcov-report/index.html
+```
+
+The HTML report shows:
+- **Green lines** - Code that was executed during tests
+- **Red lines** - Code that was NOT executed
+- **Yellow indicators** - Branches that weren't fully tested (e.g., only one side of a ternary)
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**--coverageDirectory**</span> - A Jest flag that saves coverage reports to a specific folder
+- <span style="color: #50C878;">**collectCoverageFrom**</span> - Jest config that tells Jest which files to include in coverage
+- <span style="color: #50C878;">**lcov-report**</span> - An HTML report format that shows coverage visually
+
+---
+
+### 🐣 Junior Level
+
+Run `npx jest MyTestFile.test.tsx --coverage` to see coverage for just one test file. Use `open coverage/lcov-report/index.html` to see the visual report!
+
+### 🧑‍💻 Mid Level
+
+Use `--coverageDirectory` to save multiple coverage reports without overwriting. This lets you compare what different test files cover.
+
+### 🧙 Senior Level
+
+The `collectCoverageFrom` config is essential for getting an accurate picture of project-wide coverage. Without it, untested files are invisible in the report.
+
+### 🏆 Principal Level
+
+Consider adding coverage thresholds to your CI pipeline:
+```javascript
+// jest.config.js
+module.exports = {
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80
+    }
+  }
+};
+```
+
+This prevents coverage from dropping below a certain level. But remember: **coverage is a tool, not a goal**. 100% coverage doesn't mean 0 bugs!
+
 
 ## 📖 Glossary of Keywords
 

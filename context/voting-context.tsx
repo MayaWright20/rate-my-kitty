@@ -3,7 +3,7 @@ import { createContext, useCallback, useMemo, useState } from "react";
 import { getImageVoteScore, voteImage } from "@/api/api";
 import { VoteValue } from "@/types";
 
-type VotingContextValue = {
+export type VotingContextValue = {
   errorMessagesByImageId: Record<string, string | null>;
   isLoadingVotesByImageId: Record<string, boolean>;
   isVotingByImageId: Record<string, boolean>;

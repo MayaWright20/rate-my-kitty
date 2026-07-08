@@ -2406,6 +2406,335 @@ Consider whether you even need a hook that just returns context. Sometimes it's 
 
 ---
 
+## 15. Testing Context Providers
+
+> ✅ **Completed!** You created `context/voting-context.test.tsx` with 7 passing tests covering empty state, loadVoteScore success/error, vote guard clause, vote success, vote rollback, and error messages!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+We're testing the `VotingContext` provider directly - the actual state management logic that powers voting in the app. Unlike testing hooks (which test how a component *uses* the context), testing the provider tests the context *itself* - its state, its functions, and how they interact.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why Test Context Providers?</div>
+
+Context providers contain **core business logic**:
+- State management (counts, loading states, error messages)
+- Async operations (API calls with loading/error states)
+- Optimistic updates (update UI before API responds)
+- Rollback logic (revert UI when API fails)
+
+Testing the provider directly gives you:
+- **Isolation** - Test the logic without needing a component
+- **Coverage** - Reach all the branches and edge cases
+- **Confidence** - Know the state machine works correctly
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Vending Machine Analogy 🥤</div>
+
+Think of the VotingContext provider like a **vending machine**:
+
+| Vending Machine | VotingContext Provider |
+|----------------|----------------------|
+| Press a button for a drink | Call `loadVoteScore("cat_123")` |
+| "Dispensing..." light turns on | `isLoadingVotesByImageId["cat_123"] = true` |
+| Machine checks its stock | Calls `getImageVoteScore("cat_123")` |
+| Display shows drinks left | `voteCountsByImageId["cat_123"] = 5` |
+| "Dispensing..." light turns off | `isLoadingVotesByImageId["cat_123"] = false` |
+| Machine is broken | API throws an error |
+| Shows "Out of stock!" error | `errorMessagesByImageId["cat_123"] = "Failed to fetch"` |
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #1: Importing Mocked Functions 🚨</div>
+
+When you use `jest.mock()` to mock a module, the mock variables created inside the factory function are **not available** in your test scope:
+
+```typescript
+// ❌ This creates a mock, but getImageVoteScore is NOT in scope!
+jest.mock("@/api/api", () => ({
+  getImageVoteScore: jest.fn(),
+  voteImage: jest.fn()
+}));
+
+test("my test", () => {
+  // ❌ ReferenceError: getImageVoteScore is not defined!
+  (getImageVoteScore as jest.Mock).mockResolvedValue(5);
+});
+```
+
+**The fix:** Import the mocked function! Since `jest.mock()` replaces the module at the top of the file, importing it gives you the **mocked version**:
+
+```typescript
+import { getImageVoteScore, voteImage } from "@/api/api";
+
+// ✅ Now getImageVoteScore is in scope!
+jest.mock("@/api/api", () => ({
+  getImageVoteScore: jest.fn(),
+  voteImage: jest.fn()
+}));
+
+test("my test", () => {
+  // ✅ Works! getImageVoteScore is the mocked version
+  (getImageVoteScore as jest.Mock).mockResolvedValue(5);
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #2: The `act()` Wrapper 🚨</div>
+
+When testing async functions that update React state, you must wrap them in `act()`:
+
+```typescript
+// ❌ State updates might not be processed yet!
+await result.current.loadVoteScore("cat_123");
+expect(result.current.voteCountsByImageId["cat_123"]).toBe(5); // Might be undefined!
+
+// ✅ All state updates are processed before we check
+await act(async () => {
+  await result.current.loadVoteScore("cat_123");
+});
+expect(result.current.voteCountsByImageId["cat_123"]).toBe(5); // Definitely 5!
+```
+
+Think of `act()` like a **traffic controller** 🚦:
+- Without `act()`: State updates happen whenever they want
+- With `act()`: All state updates are processed immediately
+
+Without `act()`, you'll see this warning:
+```
+console.error
+  An update to HookContainer inside a test was not wrapped in act(...)
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #3: `mockResolvedValue` vs `mockRejectedValue` 🚨</div>
+
+| Method | What it does | When to use |
+|--------|-------------|-------------|
+| `.mockResolvedValue(5)` | Makes the mock return a successful Promise with value `5` | Testing the **happy path** (API succeeds) |
+| `.mockRejectedValue(new Error("fail"))` | Makes the mock return a rejected Promise with an Error | Testing the **error path** (API fails) |
+| `.mockRejectedValue("string")` | Makes the mock throw a **non-Error** value | Testing the **fallback path** (`e instanceof Error` is `false`) |
+
+```typescript
+// Happy path: API succeeds
+(getImageVoteScore as jest.Mock).mockResolvedValue(5);
+
+// Error path: API throws an Error
+(getImageVoteScore as jest.Mock).mockRejectedValue(new Error("Failed to fetch"));
+
+// Fallback path: API throws a non-Error (string, number, etc.)
+(voteImage as jest.Mock).mockRejectedValue("Something went wrong");
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #4: The `?? 0` Safety Net 🚨</div>
+
+The `??` operator is the **nullish coalescing operator**. It means "if the value is `null` or `undefined`, use this default instead":
+
+```typescript
+(currentCounts[imageId] ?? 0)
+// If currentCounts[imageId] is undefined, use 0
+```
+
+In the vote rollback code:
+```typescript
+// Optimistic update (line 80-83):
+setVoteCountsByImageId((currentCounts) => ({
+  ...currentCounts,
+  [imageId]: (currentCounts[imageId] ?? 0) + countChange
+}));
+
+// Rollback on failure (line 88-91):
+setVoteCountsByImageId((currentCounts) => ({
+  ...currentCounts,
+  [imageId]: (currentCounts[imageId] ?? 0) - countChange
+}));
+```
+
+**Important insight:** The `?? 0` on the rollback line is **defensive programming** - it's a safety net. In practice, the optimistic update ALWAYS runs before the rollback, so `currentCounts[imageId]` will always have a value. But the `?? 0` protects against edge cases where the optimistic update might not have run.
+
+**Can we test the `?? 0` path?** Technically no - because the optimistic update always runs first in the current code. The `?? 0` is unreachable dead code. But keeping it is fine - it's defensive programming!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #5: Testing `e instanceof Error` Branches 🚨</div>
+
+The catch block has two paths:
+```typescript
+} catch (e) {
+  const message = e instanceof Error ? e.message : "Failed to vote";
+  setErrorMessagesByImageId((currentMessages) => ({
+    ...currentMessages,
+    [imageId]: message
+  }));
+}
+```
+
+| Path | What's thrown | `e instanceof Error` | `message` value |
+|------|--------------|---------------------|-----------------|
+| ✅ `e.message` | `new Error("Network error")` | `true` | `"Network error"` |
+| ✅ Fallback | `"Something went wrong"` (a string) | `false` | `"Failed to vote"` |
+
+To test the fallback path, make the mock throw a **non-Error** value:
+```typescript
+// Test the e.message path
+(voteImage as jest.Mock).mockRejectedValue(new Error("Network error"));
+
+// Test the fallback path
+(voteImage as jest.Mock).mockRejectedValue("Something went wrong");
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Tests We Wrote</div>
+
+```typescript
+import { act, renderHook } from "@testing-library/react-native";
+
+import { getImageVoteScore, voteImage } from "@/api/api";
+
+import { useVotingProviderValue } from "./voting-context";
+
+// The provider calls API functions, so we need to mock them
+jest.mock("@/api/api", () => ({
+  getImageVoteScore: jest.fn(),
+  voteImage: jest.fn()
+}));
+
+test("should start with empty state", async () => {
+  const { result } = await renderHook(() => useVotingProviderValue());
+
+  expect(result.current.voteCountsByImageId).toEqual({});
+  expect(result.current.isLoadingVotesByImageId).toEqual({});
+  expect(result.current.isVotingByImageId).toEqual({});
+  expect(result.current.errorMessagesByImageId).toEqual({});
+});
+
+test("should update count when loadVoteScore succeeds", async () => {
+  (getImageVoteScore as jest.Mock).mockResolvedValue(5);
+
+  const { result } = await renderHook(() => useVotingProviderValue());
+
+  await act(async () => {
+    await result.current.loadVoteScore("imageId");
+  });
+
+  expect(result.current.voteCountsByImageId["imageId"]).toBe(5);
+  expect(result.current.isLoadingVotesByImageId["imageId"]).toBe(false);
+});
+
+test("should store error message when loadVoteScore fails", async () => {
+  (getImageVoteScore as jest.Mock).mockRejectedValue(
+    new Error("Failed to fetch")
+  );
+
+  const { result } = await renderHook(() => useVotingProviderValue());
+
+  await act(async () => {
+    await result.current.loadVoteScore("imageId");
+  });
+
+  expect(result.current.errorMessagesByImageId["imageId"]).toBe(
+    "Failed to fetch"
+  );
+  expect(result.current.isLoadingVotesByImageId["imageId"]).toBe(false);
+  expect(result.current.voteCountsByImageId["imageId"]).toBeUndefined();
+});
+
+test("should not call voteImage when vote is called and isVotingByImageId[imageId] is true", async () => {
+  (voteImage as jest.Mock).mockResolvedValue(2);
+
+  const { result } = await renderHook(() => useVotingProviderValue());
+  result.current.isVotingByImageId["imageId"] = true;
+
+  await act(async () => {
+    await result.current.vote("imageId", 1);
+  });
+
+  expect(voteImage).not.toHaveBeenCalled();
+});
+
+test("should call voteImage when vote is called and isVotingByImageId[imageId] is false", async () => {
+  (voteImage as jest.Mock).mockResolvedValue(2);
+
+  const { result } = await renderHook(() => useVotingProviderValue());
+
+  await act(async () => {
+    await result.current.vote("imageId", 1);
+  });
+
+  expect(result.current.isVotingByImageId["imageId"]).toBe(false);
+  expect(voteImage).toHaveBeenCalled();
+});
+
+test("should reset vote when vote is called and voteImage fails and voteImage value is 1", async () => {
+  (voteImage as jest.Mock).mockRejectedValue(0);
+
+  const { result } = await renderHook(() => useVotingProviderValue());
+
+  result.current.voteCountsByImageId["imageId"] = 5;
+  await act(async () => {
+    await result.current.vote("imageId", 1);
+  });
+
+  expect(voteImage).toHaveBeenCalled();
+  expect(result.current.voteCountsByImageId["imageId"]).toBe(5);
+});
+
+test("should reset vote when vote is called and voteImage fails and voteImage value is 0", async () => {
+  (voteImage as jest.Mock).mockRejectedValue(5);
+
+  const { result } = await renderHook(() => useVotingProviderValue());
+
+  result.current.voteCountsByImageId["imageId"] = 5;
+  await act(async () => {
+    await result.current.vote("imageId", 0);
+  });
+
+  expect(voteImage).toHaveBeenCalled();
+  expect(result.current.voteCountsByImageId["imageId"]).toBe(5);
+});
+
+test("should store error message when vote fails", async () => {
+  (getImageVoteScore as jest.Mock).mockRejectedValue(
+    new Error("Failed to fetch")
+  );
+
+  const { result } = await renderHook(() => useVotingProviderValue());
+
+  await act(async () => {
+    await result.current.vote("imageId", 1);
+  });
+
+  expect(result.current.errorMessagesByImageId["imageId"]).toBe(
+    "Failed to vote"
+  );
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**act**</span> - A function from testing library that tells React to process all state updates synchronously
+- <span style="color: #50C878;">**mockResolvedValue**</span> - Makes a mock function return a resolved Promise
+- <span style="color: #50C878;">**mockRejectedValue**</span> - Makes a mock function return a rejected Promise
+- <span style="color: #50C878;">**Nullish Coalescing Operator (??)**</span> - Returns the right side if the left side is `null` or `undefined`
+- <span style="color: #50C878;">**Optimistic Update**</span> - Updating the UI before the API responds (assumes success)
+- <span style="color: #50C878;">**Rollback**</span> - Reverting an optimistic update when the API fails
+- <span style="color: #50C878;">**Defensive Programming**</span> - Writing code that handles unexpected edge cases gracefully
+
+---
+
+### 🐣 Junior Level
+
+Always wrap async operations in `act()` when testing hooks that update state. Think of `act()` like a traffic controller that makes sure all state updates happen before you check the values.
+
+### 🧑‍💻 Mid Level
+
+Understand the difference between `mockResolvedValue` (happy path) and `mockRejectedValue` (error path). Always test both! Also understand that `??` is different from `||` - `??` only checks for `null`/`undefined`, while `||` checks for any falsy value (`0`, `""`, `false`).
+
+### 🧙 Senior Level
+
+Know that `?? 0` in the rollback code is defensive programming - it protects against edge cases but may be unreachable in practice. Consider whether defensive code is worth keeping if it can't be tested. Some teams prefer to remove untestable defensive code, others keep it as a safety net.
+
+### 🏆 Principal Level
+
+Think about **testability when designing state management**:
+- Can you test each state transition independently?
+- Are error states and loading states tested?
+- Is the rollback logic correct for all edge cases?
+- Can you prove the `?? 0` is either reachable (and tested) or unreachable (and removable)?
+
+Consider writing a **state machine diagram** for complex providers to identify all possible states and transitions. This helps ensure you have tests for every path.
+
 ## 📖 Glossary of Keywords
 
 > *A comprehensive reference of all testing keywords used in this guide. Updated as new topics are added.*

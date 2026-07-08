@@ -87,7 +87,7 @@ export function useVotingProviderValue() {
       } catch (e) {
         setVoteCountsByImageId((currentCounts) => ({
           ...currentCounts,
-          [imageId]: (currentCounts[imageId] ?? 0) - countChange
+          [imageId]: currentCounts[imageId] - countChange
         }));
         const message = e instanceof Error ? e.message : "Failed to vote";
         setErrorMessagesByImageId((currentMessages) => ({

@@ -14,7 +14,7 @@ export default function useProfile() {
 
     try {
       const profileImages = await getUploadedImages();
-      // await prefetchCatImages(profileImages);
+
       setImages(profileImages);
       return profileImages;
     } catch (e) {

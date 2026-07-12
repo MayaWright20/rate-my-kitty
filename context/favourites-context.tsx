@@ -4,7 +4,6 @@ import getUploadedImages, {
   getFavourites,
   toggleFavouriteItem
 } from "@/api/api";
-import { prefetchCatImages } from "@/helpers/image-cache";
 import { CatImage } from "@/types";
 
 type ToggleFavourite = (
@@ -96,7 +95,6 @@ export function useFavouritesProviderValue() {
         (image) => nextFavouriteImageIds[image.id]
       );
 
-      await prefetchCatImages(nextFavouriteImages);
       setFavouriteImageIds(nextFavouriteImageIds);
       setFavouriteImages(nextFavouriteImages);
       return uploadedImages;

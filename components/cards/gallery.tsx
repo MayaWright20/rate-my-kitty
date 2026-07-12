@@ -92,9 +92,6 @@ export default function Gallery({
             : undefined
         }
         favouriteButton={{
-          accessibilityLabel: favouriteImageIds[item.id]
-            ? "Unfavourite image"
-            : "Favourite image",
           disabled: !!favouriteLoadingImageIds[item.id],
           isFavourite: !!favouriteImageIds[item.id],
           onPress: () => onToggleFavourite(item.id, item),

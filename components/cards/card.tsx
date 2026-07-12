@@ -16,7 +16,6 @@ interface Props {
   contentFit?: ExpoImageProps["contentFit"];
   contentPosition?: ExpoImageProps["contentPosition"];
   favouriteButton?: {
-    accessibilityLabel?: string;
     disabled?: boolean;
     isFavourite: boolean;
     onPress: () => void;
@@ -68,7 +67,6 @@ export default function Card({
         />
         {favouriteButton && (
           <FavouriteIconButton
-            accessibilityLabel={favouriteButton.accessibilityLabel}
             disabled={favouriteButton.disabled}
             isFavourite={favouriteButton.isFavourite}
             onPress={favouriteButton.onPress}

@@ -2,16 +2,21 @@ import { Image } from "expo-image";
 
 import { CatImage } from "@/types";
 
-export const prefetchCatImages = async (images: Pick<CatImage, "url">[]) => {
+export const hasImageUrls = (images: Pick<CatImage, "url">[]) => {
   const imageUrls = images
     .map((image) => image.url)
     .filter((url): url is string => Boolean(url));
 
-  if (imageUrls.length === 0) {
-    return;
+  if (imageUrls.length !== 0) {
+    return imageUrls;
   }
+};
 
-  try {
-    await Image.prefetch(imageUrls, { cachePolicy: "memory-disk" });
-  } catch {}
+export const prefetchCatImages = async (images: Pick<CatImage, "url">[]) => {
+  const imageUrls = hasImageUrls(images);
+
+  if (imageUrls)
+    try {
+      await Image.prefetch(imageUrls, { cachePolicy: "memory-disk" });
+    } catch {}
 };

@@ -99,6 +99,7 @@ export default function LogoHeader() {
     <View
       testID="logo-header"
       style={[styles.wrapper, { height: HEADER_HEIGHT }]}
+      pointerEvents="none"
     >
       <PurpleHeader
         isScreenPortrait={isScreenPortraitContext}

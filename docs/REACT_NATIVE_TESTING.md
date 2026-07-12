@@ -3061,6 +3061,106 @@ module.exports = {
 This prevents coverage from dropping below a certain level. But remember: **coverage is a tool, not a goal**. 100% coverage doesn't mean 0 bugs!
 
 
+## 🎓 What We've Learned - A Journey Recap
+
+> *A friendly summary of everything we've covered together on our testing journey!*
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Three Types of Testing We Mastered</div>
+
+We started from zero and worked our way up through three levels of testing. Here's what each one taught us:
+
+### 1️⃣ Unit Testing (Sections 1-3, 3.5)
+
+**What we tested:** Individual functions in isolation
+
+| What | Example | Key Skills Learned |
+|------|---------|-------------------|
+| **Pure functions** | `calculateScore(5, 5)` → `50` | `describe`, `it`, `expect`, `toBe`, AAA pattern |
+| **Impure functions** | `CartoonGenerator()` with `Math.random()` | Dependency injection, `jest.spyOn`, `mockReturnValue` |
+| **Test naming** | "should return 0 when no votes" | Clear, descriptive test names |
+
+**The big lesson:** Pure functions are the easiest thing to test. Same input → same output → simple assertions!
+
+### 2️⃣ Component Testing (Sections 4-11)
+
+**What we tested:** React Native components with UI, props, interactions, and context
+
+| What | Example | Key Skills Learned |
+|------|---------|-------------------|
+| **Simple rendering** | `CircularBTN` renders title | `render`, `screen`, `findByText`, `toBeOnTheScreen` |
+| **Props & styles** | Custom colors, sizes, icons | `StyleSheet.flatten`, `testID`, default values |
+| **User interactions** | Button presses | `userEvent.setup()`, `user.press()`, `jest.fn()` |
+| **Context** | Portrait vs landscape | `renderWithContext` wrapper pattern |
+| **Third-party components** | `@expo/vector-icons/Ionicons` | Prop destructuring gotcha! |
+| **Conditional rendering** | `CTA_BTN` disabled state | `queryByTestId` for checking absence |
+| **Async dependencies** | Font loading with `useFonts` | `findByTestId` vs `getByTestId` |
+
+**The big lesson:** Components are more complex than functions because they have UI, dependencies, and user interactions. But the same AAA pattern applies - Arrange (render), Act (interact), Assert (check)!
+
+### 3️⃣ Integration Testing (Section 16)
+
+**What we tested:** Multiple pieces working together
+
+| What | Example | Key Skills Learned |
+|------|---------|-------------------|
+| **Hook + real provider** | `useVoting` with real `VotingProvider` | Two `renderHook` pattern |
+| **Context connection** | Does the signal reach the TV? | Check provider state, not hook return |
+| **Real vs mocked** | Only mock APIs, let everything else be real | Integration vs unit test mindset |
+
+**The big lesson:** Unit tests prove each piece works. Integration tests prove the pieces work **together**. Both are important!
+
+---
+
+### 🧰 Bonus Skills We Also Learned
+
+| Section | Topic | What We Can Do Now |
+|---------|-------|-------------------|
+| 8 | **Mocking API calls** | Use `jest.mock()` to fake API calls, test happy & error paths |
+| 12 | **Coverage reports** | Run `npx jest --coverage`, view HTML reports, understand green/red lines |
+| 13-14 | **Testing custom hooks** | Use `renderHook` with wrapper pattern, test `useVoting` and `useFavourites` |
+| 15 | **Testing context providers** | Test state management, optimistic updates, rollback logic, error states |
+| 17 | **Viewing specific coverage** | Use `--coverageDirectory` to compare unit vs integration coverage |
+
+---
+
+### 📊 The Testing Pyramid
+
+```
+        ⬆️
+       /🔍\       E2E Tests (not covered yet)
+      /─────\
+     /  🔗   \    Integration Tests ✅ (Section 16)
+    /───────────\
+   /    🔬      \  Component Tests ✅ (Sections 4-11)
+  /─────────────────\
+ /     🔬🔬🔬       \  Unit Tests ✅ (Sections 1-3, 13-15)
+/─────────────────────────\
+```
+
+| Level | What it tests | Speed | Confidence | We covered it? |
+|-------|--------------|-------|------------|----------------|
+| 🔬 **Unit** | Individual functions, hooks, providers | ⚡ Fastest | Low | ✅ Yes! |
+| 🔗 **Integration** | Pieces working together | ⚡ Fast | Medium | ✅ Yes! |
+| 🔍 **E2E** | Full app like a real user | 🐢 Slowest | High | ❌ Not yet |
+
+---
+
+### 🚀 What's Next?
+
+You now have a solid foundation in:
+- ✅ **Unit Testing** - Pure functions, impure functions, hooks, context providers
+- ✅ **Component Testing** - Props, interactions, context, third-party, conditional rendering
+- ✅ **Integration Testing** - Hook + real provider working together
+
+**Possible next steps:**
+- **End-to-End (E2E) Testing** with Detox or Maestro
+- **Snapshot Testing** to catch visual regressions
+- **Test-Driven Development (TDD)** - writing tests before code
+- **CI/CD Integration** - running tests automatically on GitHub
+
+But most importantly: **start writing tests for your real features!** The best way to learn is by doing. Every test you write will make you more confident and your app more reliable. 🚀
+
+
 ## 📖 Glossary of Keywords
 
 > *A comprehensive reference of all testing keywords used in this guide. Updated as new topics are added.*
@@ -3129,4 +3229,25 @@ This prevents coverage from dropping below a certain level. But remember: **cove
 | 60 | <span style="color: #50C878;">**user.press()**</span> | Simulates a realistic press (touchStart → touchEnd → press) | `await user.press(screen.getByTestId("btn"))` |
 | 61 | <span style="color: #50C878;">**Wrapper Pattern**</span> | Wrapping a component in a context Provider to control its dependencies | `<IsScreenPortraitContext.Provider value={true}>{ui}</...>` |
 | 62 | <span style="color: #50C878;">**.tsx**</span> | File extension needed when using JSX syntax in TypeScript | `circular-btn.test.tsx` (not `.ts`) |
+
+---
+
+## 🎮 Commands Reference
+
+> *A quick reference of all CLI commands used throughout this guide. Bookmark this page!*
+
+| # | Command | What it does | When to use it |
+|---|---------|-------------|----------------|
+| 1 | `npx jest --passWithNoTests` | Runs Jest without failing if no tests exist | First time checking your test setup works |
+| 2 | `npx jest` | Runs all test files in the project | Running your full test suite |
+| 3 | `npx jest MyFile.test.tsx` | Runs a specific test file | Testing just one file while developing |
+| 4 | `npx jest --watch` | Runs tests in watch mode (re-runs on file save) | Development - get instant feedback as you write tests |
+| 5 | `npx jest --coverage` | Runs all tests and generates a coverage report | Checking how much of your code is tested |
+| 6 | `npx jest MyFile.test.tsx --coverage` | Runs coverage for a single test file | Seeing what a specific test file covers |
+| 7 | `npx jest --coverage --coverageDirectory=coverage-folder` | Saves coverage report to a custom folder | Saving multiple coverage reports without overwriting |
+| 8 | `open coverage/lcov-report/index.html` | Opens the visual coverage report in your browser | Viewing green/red line-by-line coverage |
+| 9 | `npx jest --watch --coverage` | Watch mode + coverage (regenerates on every save) | Real-time coverage feedback while developing |
+| 10 | `npx jest context/` | Runs all tests inside the `context/` folder | Testing a specific directory of files |
+| 11 | `npx jest --verbose` | Shows detailed test names and results | Debugging - see exactly which tests pass/fail |
+| 12 | `npx jest --clearCache` | Clears Jest's cache | Fixing weird test failures after config changes |
 

@@ -235,3 +235,17 @@ test("should store fallback error message when voteImage fails with a non-Error 
     "Failed to vote"
   );
 });
+
+test("should not call voteImage when vote is called and isVotingByImageId[imageId] is true (guard clause on line 67)", async () => {
+  (voteImage as jest.Mock).mockResolvedValue(2); // resolved value can be any value
+
+  const { result } = await renderHook(() => useVotingProviderValue());
+  result.current.isVotingByImageId["imageId"] = true;
+
+  // Wrap the async operation in act() to handle state updates properly
+  await act(async () => {
+    await result.current.vote("imageId", 1);
+  });
+
+  expect(voteImage).toHaveBeenCalled();
+});

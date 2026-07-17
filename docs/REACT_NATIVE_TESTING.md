@@ -2769,6 +2769,16 @@ Unit tests prove each piece works in isolation. Integration tests prove the piec
 | What's mocked | API calls (`jest.mock`) | API calls (`jest.mock`) |
 | What we prove | "The provider logic works" | "The hook + provider work together" |
 
+### 🎯 Key Differences: Unit Test vs Integration Test
+
+| | Unit Test | Integration Test |
+|--|-----------|-----------------|
+| **What we call** | `provider.vote("imageId", 0)` directly | `useVoting.downvote()` through the hook |
+| **What we check** | `provider.voteCountsByImageId` | `provider.voteCountsByImageId` (same!) |
+| **What's real** | The provider | The provider + the context connection |
+| **What's mocked** | API calls | API calls |
+| **Confidence** | "The provider logic works" | "The hook + provider work together" |
+
 <div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The TV Remote Analogy 📺</div>
 
 Think of the integration test like testing a TV remote control:
@@ -3250,4 +3260,25 @@ But most importantly: **start writing tests for your real features!** The best w
 | 10 | `npx jest context/` | Runs all tests inside the `context/` folder | Testing a specific directory of files |
 | 11 | `npx jest --verbose` | Shows detailed test names and results | Debugging - see exactly which tests pass/fail |
 | 12 | `npx jest --clearCache` | Clears Jest's cache | Fixing weird test failures after config changes |
+| 13 | `npx jest context/__tests__/voting-context.test.tsx --coverage --coverageDirectory=coverage-unit` | Runs unit test coverage and saves to a separate folder | Comparing what your unit test covers vs integration test |
+| 14 | `npx jest context/__tests__/voting-context.integration.test.tsx --coverage --coverageDirectory=coverage-integration` | Runs integration test coverage and saves to a separate folder | Comparing what your integration test covers vs unit test |
+| 15 | `open coverage-unit/lcov-report/index.html` | Opens the unit test coverage report | Viewing unit test coverage side by side with integration |
+| 16 | `open coverage-integration/lcov-report/index.html` | Opens the integration test coverage report | Viewing integration test coverage side by side with unit |
+| 17 | `npx jest --coverage && open coverage/lcov-report/index.html` | Runs all tests, generates coverage, then opens the report | Quick one-liner to run tests and view coverage |
+| 18 | `npm jest --watch` | `npm run test` <br/> Runs Jest in watch mode | Development - tests re-run on every save |
+| 19 | `npx jest context/__tests__/voting-context.integration.test.tsx --coverage --coverageDirectory=coverage/integration-tests-coverage && open coverage/integration-tests-coverage/lcov-report/index.html` | `npm run test:integrations` <br/>Runs integration tests with coverage and opens the report | Checking integration test coverage |
+| 20 | `npx jest --coverage --coverageDirectory=coverage/unit-tests-coverage && open coverage/unit-tests-coverage/lcov-report/index.html` | `npm run test:units`<br/>Runs all tests with coverage and opens the report | Checking overall unit test coverage |
+| 21 | `npm run jest --watch && npx jest --coverage && open coverage/lcov-report/index.html` | `npm run:all`<br/>Runs watch mode, then coverage, then opens report | Full test workflow in one command |
+| 22 | `npx jest --coverage --coverageDirectory=coverage/unit-tests-coverage && open coverage/unit-tests-coverage/lcov-report/index.html && npx jest context/__tests__/voting-context.integration.test.tsx --coverage --coverageDirectory=coverage/integration-tests-coverage && open coverage/integration-tests-coverage/lcov-report/index.html` | `npm run:all-tests`<br/>Runs unit + integration coverage separately and opens both reports | Comparing unit vs integration coverage side by side |
 
+---
+
+## 📚 Useful Links
+
+> *Handy references to bookmark for your testing journey!*
+
+| Link | What it is | Why it's useful |
+|------|-----------|-----------------|
+| [React Native Testing Library API Docs](https://oss.callstack.com/react-native-testing-library/docs/api) | Official API documentation for RNTL | The go-to reference for all query methods, matchers, and utilities |
+| [Jest Documentation](https://jestjs.io/docs/getting-started) | Official Jest docs | Deep dive into mocking, matchers, and configuration |
+| [Expo Testing Guide](https://docs.expo.dev/guides/testing/) | Expo's official testing docs | Expo-specific testing tips and setup guides |

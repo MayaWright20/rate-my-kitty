@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react-native";
 
-import VoteButton from "./voting-btn";
+import VoteButton from "../voting-btn";
 
 test("should render voting button", async () => {
   const mockFnOnDownVote = jest.fn();

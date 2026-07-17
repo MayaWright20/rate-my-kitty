@@ -2,7 +2,7 @@ import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
 import { render, screen } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
-import CustomFont from "./title-header";
+import CustomFont from "../title-header";
 
 test("should render styles.title if header is true", async () => {
   await render(

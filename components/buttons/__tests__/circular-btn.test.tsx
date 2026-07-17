@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 
-import CircularBTN from "./circular-btn";
+import CircularBTN from "../circular-btn";
 
 function RenderWithContext(ui: React.ReactElement, isPortrait: boolean) {
   return render(

@@ -3,7 +3,7 @@ import React from "react";
 
 import { VotingContext, VotingContextType } from "@/context/voting-context";
 
-import useVoting from "./useVoting";
+import useVoting from "../useVoting";
 
 // 1. Create the wrapper component that has context
 function RenderWithContext({

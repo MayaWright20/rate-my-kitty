@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react-native";
 
 import { getImageVoteScore, voteImage } from "@/api/api";
 
-import { useVotingProviderValue } from "./voting-context";
+import { useVotingProviderValue } from "../voting-context";
 
 // The provider calls API functions, so we need to mock them
 jest.mock("@/api/api", () => ({

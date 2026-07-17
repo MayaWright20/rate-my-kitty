@@ -5,7 +5,7 @@ import {
   FavouritesContextType
 } from "@/context/favourites-context";
 
-import useFavourites from "./useFavourites";
+import useFavourites from "../useFavourites";
 
 function RenderWithContext({
   children,

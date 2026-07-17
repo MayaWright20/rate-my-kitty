@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 
-import CTA_BTN from "./cta-btn";
+import CTA_BTN from "../cta-btn";
 
 function renderWithContext(ui: React.ReactElement, isPortrait: boolean) {
   return render(

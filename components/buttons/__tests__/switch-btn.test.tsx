@@ -1,7 +1,7 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
-import { SwitchBTN } from "./switch-btn";
+import { SwitchBTN } from "../switch-btn";
 
 test("should render catloader", async () => {
   const mockFn = jest.fn();

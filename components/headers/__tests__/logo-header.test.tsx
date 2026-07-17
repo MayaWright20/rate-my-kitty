@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native";
 
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 
-import LogoHeader from "./logo-header";
+import LogoHeader from "../logo-header";
 
 function RenderWithContext(ui: React.ReactElement, isPortrait: boolean) {
   return render(

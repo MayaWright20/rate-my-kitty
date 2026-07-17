@@ -2,7 +2,7 @@ import { render, screen, userEvent } from "@testing-library/react-native";
 import * as React from "react";
 import { StyleSheet } from "react-native";
 
-import FavouriteIconButton from "./favourite-icon-btn";
+import FavouriteIconButton from "../favourite-icon-btn";
 
 test("should call onPress when pressed", async () => {
   const mockFn = jest.fn();

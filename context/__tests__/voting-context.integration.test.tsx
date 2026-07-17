@@ -3,7 +3,7 @@ import { act, renderHook } from "@testing-library/react-native";
 import { getImageVoteScore, voteImage } from "@/api/api";
 import useVoting from "@/hooks/useVoting";
 
-import { useVotingProviderValue, VotingContext } from "./voting-context";
+import { useVotingProviderValue, VotingContext } from "../voting-context";
 
 // Mock the API - we don't want real network calls
 jest.mock("@/api/api", () => ({

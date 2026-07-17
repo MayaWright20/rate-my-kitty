@@ -1,4 +1,4 @@
-import CartoonGenerator from "./cartoon-generator";
+import CartoonGenerator from "../cartoon-generator";
 
 describe("CartoonGenerator", () => {
   it("should return an array of 2 items when index is 0", () => {

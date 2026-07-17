@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 
 import getUploadedImages from "@/api/api";
-import { prefetchCatImages } from "@/helpers/image-cache";
 import { CatImage } from "@/types";
 
 export default function useProfile() {
@@ -15,7 +14,7 @@ export default function useProfile() {
 
     try {
       const profileImages = await getUploadedImages();
-      await prefetchCatImages(profileImages);
+
       setImages(profileImages);
       return profileImages;
     } catch (e) {

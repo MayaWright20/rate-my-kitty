@@ -90,7 +90,7 @@ export default function RootLayout() {
                   tabBarIcon: ({ focused }) => (
                     <Ionicons
                       name={"heart"}
-                      color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
+                      color={focused ? COLORS.RED[0] : COLORS.BLACK[0]}
                       size={isScreenPortrait ? 30 : 20}
                     />
                   )

@@ -3,7 +3,7 @@ import { createContext, useCallback, useMemo, useState } from "react";
 import { getImageVoteScore, voteImage } from "@/api/api";
 import { VoteValue } from "@/types";
 
-type VotingContextValue = {
+export type VotingContextValue = {
   errorMessagesByImageId: Record<string, string | null>;
   isLoadingVotesByImageId: Record<string, boolean>;
   isVotingByImageId: Record<string, boolean>;
@@ -11,6 +11,8 @@ type VotingContextValue = {
   vote: (imageId: string, value: VoteValue, subId?: string) => Promise<void>;
   voteCountsByImageId: Record<string, number>;
 };
+
+export type VotingContextType = VotingContextValue | null;
 
 export const VotingContext = createContext<VotingContextValue | null>(null);
 
@@ -85,7 +87,7 @@ export function useVotingProviderValue() {
       } catch (e) {
         setVoteCountsByImageId((currentCounts) => ({
           ...currentCounts,
-          [imageId]: (currentCounts[imageId] ?? 0) - countChange
+          [imageId]: currentCounts[imageId] - countChange
         }));
         const message = e instanceof Error ? e.message : "Failed to vote";
         setErrorMessagesByImageId((currentMessages) => ({

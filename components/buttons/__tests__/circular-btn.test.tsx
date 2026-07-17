@@ -3,9 +3,9 @@ import { StyleSheet } from "react-native";
 
 import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
 
-import CircularBTN from "./circular-btn";
+import CircularBTN from "../circular-btn";
 
-function renderWithContext(ui: React.ReactElement, isPortrait: boolean) {
+function RenderWithContext(ui: React.ReactElement, isPortrait: boolean) {
   return render(
     <IsScreenPortraitContext.Provider value={isPortrait}>
       {ui}
@@ -85,7 +85,7 @@ test("should call onPress when the button is pressed", async () => {
 });
 
 test("should use portrait width of 70% when in portrait mode", async () => {
-  await renderWithContext(<CircularBTN />, true);
+  await RenderWithContext(<CircularBTN />, true);
 
   const iconWrapper = screen.getByTestId("circular-btn-icon-wrapper");
   const flatStyle = StyleSheet.flatten(iconWrapper.props.style);
@@ -94,7 +94,7 @@ test("should use portrait width of 70% when in portrait mode", async () => {
 });
 
 test("should use landscape width of 40% when in landscape mode", async () => {
-  await renderWithContext(<CircularBTN />, false);
+  await RenderWithContext(<CircularBTN />, false);
 
   const iconWrapper = screen.getByTestId("circular-btn-icon-wrapper");
   const flatStyle = StyleSheet.flatten(iconWrapper.props.style);

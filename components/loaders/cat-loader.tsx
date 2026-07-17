@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 
 export default function CatLoader() {
   return (
-    <View style={styles.wrapper}>
+    <View style={styles.wrapper} testID="cat-loader">
       <LottieView
         source={require("../../assets/animations/cat-loader.json")}
         autoPlay

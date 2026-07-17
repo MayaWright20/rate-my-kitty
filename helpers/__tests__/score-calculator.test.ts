@@ -1,4 +1,4 @@
-import { calculateScore } from "./score-calculator";
+import { calculateScore } from "../score-calculator";
 
 describe("calculateScore", () => {
   it("should return 0 if upvotes and downvotes are 0", () => {

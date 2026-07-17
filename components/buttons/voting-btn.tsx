@@ -26,7 +26,7 @@ export default function VoteButton({ count, onDownvote, onUpvote }: Props) {
   const ICON_SIZE = 20;
 
   return (
-    <View style={styles.votePill}>
+    <View testID="vote-button" style={styles.votePill}>
       <TouchableOpacity
         accessibilityLabel={ACCESSIBILITY_LABEL_UP}
         accessibilityRole="button"

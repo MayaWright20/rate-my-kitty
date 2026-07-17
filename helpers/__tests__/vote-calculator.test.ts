@@ -1,4 +1,4 @@
-import voteCalculator from "./vote-calculator";
+import voteCalculator from "../vote-calculator";
 
 describe("voteCalculator", () => {
   it("should return 0 when upvotes are 0 and downvotes are 0", () => {

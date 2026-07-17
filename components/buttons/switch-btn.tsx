@@ -52,6 +52,7 @@ export function SwitchBTN({
 
   return (
     <Pressable
+      testID="switch-btn"
       onPress={() => onChange(!value)}
       style={[styles.switch, style ? style : undefined]}
       accessibilityRole="switch"
@@ -61,7 +62,10 @@ export function SwitchBTN({
       <Animated.View style={[styles.active, activeBtnStyle]} />
 
       <View style={styles.labelRow}>
-        <Text style={[styles.label, !value && styles.activeLabel]}>
+        <Text
+          testID="switch-btn-left-label"
+          style={[styles.label, !value && styles.activeLabel]}
+        >
           {leftLabel}
         </Text>
         <Text style={[styles.label, value && styles.activeLabel]}>

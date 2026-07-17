@@ -86,6 +86,15 @@ npm run web      # Start the app on web
 npm run lint     # Run Expo linting
 ```
 
+
+## Tests
+```bash
+npx jest --coverage    # Run test coverage for all tests
+
+open coverage/lcov-report/index.html   # Open all test coverage doc
+```
+
+
 ## Project Structure
 
 ```text

@@ -1,3 +1,6 @@
 import { createContext } from "react";
 
-export const IsScreenPortraitContext = createContext<boolean | null>(null);
+export type IsScreenPortraitContextProps = boolean | null;
+
+export const IsScreenPortraitContext =
+  createContext<IsScreenPortraitContextProps>(null);

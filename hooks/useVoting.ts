@@ -12,9 +12,9 @@ export default function useVoting(
   imageId: string,
   { initialCount = 0, subId }: UseVotingOptions = {}
 ) {
-  const voting = useContext(VotingContext);
+  const votingContext = useContext(VotingContext);
 
-  if (!voting) {
+  if (!votingContext) {
     throw new Error("useVoting must be used inside VotingProvider");
   }
 
@@ -25,7 +25,7 @@ export default function useVoting(
     loadVoteScore: loadVoteScoreFromContext,
     vote: voteFromContext,
     voteCountsByImageId
-  } = voting;
+  } = votingContext;
 
   const loadVoteScore = useCallback(
     () => loadVoteScoreFromContext(imageId, subId),

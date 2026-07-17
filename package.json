@@ -4,7 +4,11 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "test": "jest",
+    "test": "jest --watch",
+    "test:all": "jest --watch && npx jest --coverage && open coverage/lcov-report/index.html",
+    "test:all-tests": "npx jest --coverage --coverageDirectory=coverage/unit-tests-coverage && open coverage/unit-tests-coverage/lcov-report/index.html && npx jest context/__tests__/voting-context.integration.test.tsx --coverage --coverageDirectory=coverage/integration-tests-coverage && open coverage/integration-tests-coverage/lcov-report/index.html",
+    "test:integrations": "npx jest context/__tests__/voting-context.integration.test.tsx --coverage --coverageDirectory=coverage/integration-tests-coverage && open coverage/integration-tests-coverage/lcov-report/index.html",
+    "test:units": "npx jest --coverage --coverageDirectory=coverage/unit-tests-coverage && open coverage/unit-tests-coverage/lcov-report/index.html",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",

@@ -28,6 +28,7 @@ export default function CustomFont({
   const text = (
     <Text
       {...props}
+      testID="custom-font-text"
       style={[
         fontLoaded ? { fontFamily: "fontFamily" } : styles.defaultFont,
         header ? styles.title : undefined,
@@ -52,7 +53,11 @@ export default function CustomFont({
           style={[styles.image, styles.imageTrailing]}
         />
       </View>
-      {subheading && <Text style={styles.subheading}>{subheading}</Text>}
+      {subheading && (
+        <Text testID="custom-font-subheading" style={styles.subheading}>
+          {subheading}
+        </Text>
+      )}
     </>
   );
 }

@@ -13,7 +13,7 @@ import { COLORS } from "@/constants/colors";
 import { MARGIN } from "@/constants/styles";
 import useFavourites from "@/hooks/useFavourites";
 
-export default function Index() {
+export default function FavouritesScreen() {
   const {
     errorMessage,
     favouriteImages,

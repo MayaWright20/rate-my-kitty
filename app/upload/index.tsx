@@ -12,7 +12,7 @@ import { COLORS } from "@/constants/colors";
 import { MARGIN, SCREEN_WIDTH_MARGIN } from "@/constants/styles";
 import useUploadImage from "@/hooks/useUploadImage";
 
-export default function Index() {
+export default function UploadScreen() {
   const {
     errorMessage,
     image,

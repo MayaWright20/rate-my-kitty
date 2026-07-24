@@ -25,8 +25,9 @@ export default function ImageBackgroundScreen({
   source
 }: Props) {
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="image-background-screen">
       <Image
+        testID="image-background-screen-image"
         source={source ? source : defaultBackground}
         style={styles.background}
         contentFit="cover"

@@ -23,7 +23,8 @@
 15. [Testing Async Operations & Error States](#15-testing-async-operations--error-states)
 16. [Integration Testing](#16-integration-testing)
 17. [Viewing Coverage for Specific Tests](#17-viewing-coverage-for-specific-tests)
-18. [Testing Best Practices & Patterns](#18-testing-best-practices--patterns)
+18. [End-to-End (E2E) Testing with Maestro](#18-end-to-end-e2e-testing-with-maestro)
+19. [Testing Best Practices & Patterns](#19-testing-best-practices--patterns)
 
 ---
 
@@ -3137,7 +3138,7 @@ We started from zero and worked our way up through three levels of testing. Here
 
 ```
         ⬆️
-       /🔍\       E2E Tests (not covered yet)
+       /🔍\       E2E Tests ✅ (Section 18 - Maestro)
       /─────\
      /  🔗   \    Integration Tests ✅ (Section 16)
     /───────────\
@@ -3151,7 +3152,7 @@ We started from zero and worked our way up through three levels of testing. Here
 |-------|--------------|-------|------------|----------------|
 | 🔬 **Unit** | Individual functions, hooks, providers | ⚡ Fastest | Low | ✅ Yes! |
 | 🔗 **Integration** | Pieces working together | ⚡ Fast | Medium | ✅ Yes! |
-| 🔍 **E2E** | Full app like a real user | 🐢 Slowest | High | ❌ Not yet |
+| 🔍 **E2E** | Full app like a real user | 🐢 Slowest | High | ✅ Yes! (Section 18) |
 
 ---
 
@@ -3273,6 +3274,420 @@ But most importantly: **start writing tests for your real features!** The best w
 
 ---
 
+## 18. End-to-End (E2E) Testing with Maestro
+
+> *"Unit tests check the engine, integration tests check the gears, but E2E tests drive the whole car."*
+
+### What is E2E Testing?
+
+**End-to-End (E2E)** testing is where you test your app exactly like a real user would. Instead of mocking components, APIs, or contexts, you:
+
+1. **Launch the actual app** on a real device or simulator
+2. **Tap buttons** like a real user
+3. **Wait for real API responses** (or use a test server)
+4. **Assert that the UI looks correct** with real data
+
+Think of it this way:
+- **Unit test**: "Does the upvote button call the right function?" ✅
+- **Integration test**: "Does clicking upvote update the score and save to favourites?" ✅
+- **E2E test**: "I open the app, upload a cat photo, vote on it, and see it in my favourites - just like a real user would!" 🎯
+
+### Why Use Maestro?
+
+**Maestro** is a mobile E2E testing framework that's:
+- **Simple** - Uses YAML files (no coding required!)
+- **Fast** - Tests run directly on your simulator
+- **Reliable** - Waits for elements to appear before interacting
+- **Free** - Open source and easy to set up
+- **Cross-platform** - Same tests work on iOS and Android
+
+### When to Use E2E Tests
+
+| Scenario | Use E2E? | Why |
+|----------|----------|-----|
+| Checking the app launches | ✅ Yes | Can't unit test this |
+| Full user flow (upload → vote → favourite) | ✅ Yes | Tests real integration |
+| UI looks correct on different screen sizes | ✅ Yes | Visual testing |
+| A single button's onPress handler | ❌ No | Use a unit test instead |
+| A context provider's state management | ❌ No | Use an integration test |
+| API error handling logic | ❌ No | Use a unit/integration test |
+
+### When NOT to Use E2E Tests
+
+- **For pure logic** - Test pure functions with Jest (faster)
+- **For component rendering** - Use RNTL (faster, no simulator needed)
+- **For edge cases** - Unit tests can cover 100 edge cases in seconds; E2E tests take minutes
+- **During active development** - E2E tests are slow to run; use them as a final check
+
+### How Maestro Works
+
+Maestro uses **YAML files** (`.yaml`) that describe a sequence of steps. Each step is either:
+- **`tapOn`** - Tap something on screen (by text, id, or point)
+- **`assertVisible`** - Check something is on screen
+- **`launchApp`** - Start the app
+- **`scroll`** - Scroll the screen
+- **`inputText`** - Type text into a field
+
+### Setting Up Maestro
+
+**Step 1: Install Maestro**
+
+```bash
+# Using Homebrew (macOS)
+brew install maestro
+
+# Or using the install script
+curl -Ls "https://get.maestro.mobile.dev" | bash
+```
+
+**Step 2: Verify Installation**
+
+```bash
+maestro --version
+```
+
+**Step 3: Create a test directory**
+
+```bash
+mkdir Maestro
+```
+
+**Step 4: Create your first test**
+
+Create `Maestro/index.yaml`:
+
+```yaml
+appId: com.yourcompany.yourapp
+---
+- launchApp:
+    clearState: true
+- assertVisible: "Home"
+- tapOn: "Login"
+- assertVisible: "Welcome back!"
+```
+
+### Anatomy of a Maestro Test
+
+Let's break down the test you've already written:
+
+```yaml
+# Line 1: The app ID (must match your app's bundle identifier)
+appId: com.mayagwright20.ratemykitty
+
+# Line 2: The --- separates the header from the test steps
+---
+
+# Step 1: Launch the app fresh (clearState removes all saved data)
+- launchApp:
+    clearState: true
+
+# Step 2: Tap on something by its text
+- tapOn: "http://localhost:8081"
+
+# Step 3: Assert something is visible by its text
+- assertVisible: ""
+
+# Step 4: Assert something is visible by its testID
+- assertVisible:
+    id: "circular-btn-icon-wrapper"
+
+# Step 5: Assert by text with accessibility label
+- assertVisible: "UPLOAD, tab, 1 of 3"
+
+# Step 6: Tap on something and then assert by screen position
+- tapOn: "LIST"
+- assertVisible:
+    point: 22%,0%
+
+# Step 7: Assert by text with index (when multiple elements have same text)
+- assertVisible:
+    text: "1"
+    index: 1
+```
+
+### Key Maestro Concepts
+
+#### 1. **`appId`** - The Bundle Identifier
+
+This is the unique ID for your app. In Expo, it's set in `app.json`:
+
+```json
+{
+  "expo": {
+    "ios": {
+      "bundleIdentifier": "com.mayagwright20.ratemykitty"
+    }
+  }
+}
+```
+
+> ⚠️ **Gotcha**: If you change your bundle identifier, update the `appId` in ALL your Maestro test files!
+
+#### 2. **Finding Elements** - The Tricky Part
+
+Maestro finds elements in three ways:
+
+| Method | Example | Best For |
+|--------|---------|----------|
+| **By text** | `tapOn: "Submit"` | Buttons, labels, headers |
+| **By testID** | `assertVisible: { id: "my-button" }` | Elements without visible text |
+| **By point** | `assertVisible: { point: "50%,50%" }` | Checking layout positions |
+
+> 💡 **Pro Tip**: Use `testID` props in your React Native components to make elements easier to find:
+> ```tsx
+> <TouchableOpacity testID="upvote-button">
+>   <Text>Up vote cat</Text>
+> </TouchableOpacity>
+> ```
+
+#### 3. **`clearState: true`** - Starting Fresh
+
+Always use `clearState: true` when launching the app for E2E tests. This:
+- Clears AsyncStorage
+- Resets any saved state
+- Ensures every test run starts from the same place
+
+> ⚠️ **Gotcha**: Without `clearState`, your tests might pass on the first run but fail on the second because data from the previous run is still there!
+
+#### 4. **`point` Coordinates** - Screen Positions
+
+Maestro can check elements by their position on screen:
+
+```yaml
+- assertVisible:
+    point: 22%,0%
+```
+
+This checks that something is visible at 22% from the left and 0% from the top of the screen.
+
+> ⚠️ **Gotcha**: Point coordinates are **percentage-based** (not pixels), so they work on different screen sizes. But they're still fragile - a small layout change can break them!
+
+### Running Maestro Tests
+
+**Step 1: Build your app for the simulator**
+
+```bash
+# Build the iOS app for the simulator
+npx expo run:ios
+```
+
+This creates a `.app` file in Xcode's DerivedData folder.
+
+**Step 2: Start the Metro bundler**
+
+```bash
+npx expo start
+```
+
+**Step 3: Run your Maestro tests**
+
+```bash
+# Run all tests in the Maestro directory
+maestro test Maestro/
+
+# Run a specific test file
+maestro test Maestro/index.yaml
+
+# Run with flow report (generates a HTML report)
+maestro test --format flow Maestro/index.yaml
+```
+
+**Step 4: View the report**
+
+```bash
+# Open the flow report
+open .maestro/reports/
+```
+
+### Your Maestro Test - Step by Step
+
+Here's what your test does, broken down into logical sections:
+
+#### Section 1: Launch & Home Screen Check
+```yaml
+- launchApp:
+    clearState: true
+- tapOn: "http://localhost:8081"
+- tapOn: "Close"
+- assertVisible: ""
+- assertVisible:
+    id: "circular-btn-icon-wrapper"
+- assertVisible: "UPLOAD, tab, 1 of 3"
+- assertVisible: "FAVOURITES, tab, 3 of 3"
+- assertVisible: "LIST"
+- assertVisible: "0"
+```
+
+This verifies the home screen loads with all expected elements.
+
+#### Section 2: Toggle List View
+```yaml
+- tapOn: "LIST"
+- assertVisible:
+    point: 22%,0%
+- assertVisible:
+    point: 0%,0%
+- assertVisible:
+    point: 0%,-15%
+```
+
+This checks that tapping "LIST" changes the layout.
+
+#### Section 3: Navigate to Upload & Upload a Photo
+```yaml
+- tapOn: "UPLOAD, tab, 1 of 3"
+- assertVisible: "Submit Your Cat"
+- assertVisible: "Upload a photo of your cat to put them in the vote!"
+- assertVisible: ", Tap to upload, Pick your best cat picture!"
+- assertVisible: ", SUBMIT"
+- tapOn: ", Tap to upload, Pick your best cat picture!"
+- tapOn: "Photo, 30 March 2018, 20:14"
+- tapOn: "Choose"
+```
+
+This navigates to the upload screen and selects a photo from the simulator's photo library.
+
+> ⚠️ **Gotcha**: The photo names (`"Photo, 30 March 2018, 20:14"`) are specific to the simulator's photo library. If you reset the simulator, these names change! You may need to pre-populate the simulator with specific photos.
+
+#### Section 4: Submit & Handle Classification Error
+```yaml
+- tapOn: ", SUBMIT"
+- assertVisible: "*Classifcation failed: correct animal not found. \n   Please try again"
+```
+
+This tests the error handling flow - submitting a non-cat photo should show an error.
+
+#### Section 5: Upload a Real Cat Photo & Vote
+```yaml
+- tapOn: ", Edit photo, Pick your best cat picture!"
+- tapOn: "Photo, 21 July, 20:27"
+- tapOn: "Choose"
+- tapOn: ", SUBMIT"
+- assertVisible: "Up vote cat"
+- assertVisible: "Down vote cat"
+- tapOn: "Up vote cat"
+- assertVisible:
+    text: "1"
+    index: 1
+```
+
+This uploads a cat photo, submits it, and upvotes it.
+
+#### Section 6: Favourite & Verify
+```yaml
+- tapOn: ""
+- tapOn: "FAVOURITES, tab, 3 of 3"
+- tapOn:
+    point: 4%,20%
+- assertVisible: "1"
+- tapOn: "Down vote cat"
+- assertVisible: "0"
+- assertVisible: "Favourites"
+```
+
+This favourites the cat, navigates to favourites, and verifies the score.
+
+#### Section 7: Return to Upload
+```yaml
+- tapOn: ""
+- tapOn: ""
+- assertVisible: "Submit Your Cat"
+```
+
+This navigates back to the upload screen to complete the full flow.
+
+### Common Maestro Gotchas
+
+#### 🚨 Gotcha 1: Simulator Photo Library
+The simulator's photo library is empty by default. You need to:
+1. Find or create test images
+2. Drag them onto the simulator to add them to the photo library
+3. Use consistent photo names in your tests
+
+#### 🚨 Gotcha 2: Point Coordinates Are Fragile
+```yaml
+- assertVisible:
+    point: 22%,0%
+```
+These coordinates depend on your exact layout. A small UI change can break them. Use text or testID matchers when possible.
+
+#### 🚨 Gotcha 3: Emoji Rendering
+Maestro matches emoji by their actual rendered text. If an emoji doesn't render correctly, the test will fail. Test with the actual emoji characters your app uses.
+
+#### 🚨 Gotcha 4: Timing
+Maestro automatically waits for elements to appear (up to a timeout), but:
+- Network requests can take time
+- Animations can delay rendering
+- Use `assertVisible` before `tapOn` to ensure elements are ready
+
+#### 🚨 Gotcha 5: App Must Be Built First
+You can't run Maestro tests without first building the app:
+```bash
+# Build first (takes a few minutes)
+npx expo run:ios
+
+# Then run tests
+maestro test Maestro/
+```
+
+### Maestro vs Detox - Which Should You Use?
+
+| Feature | Maestro | Detox |
+|---------|---------|-------|
+| **Setup complexity** | Low (install + YAML) | High (config + code) |
+| **Test language** | YAML (no coding) | JavaScript/TypeScript |
+| **Speed** | Fast | Fast |
+| **Reliability** | Very reliable | Reliable |
+| **CI/CD support** | Built-in | Built-in |
+| **Debugging** | Flow reports | Screenshots + logs |
+| **Best for** | Simple flows, non-devs | Complex test logic |
+
+> 💡 **Senior Dev Tip**: Start with Maestro for your main user flows. If you need complex test logic (loops, conditions, data-driven tests), consider Detox.
+
+### Adding Maestro to Your CI/CD
+
+```yaml
+# .github/workflows/e2e.yml
+name: E2E Tests
+on: [deployment]
+jobs:
+  e2e:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - run: npm ci
+      - run: npx expo run:ios
+      - run: brew install maestro
+      - run: maestro test Maestro/
+```
+
+### 📖 Glossary of E2E Testing Terms
+
+| Term | Meaning | Example |
+|------|---------|---------|
+| **E2E (End-to-End)** | Testing the entire app flow from start to finish | Launch app → upload photo → vote → see favourites |
+| **Simulator** | A virtual iPhone on your computer | iOS Simulator running iPhone 15 |
+| **YAML** | A human-readable data format (`.yaml` files) | `- tapOn: "Submit"` |
+| **appId** | Your app's unique bundle identifier | `com.mayagwright20.ratemykitty` |
+| **testID** | A prop you add to components for testing | `testID="upvote-button"` |
+| **clearState** | Resets all app data before a test | `launchApp: { clearState: true }` |
+| **Flow Report** | A visual HTML report of your test run | Shows screenshots at each step |
+| **Point** | A percentage-based screen position | `point: 50%,50%` (center of screen) |
+
+### 🎮 Maestro Commands Reference
+
+| Command | What it does | When to use it |
+|---------|-------------|----------------|
+| `maestro test Maestro/` | Runs all tests in the Maestro directory | Running your full E2E suite |
+| `maestro test Maestro/index.yaml` | Runs a specific test file | Testing one flow at a time |
+| `maestro test --format flow Maestro/index.yaml` | Runs tests and generates a visual flow report | Debugging - see screenshots of each step |
+| `maestro upload <path>` | Uploads a flow report to Maestro Cloud | Sharing test results with your team |
+| `maestro --version` | Checks Maestro is installed | Verifying your setup |
+| `brew install maestro` | Installs Maestro | First-time setup |
+
+---
+
 ## 📚 Useful Links
 
 > *Handy references to bookmark for your testing journey!*
@@ -3282,3 +3697,5 @@ But most importantly: **start writing tests for your real features!** The best w
 | [React Native Testing Library API Docs](https://oss.callstack.com/react-native-testing-library/docs/api) | Official API documentation for RNTL | The go-to reference for all query methods, matchers, and utilities |
 | [Jest Documentation](https://jestjs.io/docs/getting-started) | Official Jest docs | Deep dive into mocking, matchers, and configuration |
 | [Expo Testing Guide](https://docs.expo.dev/guides/testing/) | Expo's official testing docs | Expo-specific testing tips and setup guides |
+| [Maestro Documentation](https://maestro.mobile.dev/) | Official Maestro docs | Complete reference for all Maestro commands and features |
+| [Maestro Flow Reports](https://maestro.mobile.dev/getting-started/flow-report) | Visual test reports | Debugging E2E test failures with screenshots |

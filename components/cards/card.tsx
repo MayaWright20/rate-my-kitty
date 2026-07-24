@@ -45,39 +45,38 @@ export default function Card({
 }: Props) {
   const { count, downvote, upvote } = useVoting(image.id);
 
-  if (children || favouriteButton || wrapperStyle) {
-    return (
-      <View style={[styles.wrapper, wrapperStyle]}>
-        <Image
-          cachePolicy="memory-disk"
-          contentFit={contentFit}
-          contentPosition={contentPosition}
-          recyclingKey={image.id}
-          source={{ uri: image.url }}
-          style={[
-            styles.image,
-            {
-              borderColor:
-                IMAGE_BORDER_COLORS[
-                  Math.floor(Math.random() * IMAGE_BORDER_COLORS.length)
-                ]
-            },
-            imageStyle
-          ]}
+  if (!(children || favouriteButton || wrapperStyle)) return;
+  return (
+    <View style={[styles.wrapper, wrapperStyle]}>
+      <Image
+        cachePolicy="memory-disk"
+        contentFit={contentFit}
+        contentPosition={contentPosition}
+        recyclingKey={image.id}
+        source={{ uri: image.url }}
+        style={[
+          styles.image,
+          {
+            borderColor:
+              IMAGE_BORDER_COLORS[
+                Math.floor(Math.random() * IMAGE_BORDER_COLORS.length)
+              ]
+          },
+          imageStyle
+        ]}
+      />
+      {favouriteButton && (
+        <FavouriteIconButton
+          disabled={favouriteButton.disabled}
+          isFavourite={favouriteButton.isFavourite}
+          onPress={favouriteButton.onPress}
+          size={favouriteButton.size}
         />
-        {favouriteButton && (
-          <FavouriteIconButton
-            disabled={favouriteButton.disabled}
-            isFavourite={favouriteButton.isFavourite}
-            onPress={favouriteButton.onPress}
-            size={favouriteButton.size}
-          />
-        )}
-        <VoteButton count={count} onDownvote={downvote} onUpvote={upvote} />
-        {children}
-      </View>
-    );
-  }
+      )}
+      <VoteButton count={count} onDownvote={downvote} onUpvote={upvote} />
+      {children}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

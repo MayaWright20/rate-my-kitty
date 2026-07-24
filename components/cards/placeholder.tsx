@@ -27,6 +27,7 @@ export default function CatPlaceholder({ source, title, subheading }: Props) {
   return (
     <View style={styles.noImagesPlaceholderWrapper}>
       <Image
+        testID="cat-placeholder-image"
         source={source ? source : DEFAULT_PLACEHOLDER}
         style={[
           styles.noImagesPlaceholder,

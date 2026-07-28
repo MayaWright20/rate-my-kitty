@@ -79,3 +79,67 @@ test("should return image as null if onChangeImage is called", async () => {
 
   expect(result.current.image).toBe(null);
 });
+
+test("should call resetImage making image null if image upload is successful and the result from the api is result.approved : 1", async () => {
+  (uploadImage as jest.Mock).mockResolvedValue({ approved: 1 });
+
+  const { result } = await renderHook(() => useUploadImage());
+
+  await act(async () => {
+    result.current.onChangeImage(mockImage);
+  });
+
+  await act(async () => {
+    await result.current.uploadSelectedImage();
+  });
+
+  expect(result.current.image).toBeNull();
+});
+
+test("should call resetImage making image null if image upload is successful and the result from the api is result.approved : 1", async () => {
+  (uploadImage as jest.Mock).mockResolvedValue({ approved: 1 });
+
+  const { result } = await renderHook(() => useUploadImage());
+
+  await act(async () => {
+    result.current.onChangeImage(mockImage);
+  });
+
+  await act(async () => {
+    await result.current.uploadSelectedImage();
+  });
+
+  expect(result.current.image).toBeNull();
+});
+
+test("should show error message if api is successful but approved.result is not 1", async () => {
+  (uploadImage as jest.Mock).mockResolvedValue({ approved: 0 });
+
+  const { result } = await renderHook(() => useUploadImage());
+
+  await act(async () => {
+    result.current.onChangeImage(mockImage);
+  });
+
+  await act(async () => {
+    await result.current.uploadSelectedImage();
+  });
+
+  expect(result.current.errorMessage).not.toBeNull();
+});
+
+test("should show error message from api if api is successful but approved.result is not 1 and the result is of type string", async () => {
+  (uploadImage as jest.Mock).mockResolvedValue("api error message result");
+
+  const { result } = await renderHook(() => useUploadImage());
+
+  await act(async () => {
+    result.current.onChangeImage(mockImage);
+  });
+
+  await act(async () => {
+    await result.current.uploadSelectedImage();
+  });
+
+  expect(result.current.errorMessage).toBe("api error message result");
+});

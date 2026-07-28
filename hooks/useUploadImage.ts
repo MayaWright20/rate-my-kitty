@@ -1,4 +1,5 @@
 import { ImagePickerAsset } from "expo-image-picker";
+import { router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 
 import { uploadImage } from "@/api/api";
@@ -35,7 +36,7 @@ export default function useUploadImage() {
 
       if (typeof result === "object" && result && result.approved === 1) {
         resetImage();
-        return;
+        return router.push("/");
       }
 
       setErrorMessage(

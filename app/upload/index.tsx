@@ -1,5 +1,4 @@
 import { LilitaOne_400Regular } from "@expo-google-fonts/lilita-one";
-import { router } from "expo-router";
 import { ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -21,14 +20,6 @@ export default function UploadScreen() {
     uploadSelectedImage,
     isUploading
   } = useUploadImage();
-
-  const uploadImageHandler = async () => {
-    const isUploaded = await uploadSelectedImage();
-
-    if (isUploaded) {
-      router.push("/");
-    }
-  };
 
   return (
     <ImageBackgroundScreen>
@@ -59,7 +50,9 @@ export default function UploadScreen() {
               size: 30,
               color: COLORS.WHITE[0]
             }}
-            onPress={uploadImageHandler}
+            onPress={async () => {
+              await uploadSelectedImage();
+            }}
           />
           {errorMessage && (
             <Text

@@ -29,6 +29,7 @@ export default function UploadScreen() {
       router.push("/");
     }
   };
+
   return (
     <ImageBackgroundScreen>
       <SafeAreaView testID="upload" style={styles.safeAreaView} edges={["top"]}>

@@ -35,17 +35,15 @@ export default function useUploadImage() {
 
       if (typeof result === "object" && result && result.approved === 1) {
         resetImage();
-        return true;
+        return;
       }
 
       setErrorMessage(
         typeof result === "string" ? result : "Image upload failed"
       );
-      return false;
     } catch (e) {
       const message = e instanceof Error ? e.message : "Image upload failed";
       setErrorMessage(message);
-      return false;
     } finally {
       setIsUploading(false);
     }

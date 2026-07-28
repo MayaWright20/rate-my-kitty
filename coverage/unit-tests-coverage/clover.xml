@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1785229330445" clover="3.2.0">
-  <project timestamp="1785229330445" name="All files">
-    <metrics statements="413" coveredstatements="147" conditionals="233" coveredconditionals="87" methods="93" coveredmethods="40" elements="739" coveredelements="274" complexity="0" loc="413" ncloc="413" packages="12" files="28" classes="28"/>
+<coverage generated="1785245427949" clover="3.2.0">
+  <project timestamp="1785245427949" name="All files">
+    <metrics statements="413" coveredstatements="163" conditionals="233" coveredconditionals="89" methods="93" coveredmethods="42" elements="739" coveredelements="294" complexity="0" loc="413" ncloc="413" packages="12" files="28" classes="28"/>
     <package name="rate-my-kitty">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="expo-env.d.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/expo-env.d.ts">
@@ -461,7 +461,7 @@
       </file>
     </package>
     <package name="rate-my-kitty.hooks">
-      <metrics statements="60" coveredstatements="17" conditionals="26" coveredconditionals="10" methods="14" coveredmethods="7"/>
+      <metrics statements="60" coveredstatements="33" conditionals="26" coveredconditionals="12" methods="14" coveredmethods="9"/>
       <file name="useFavourites.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/hooks/useFavourites.ts">
         <metrics statements="4" coveredstatements="4" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
         <line num="6" count="3" type="stmt"/>
@@ -470,23 +470,23 @@
         <line num="12" count="1" type="stmt"/>
       </file>
       <file name="useProfile.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/hooks/useProfile.ts">
-        <metrics statements="16" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="2" coveredmethods="0"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
-        <line num="22" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="27" count="0" type="stmt"/>
-        <line num="31" count="0" type="stmt"/>
+        <metrics statements="16" coveredstatements="16" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
+        <line num="7" count="6" type="stmt"/>
+        <line num="8" count="6" type="stmt"/>
+        <line num="9" count="6" type="stmt"/>
+        <line num="11" count="6" type="stmt"/>
+        <line num="12" count="3" type="stmt"/>
+        <line num="13" count="3" type="stmt"/>
+        <line num="15" count="3" type="stmt"/>
+        <line num="16" count="3" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="22" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="23" count="2" type="stmt"/>
+        <line num="24" count="2" type="stmt"/>
+        <line num="25" count="2" type="stmt"/>
+        <line num="27" count="3" type="stmt"/>
+        <line num="31" count="6" type="stmt"/>
       </file>
       <file name="useUploadImage.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/hooks/useUploadImage.ts">
         <metrics statements="27" coveredstatements="0" conditionals="14" coveredconditionals="0" methods="5" coveredmethods="0"/>

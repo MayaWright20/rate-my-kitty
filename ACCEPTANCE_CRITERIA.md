@@ -1,16 +1,17 @@
 # 🧪 Acceptance Criteria
 
-<b>Uploading the Cats</b>
+<b>1. Uploading the Cats</b>
 
-- Create a page at “/upload” that lets you upload a new cat image. <br/>
-The requirements are: 1.
-Allow a user to select a file from their PC to upload
+- Create a page at “/upload” that lets you upload a new cat image. <br/> 
+```
+[ ] Create an upload page on /upload
 
-    [ ] /images/upload API endpoint.
+[ ] Be able to upload a picture of a cat from phone
 
-    [ ] Be able to upload a picture of a cat from phone
+[ ] Be able to upload a picture of a cat from computer
+```
+<br/> <br/> 
 
-    [ ] Be able to upload a picture of a cat from computer<br/> <br/> 
 
 <b>2. Uploads the image to the /images/upload API endpoint.</b>
 <br/><br/>

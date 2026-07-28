@@ -309,7 +309,7 @@ FNF:4
 FNH:4
 FNDA:4,SwitchBTN
 FNDA:4,(anonymous_1)
-FNDA:12,(anonymous_2)
+FNDA:11,(anonymous_2)
 FNDA:1,(anonymous_3)
 DA:27,1
 DA:28,1
@@ -318,7 +318,7 @@ DA:30,1
 DA:39,4
 DA:41,4
 DA:42,4
-DA:49,12
+DA:49,11
 DA:53,4
 DA:56,1
 DA:81,1

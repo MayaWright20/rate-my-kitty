@@ -2,7 +2,7 @@
 
 <b>1. Uploading the Cats</b>
 
-- Create a page at “/upload” that lets you upload a new cat image. <br/> 
+Create a page at “/upload” that lets you upload a new cat image. <br/> 
 ```
 [ ] Create an upload page on /upload
 
@@ -18,7 +18,6 @@
 
     [ ] Images should be uploaded to the images/upload API
 
-    [ ] Calls the /images/upload API endpoint
 <br/><br/>
 
 <b>3. After uploading successfully it returns the user to the “/” page, otherwise it displays

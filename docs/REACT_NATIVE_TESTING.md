@@ -24,7 +24,9 @@
 16. [Integration Testing](#16-integration-testing)
 17. [Viewing Coverage for Specific Tests](#17-viewing-coverage-for-specific-tests)
 18. [End-to-End (E2E) Testing with Maestro](#18-end-to-end-e2e-testing-with-maestro)
-19. [Testing Best Practices & Patterns](#19-testing-best-practices--patterns)
+19. [Testing Navigation & Routing](#19-testing-navigation--routing)
+20. [Testing That a Page Exists & Navigation Works](#20-testing-that-a-page-exists--navigation-works)
+21. [The Great Gotcha: Default Export vs Named Export in Mocks](#21-the-great-gotcha-default-export-vs-named-export-in-mocks)
 
 ---
 
@@ -3685,6 +3687,202 @@ jobs:
 | `maestro upload <path>` | Uploads a flow report to Maestro Cloud | Sharing test results with your team |
 | `maestro --version` | Checks Maestro is installed | Verifying your setup |
 | `brew install maestro` | Installs Maestro | First-time setup |
+
+---
+
+## 21. The Great Gotcha: Default Export vs Named Export in Mocks
+
+> *"Why does one mock use `{ __esModule: true, default: jest.fn() }` and another use `{ getImageVoteScore: jest.fn() }`?"*
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+We're understanding the difference between mocking **default exports** vs **named exports**. This is one of the most common gotchas when mocking modules in Jest!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why This Matters</div>
+
+If you use the wrong mock syntax, your mock function will be `undefined` and you'll get:
+```
+TypeError: _api.default.mockResolvedValue is not a function
+```
+
+This happens because `import getUploadedImages from "@/api/api"` looks for the **default** export, but your mock only provides a **named** export.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Two Types of Exports</div>
+
+Looking at `api/api.ts`, it has **both** types of exports:
+
+```typescript
+// NAMED exports (line 217, 280):
+export const voteImage = async (...) => { ... };
+export const getImageVoteScore = async (...) => { ... };
+
+// DEFAULT export (line 288):
+export default async function getUploadedImages(): Promise<CatImage[]> { ... }
+```
+
+### Named Exports (with `export` keyword)
+
+```typescript
+// api/api.ts
+export const voteImage = async (...) => { ... };
+export const getImageVoteScore = async (...) => { ... };
+```
+
+**Import syntax:** Uses curly braces `{ }`:
+```typescript
+import { getImageVoteScore, voteImage } from "@/api/api";
+//      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  Named exports in curly braces
+```
+
+**Mock syntax:** Use the same names as the exports:
+```typescript
+jest.mock("@/api/api", () => ({
+  getImageVoteScore: jest.fn(),  // Same name as the export
+  voteImage: jest.fn()           // Same name as the export
+}));
+```
+
+### Default Export (with `export default` keyword)
+
+```typescript
+// api/api.ts
+export default async function getUploadedImages(): Promise<CatImage[]> { ... }
+```
+
+**Import syntax:** No curly braces, you can name it anything:
+```typescript
+import getUploadedImages from "@/api/api";
+//      ^^^^^^^^^^^^^^^^  No curly braces! This is the default export
+```
+
+**Mock syntax:** Must use `__esModule: true` + `default`:
+```typescript
+jest.mock("@/api/api", () => ({
+  __esModule: true,    // ← REQUIRED for default exports!
+  default: jest.fn()   // ← The default export
+}));
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Rule of Thumb 📝</div>
+
+| Import syntax | Export type | Mock syntax |
+|--------------|-------------|-------------|
+| `import { foo } from "./module"` | **Named** export | `{ foo: jest.fn() }` |
+| `import foo from "./module"` | **Default** export | `{ __esModule: true, default: jest.fn() }` |
+| `import foo, { bar } from "./module"` | **Both** | `{ __esModule: true, default: jest.fn(), bar: jest.fn() }` |
+
+### The Easy Way to Remember 🧠
+
+- **Curly braces** `{ }` in import → **Named** exports → No `__esModule` needed
+- **No curly braces** in import → **Default** export → Need `__esModule: true` + `default`
+
+```typescript
+// Curly braces = named exports
+import { getImageVoteScore } from "@/api/api";
+// Mock: { getImageVoteScore: jest.fn() }
+
+// No curly braces = default export
+import getUploadedImages from "@/api/api";
+// Mock: { __esModule: true, default: jest.fn() }
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha: Why `__esModule: true`? 🚨</div>
+
+When Jest mocks a module, it creates a CommonJS (CJS) module. But your source code uses ES Modules (ESM) with `import`/`export`. The `__esModule: true` flag tells Jest:
+
+> "Hey, this mock module was originally an ES Module, so when someone does `import foo from './module'`, give them `module.default` instead of the whole module object."
+
+Without `__esModule: true`:
+```typescript
+import getUploadedImages from "@/api/api";
+// getUploadedImages = { default: jest.fn() }  ← The whole module object!
+// getUploadedImages.mockResolvedValue() ← TypeError! It's an object, not a function!
+```
+
+With `__esModule: true`:
+```typescript
+import getUploadedImages from "@/api/api";
+// getUploadedImages = jest.fn()  ← Just the function!
+// getUploadedImages.mockResolvedValue() ← Works!
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Real Example from Your Codebase</div>
+
+### voting-context.integration.test.tsx (Named Exports) ✅
+
+```typescript
+// Import uses curly braces = named exports
+import { getImageVoteScore, voteImage } from "@/api/api";
+
+// Mock uses the same names
+jest.mock("@/api/api", () => ({
+  getImageVoteScore: jest.fn(),  // Named export
+  voteImage: jest.fn()           // Named export
+}));
+```
+
+### useProfile.test.tsx (Default Export) ✅
+
+```typescript
+// Import has NO curly braces = default export
+import getUploadedImages from "@/api/api";
+
+// Mock uses __esModule + default
+jest.mock("@/api/api", () => ({
+  __esModule: true,    // ← Required for default exports!
+  default: jest.fn()   // ← The default export
+}));
+```
+
+### What Happens If You Mix Them Up ❌
+
+```typescript
+// ❌ WRONG: Mocking a default export as a named export
+jest.mock("@/api/api", () => ({
+  getUploadedImages: jest.fn()  // Creates a NAMED export
+}));
+
+import getUploadedImages from "@/api/api";
+// getUploadedImages = undefined! Because there's no default export!
+// TypeError: _api.default.mockResolvedValue is not a function
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**Default Export**</span> - `export default function foo()` - imported without curly braces
+- <span style="color: #50C878;">**Named Export**</span> - `export function foo()` - imported with curly braces
+- <span style="color: #50C878;">**__esModule**</span> - A flag that tells Jest "this module uses ES Modules"
+- <span style="color: #50C878;">**CJS (CommonJS)**</span> - The module system Jest uses internally (`require()`/`module.exports`)
+- <span style="color: #50C878;">**ESM (ES Modules)**</span> - The modern module system (`import`/`export`)
+
+---
+
+### 🐣 Junior Level
+
+Look at your import statement:
+- **Curly braces** `{ }` → Named export → `{ myFunction: jest.fn() }`
+- **No curly braces** → Default export → `{ __esModule: true, default: jest.fn() }`
+
+### 🧑‍💻 Mid Level
+
+Understand that `__esModule: true` is a compatibility layer between ESM (your source code) and CJS (Jest's internal module system). Without it, `import foo from "./module"` would give you the whole module object instead of just the function.
+
+### 🧙 Senior Level
+
+Know that you can also mock a default export by returning a function directly:
+```typescript
+jest.mock("@/api/api", () => jest.fn());
+```
+This works because if the mock factory returns a function (not an object), Jest treats it as the default export. But using `{ __esModule: true, default: jest.fn() }` is more explicit and consistent.
+
+### 🏆 Principal Level
+
+Consider whether your module's export style affects testability. Some teams prefer to use **only named exports** (no default exports) because:
+- Named exports are more explicit in imports
+- Named exports are easier to mock consistently
+- Named exports prevent naming conflicts (you can't rename a named import)
+
+But default exports are useful for the "main" function of a module. There's no right answer - it's a team/style choice!
 
 ---
 

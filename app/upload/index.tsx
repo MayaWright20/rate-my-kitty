@@ -31,7 +31,7 @@ export default function UploadScreen() {
   };
   return (
     <ImageBackgroundScreen>
-      <SafeAreaView style={styles.safeAreaView} edges={["top"]}>
+      <SafeAreaView testID="upload" style={styles.safeAreaView} edges={["top"]}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardDismissMode="interactive"

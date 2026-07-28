@@ -106,6 +106,7 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
 
   return (
     <View
+      testID="image-uploader"
       style={[
         styles.wrapper,
         isScreenPortrait === false ? styles.wrapperHorizontal : undefined
@@ -129,6 +130,7 @@ export default function ImageUploader({ getImage, resetImages }: Props) {
         </View>
       )}
       <Pressable
+        testID="image-uploader-pressable"
         style={
           image
             ? [styles.container, styles.containerSmall]

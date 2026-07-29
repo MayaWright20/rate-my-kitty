@@ -1,5 +1,4 @@
 const jestConfig = require("jest-expo/jest-preset");
-
 // Add transform for .mjs files (needed for rettime which is pure ESM)
 jestConfig.transform["^.+\\.mjs$"] = [
   "babel-jest",
@@ -20,15 +19,20 @@ jestConfig.moduleNameMapper = {
 
 // ✅ NEW: Tell Jest which files to include in coverage reports
 jestConfig.collectCoverageFrom = [
-  "**/*.{ts,tsx}", // All TypeScript files
-  "!**/node_modules/**", // Ignore dependencies
-  "!**/coverage/**", // Ignore coverage output
-  "!**/*.config.*", // Ignore config files (jest.config, tsconfig, etc.)
-  "!**/app/**", // Ignore Expo Router files (they need special setup)
-  "!**/assets/**", // Ignore static assets
+  "**/*.{ts,tsx}",
+  // All TypeScript files
+  "!**/node_modules/**",
+  // Ignore dependencies
+  "!**/coverage/**",
+  // Ignore coverage output
+  "!**/*.config.*",
+  // Ignore config files (jest.config, tsconfig, etc.)
+  "!**/app/**",
+  // Ignore Expo Router files (they need special setup)
+  "!**/assets/**",
+  // Ignore static assets
   "!**/__mocks__/**", // Ignore mock files
   "!**/.expo/**", // Ignore Expo build files
   "!**/types.ts" // Ignore type definition files (no logic to test)
 ];
-
 module.exports = jestConfig;

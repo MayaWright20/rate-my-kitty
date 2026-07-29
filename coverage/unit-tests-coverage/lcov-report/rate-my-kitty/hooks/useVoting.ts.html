@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/15</span>
+                <span class='fraction'>15/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/8</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -134,12 +134,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -147,26 +145,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -187,14 +187,14 @@ type UseVotingOptions = {
   subId?: string;
 };
 &nbsp;
-export default function <span class="fstat-no" title="function not covered" >useVoting(</span>
+export default function useVoting(
   imageId: string,
-  { initialCount = <span class="branch-0 cbranch-no" title="branch not covered" >0,</span> subId }: UseVotingOptions = <span class="branch-0 cbranch-no" title="branch not covered" >{}</span>
+  { initialCount = 0, subId }: UseVotingOptions = {}
 ) {
-  const votingContext = <span class="cstat-no" title="statement not covered" >useContext(VotingContext);</span>
+  const votingContext = useContext(VotingContext);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!votingContext) {</span>
-<span class="cstat-no" title="statement not covered" >    throw new Error("useVoting must be used inside VotingProvider");</span>
+  if (!votingContext) {
+    throw new Error("useVoting must be used inside VotingProvider");
   }
 &nbsp;
   const {
@@ -204,26 +204,26 @@ export default function <span class="fstat-no" title="function not covered" >use
     loadVoteScore: loadVoteScoreFromContext,
     vote: voteFromContext,
     voteCountsByImageId
-  } = <span class="cstat-no" title="statement not covered" >votingContext;</span>
+  } = votingContext;
 &nbsp;
-  const loadVoteScore = <span class="cstat-no" title="statement not covered" >useCallback(</span>
-<span class="fstat-no" title="function not covered" >    ()</span> =&gt; <span class="cstat-no" title="statement not covered" >loadVoteScoreFromContext(imageId, subId),</span>
+  const loadVoteScore = useCallback(
+    () =&gt; loadVoteScoreFromContext(imageId, subId),
     [imageId, loadVoteScoreFromContext, subId]
   );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  useEffect(<span class="fstat-no" title="function not covered" >()</span> =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >    loadVoteScore();</span>
+  useEffect(() =&gt; {
+    loadVoteScore();
   }, [loadVoteScore]);
 &nbsp;
-  const vote = <span class="cstat-no" title="statement not covered" >useCallback(</span>
-<span class="fstat-no" title="function not covered" >    (v</span>alue: VoteValue) =&gt; <span class="cstat-no" title="statement not covered" >voteFromContext(imageId, value, subId),</span>
+  const vote = useCallback(
+    (value: VoteValue) =&gt; voteFromContext(imageId, value, subId),
     [imageId, subId, voteFromContext]
   );
 &nbsp;
-  const upvote = <span class="cstat-no" title="statement not covered" >useCallback(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >vote(1),</span> [vote]);</span>
-  const downvote = <span class="cstat-no" title="statement not covered" >useCallback(<span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >vote(0),</span> [vote]);</span>
+  const upvote = useCallback(() =&gt; vote(1), [vote]);
+  const downvote = useCallback(() =&gt; vote(0), [vote]);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return {</span>
+  return {
     count: voteCountsByImageId[imageId] ?? initialCount,
     downvote,
     errorMessage: errorMessagesByImageId[imageId] ?? null,
@@ -241,7 +241,7 @@ export default function <span class="fstat-no" title="function not covered" >use
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-28T22:38:47.806Z
+                at 2026-07-28T23:20:34.471Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

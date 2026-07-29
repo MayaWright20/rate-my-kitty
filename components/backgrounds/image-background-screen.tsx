@@ -40,7 +40,7 @@ export default function ImageBackgroundScreen({
 
 const styles = StyleSheet.create({
   background: {
-    ...StyleSheet.absoluteFillObject
+    ...StyleSheet.absoluteFill
   },
   container: {
     flex: 1

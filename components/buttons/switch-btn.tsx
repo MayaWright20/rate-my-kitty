@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react";
+import { memo, useEffect } from "react";
 import {
   Pressable,
   StyleProp,
@@ -60,7 +60,6 @@ export function SwitchBTN({
       hitSlop={12}
     >
       <Animated.View style={[styles.active, activeBtnStyle]} />
-
       <View style={styles.labelRow}>
         <Text
           testID="switch-btn-left-label"

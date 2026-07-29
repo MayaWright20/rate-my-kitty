@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1785280834496" clover="3.2.0">
-  <project timestamp="1785280834496" name="All files">
-    <metrics statements="411" coveredstatements="196" conditionals="233" coveredconditionals="106" methods="93" coveredmethods="47" elements="737" coveredelements="349" complexity="0" loc="411" ncloc="411" packages="12" files="28" classes="28"/>
+<coverage generated="1785321050470" clover="3.2.0">
+  <project timestamp="1785321050471" name="All files">
+    <metrics statements="411" coveredstatements="207" conditionals="233" coveredconditionals="118" methods="93" coveredmethods="51" elements="737" coveredelements="376" complexity="0" loc="411" ncloc="411" packages="12" files="28" classes="28"/>
     <package name="rate-my-kitty">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="expo-env.d.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/expo-env.d.ts">
@@ -142,7 +142,7 @@
       </file>
     </package>
     <package name="rate-my-kitty.components.buttons">
-      <metrics statements="33" coveredstatements="22" conditionals="36" coveredconditionals="24" methods="8" coveredmethods="4"/>
+      <metrics statements="33" coveredstatements="33" conditionals="36" coveredconditionals="36" methods="8" coveredmethods="8"/>
       <file name="circular-btn.tsx" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/components/buttons/circular-btn.tsx">
         <metrics statements="5" coveredstatements="5" conditionals="9" coveredconditionals="9" methods="1" coveredmethods="1"/>
         <line num="27" count="1" type="stmt"/>
@@ -167,18 +167,18 @@
         <line num="59" count="2" type="stmt"/>
       </file>
       <file name="switch-btn.tsx" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/components/buttons/switch-btn.tsx">
-        <metrics statements="11" coveredstatements="0" conditionals="12" coveredconditionals="0" methods="4" coveredmethods="0"/>
-        <line num="27" count="0" type="stmt"/>
-        <line num="28" count="0" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="39" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="41" count="0" type="stmt"/>
-        <line num="42" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="49" count="0" type="stmt"/>
-        <line num="53" count="0" type="stmt"/>
-        <line num="56" count="0" type="stmt"/>
-        <line num="81" count="0" type="stmt"/>
+        <metrics statements="11" coveredstatements="11" conditionals="12" coveredconditionals="12" methods="4" coveredmethods="4"/>
+        <line num="27" count="1" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="29" count="1" type="stmt"/>
+        <line num="30" count="1" type="stmt"/>
+        <line num="39" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="41" count="4" type="stmt"/>
+        <line num="42" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="49" count="4" type="stmt"/>
+        <line num="53" count="4" type="stmt"/>
+        <line num="56" count="1" type="stmt"/>
+        <line num="80" count="1" type="stmt"/>
       </file>
       <file name="voting-btn.tsx" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/components/buttons/voting-btn.tsx">
         <metrics statements="8" coveredstatements="8" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
@@ -317,7 +317,7 @@
       <metrics statements="10" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="colors.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/constants/colors.ts">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="6" type="stmt"/>
+        <line num="1" count="7" type="stmt"/>
       </file>
       <file name="env.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/constants/env.ts">
         <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -326,13 +326,13 @@
       </file>
       <file name="styles.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/constants/styles.ts">
         <metrics statements="7" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="3" count="9" type="stmt"/>
-        <line num="8" count="9" type="stmt"/>
-        <line num="10" count="9" type="stmt"/>
-        <line num="16" count="9" type="stmt"/>
-        <line num="25" count="9" type="stmt"/>
-        <line num="30" count="9" type="stmt"/>
-        <line num="39" count="9" type="stmt"/>
+        <line num="3" count="10" type="stmt"/>
+        <line num="8" count="10" type="stmt"/>
+        <line num="10" count="10" type="stmt"/>
+        <line num="16" count="10" type="stmt"/>
+        <line num="25" count="10" type="stmt"/>
+        <line num="30" count="10" type="stmt"/>
+        <line num="39" count="10" type="stmt"/>
       </file>
     </package>
     <package name="rate-my-kitty.context">

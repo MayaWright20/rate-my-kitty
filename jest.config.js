@@ -12,9 +12,11 @@ jestConfig.transformIgnorePatterns = [
 ];
 
 // Mock rettime - pure ESM package that Jest (CJS) cannot load directly
+// Mock react-native-reanimated - native module that can't run in Jest
 jestConfig.moduleNameMapper = {
   ...jestConfig.moduleNameMapper,
-  "^rettime$": "<rootDir>/__mocks__/rettime.js"
+  "^rettime$": "<rootDir>/__mocks__/rettime.js",
+  "^react-native-reanimated$": "<rootDir>/__mocks__/react-native-reanimated.js"
 };
 
 // ✅ NEW: Tell Jest which files to include in coverage reports

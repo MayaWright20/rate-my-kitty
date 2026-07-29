@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1785326038562" clover="3.2.0">
-  <project timestamp="1785326038562" name="All files">
-    <metrics statements="411" coveredstatements="224" conditionals="233" coveredconditionals="140" methods="93" coveredmethods="53" elements="737" coveredelements="417" complexity="0" loc="411" ncloc="411" packages="12" files="28" classes="28"/>
+<coverage generated="1785329716385" clover="3.2.0">
+  <project timestamp="1785329716385" name="All files">
+    <metrics statements="413" coveredstatements="249" conditionals="233" coveredconditionals="172" methods="93" coveredmethods="58" elements="739" coveredelements="479" complexity="0" loc="413" ncloc="413" packages="12" files="29" classes="29"/>
     <package name="rate-my-kitty">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="expo-env.d.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/expo-env.d.ts">
@@ -12,38 +12,38 @@
       <metrics statements="118" coveredstatements="14" conditionals="42" coveredconditionals="0" methods="18" coveredmethods="0"/>
       <file name="api.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/api/api.ts">
         <metrics statements="118" coveredstatements="14" conditionals="42" coveredconditionals="0" methods="18" coveredmethods="0"/>
-        <line num="13" count="3" type="stmt"/>
+        <line num="13" count="4" type="stmt"/>
         <line num="14" count="0" type="stmt"/>
         <line num="16" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="17" count="0" type="stmt"/>
         <line num="20" count="0" type="stmt"/>
         <line num="21" count="0" type="stmt"/>
         <line num="23" count="0" type="stmt"/>
-        <line num="27" count="3" type="stmt"/>
+        <line num="27" count="4" type="stmt"/>
         <line num="28" count="0" type="stmt"/>
         <line num="30" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="31" count="0" type="stmt"/>
         <line num="34" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="35" count="0" type="stmt"/>
         <line num="38" count="0" type="stmt"/>
-        <line num="41" count="3" type="stmt"/>
+        <line num="41" count="4" type="stmt"/>
         <line num="42" count="0" type="stmt"/>
-        <line num="44" count="3" type="stmt"/>
+        <line num="44" count="4" type="stmt"/>
         <line num="45" count="0" type="stmt"/>
         <line num="47" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="48" count="0" type="stmt"/>
         <line num="51" count="0" type="stmt"/>
-        <line num="54" count="3" type="stmt"/>
+        <line num="54" count="4" type="stmt"/>
         <line num="55" count="0" type="stmt"/>
         <line num="57" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="58" count="0" type="stmt"/>
         <line num="61" count="0" type="stmt"/>
-        <line num="64" count="3" type="stmt"/>
+        <line num="64" count="4" type="stmt"/>
         <line num="68" count="0" type="cond" truecount="0" falsecount="2"/>
         <line num="69" count="0" type="stmt"/>
         <line num="70" count="0" type="stmt"/>
         <line num="73" count="0" type="stmt"/>
-        <line num="80" count="3" type="stmt"/>
+        <line num="80" count="4" type="stmt"/>
         <line num="83" count="0" type="stmt"/>
         <line num="85" count="0" type="stmt"/>
         <line num="87" count="0" type="stmt"/>
@@ -54,7 +54,7 @@
         <line num="105" count="0" type="stmt"/>
         <line num="107" count="0" type="stmt"/>
         <line num="108" count="0" type="stmt"/>
-        <line num="112" count="3" type="stmt"/>
+        <line num="112" count="4" type="stmt"/>
         <line num="113" count="0" type="stmt"/>
         <line num="114" count="0" type="stmt"/>
         <line num="126" count="0" type="stmt"/>
@@ -66,7 +66,7 @@
         <line num="141" count="0" type="stmt"/>
         <line num="143" count="0" type="stmt"/>
         <line num="144" count="0" type="stmt"/>
-        <line num="148" count="3" type="stmt"/>
+        <line num="148" count="4" type="stmt"/>
         <line num="149" count="0" type="stmt"/>
         <line num="150" count="0" type="stmt"/>
         <line num="158" count="0" type="stmt"/>
@@ -77,7 +77,7 @@
         <line num="170" count="0" type="stmt"/>
         <line num="172" count="0" type="stmt"/>
         <line num="173" count="0" type="stmt"/>
-        <line num="177" count="3" type="stmt"/>
+        <line num="177" count="4" type="stmt"/>
         <line num="178" count="0" type="stmt"/>
         <line num="179" count="0" type="stmt"/>
         <line num="187" count="0" type="stmt"/>
@@ -86,7 +86,7 @@
         <line num="195" count="0" type="stmt"/>
         <line num="197" count="0" type="stmt"/>
         <line num="198" count="0" type="stmt"/>
-        <line num="202" count="3" type="stmt"/>
+        <line num="202" count="4" type="stmt"/>
         <line num="203" count="0" type="stmt"/>
         <line num="204" count="0" type="stmt"/>
         <line num="205" count="0" type="stmt"/>
@@ -95,7 +95,7 @@
         <line num="210" count="0" type="stmt"/>
         <line num="213" count="0" type="stmt"/>
         <line num="214" count="0" type="stmt"/>
-        <line num="217" count="3" type="stmt"/>
+        <line num="217" count="4" type="stmt"/>
         <line num="222" count="0" type="stmt"/>
         <line num="223" count="0" type="stmt"/>
         <line num="236" count="0" type="stmt"/>
@@ -104,7 +104,7 @@
         <line num="244" count="0" type="stmt"/>
         <line num="246" count="0" type="stmt"/>
         <line num="247" count="0" type="stmt"/>
-        <line num="251" count="3" type="stmt"/>
+        <line num="251" count="4" type="stmt"/>
         <line num="252" count="0" type="stmt"/>
         <line num="253" count="0" type="stmt"/>
         <line num="261" count="0" type="stmt"/>
@@ -115,7 +115,7 @@
         <line num="273" count="0" type="stmt"/>
         <line num="275" count="0" type="stmt"/>
         <line num="276" count="0" type="stmt"/>
-        <line num="280" count="3" type="stmt"/>
+        <line num="280" count="4" type="stmt"/>
         <line num="281" count="0" type="stmt"/>
         <line num="283" count="0" type="stmt"/>
         <line num="284" count="0" type="stmt"/>
@@ -159,12 +159,12 @@
       </file>
       <file name="favourite-icon-btn.tsx" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/components/buttons/favourite-icon-btn.tsx">
         <metrics statements="6" coveredstatements="6" conditionals="9" coveredconditionals="9" methods="1" coveredmethods="1"/>
-        <line num="20" count="5" type="stmt"/>
-        <line num="21" count="5" type="stmt"/>
-        <line num="22" count="5" type="cond" truecount="2" falsecount="0"/>
-        <line num="23" count="5" type="cond" truecount="2" falsecount="0"/>
-        <line num="25" count="5" type="stmt"/>
-        <line num="59" count="2" type="stmt"/>
+        <line num="20" count="15" type="stmt"/>
+        <line num="21" count="15" type="stmt"/>
+        <line num="22" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="23" count="15" type="cond" truecount="2" falsecount="0"/>
+        <line num="25" count="15" type="stmt"/>
+        <line num="59" count="3" type="stmt"/>
       </file>
       <file name="switch-btn.tsx" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/components/buttons/switch-btn.tsx">
         <metrics statements="11" coveredstatements="11" conditionals="12" coveredconditionals="12" methods="4" coveredmethods="4"/>
@@ -182,51 +182,51 @@
       </file>
       <file name="voting-btn.tsx" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/components/buttons/voting-btn.tsx">
         <metrics statements="8" coveredstatements="8" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
-        <line num="19" count="2" type="stmt"/>
-        <line num="20" count="2" type="stmt"/>
-        <line num="21" count="2" type="stmt"/>
-        <line num="22" count="2" type="stmt"/>
-        <line num="23" count="2" type="stmt"/>
-        <line num="26" count="5" type="stmt"/>
-        <line num="28" count="5" type="stmt"/>
-        <line num="62" count="2" type="stmt"/>
+        <line num="19" count="3" type="stmt"/>
+        <line num="20" count="3" type="stmt"/>
+        <line num="21" count="3" type="stmt"/>
+        <line num="22" count="3" type="stmt"/>
+        <line num="23" count="3" type="stmt"/>
+        <line num="26" count="15" type="stmt"/>
+        <line num="28" count="15" type="stmt"/>
+        <line num="62" count="3" type="stmt"/>
       </file>
     </package>
     <package name="rate-my-kitty.components.cards">
-      <metrics statements="32" coveredstatements="9" conditionals="43" coveredconditionals="11" methods="7" coveredmethods="2"/>
+      <metrics statements="32" coveredstatements="32" conditionals="43" coveredconditionals="43" methods="7" coveredmethods="7"/>
       <file name="card.tsx" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/components/cards/card.tsx">
         <metrics statements="5" coveredstatements="5" conditionals="9" coveredconditionals="9" methods="1" coveredmethods="1"/>
-        <line num="29" count="1" type="stmt"/>
-        <line num="46" count="5" type="stmt"/>
-        <line num="48" count="5" type="cond" truecount="5" falsecount="0"/>
-        <line num="49" count="4" type="stmt"/>
-        <line num="82" count="1" type="stmt"/>
+        <line num="29" count="2" type="stmt"/>
+        <line num="46" count="15" type="stmt"/>
+        <line num="48" count="15" type="cond" truecount="5" falsecount="0"/>
+        <line num="49" count="14" type="stmt"/>
+        <line num="82" count="2" type="stmt"/>
       </file>
       <file name="gallery.tsx" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/components/cards/gallery.tsx">
-        <metrics statements="23" coveredstatements="0" conditionals="32" coveredconditionals="0" methods="5" coveredmethods="0"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
-        <line num="20" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="49" count="0" type="stmt"/>
-        <line num="50" count="0" type="stmt"/>
-        <line num="52" count="0" type="stmt"/>
-        <line num="53" count="0" type="stmt"/>
-        <line num="54" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="55" count="0" type="stmt"/>
-        <line num="58" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="62" count="0" type="stmt"/>
-        <line num="73" count="0" type="stmt"/>
-        <line num="75" count="0" type="stmt"/>
-        <line num="77" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="79" count="0" type="cond" truecount="0" falsecount="3"/>
-        <line num="81" count="0" type="stmt"/>
-        <line num="97" count="0" type="stmt"/>
-        <line num="122" count="0" type="stmt"/>
-        <line num="128" count="0" type="stmt"/>
-        <line num="139" count="0" type="stmt"/>
+        <metrics statements="23" coveredstatements="23" conditionals="32" coveredconditionals="32" methods="5" coveredmethods="5"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="22" count="1" type="stmt"/>
+        <line num="49" count="6" type="stmt"/>
+        <line num="50" count="6" type="stmt"/>
+        <line num="52" count="6" type="stmt"/>
+        <line num="53" count="6" type="stmt"/>
+        <line num="54" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="55" count="4" type="stmt"/>
+        <line num="58" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="62" count="2" type="stmt"/>
+        <line num="73" count="6" type="stmt"/>
+        <line num="75" count="6" type="stmt"/>
+        <line num="77" count="10" type="cond" truecount="4" falsecount="0"/>
+        <line num="79" count="10" type="cond" truecount="3" falsecount="0"/>
+        <line num="81" count="10" type="stmt"/>
+        <line num="97" count="1" type="stmt"/>
+        <line num="122" count="6" type="stmt"/>
+        <line num="129" count="19" type="stmt"/>
+        <line num="140" count="1" type="stmt"/>
       </file>
       <file name="placeholder.tsx" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/components/cards/placeholder.tsx">
         <metrics statements="4" coveredstatements="4" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
@@ -314,25 +314,30 @@
       </file>
     </package>
     <package name="rate-my-kitty.constants">
-      <metrics statements="10" coveredstatements="10" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <metrics statements="12" coveredstatements="12" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="colors.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/constants/colors.ts">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="7" type="stmt"/>
+        <line num="1" count="8" type="stmt"/>
       </file>
       <file name="env.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/constants/env.ts">
         <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="3" type="stmt"/>
-        <line num="2" count="3" type="stmt"/>
+        <line num="1" count="4" type="stmt"/>
+        <line num="2" count="4" type="stmt"/>
       </file>
       <file name="styles.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/constants/styles.ts">
         <metrics statements="7" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="3" count="10" type="stmt"/>
-        <line num="8" count="10" type="stmt"/>
-        <line num="10" count="10" type="stmt"/>
-        <line num="16" count="10" type="stmt"/>
-        <line num="25" count="10" type="stmt"/>
-        <line num="30" count="10" type="stmt"/>
-        <line num="39" count="10" type="stmt"/>
+        <line num="3" count="11" type="stmt"/>
+        <line num="8" count="11" type="stmt"/>
+        <line num="10" count="11" type="stmt"/>
+        <line num="16" count="11" type="stmt"/>
+        <line num="25" count="11" type="stmt"/>
+        <line num="30" count="11" type="stmt"/>
+        <line num="39" count="11" type="stmt"/>
+      </file>
+      <file name="test-variables.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/constants/test-variables.ts">
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="21" count="2" type="stmt"/>
       </file>
     </package>
     <package name="rate-my-kitty.context">
@@ -403,11 +408,11 @@
       </file>
       <file name="screen-orientation-context.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/context/screen-orientation-context.ts">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="6" count="4" type="stmt"/>
+        <line num="6" count="5" type="stmt"/>
       </file>
       <file name="voting-context.tsx" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/context/voting-context.tsx">
         <metrics statements="30" coveredstatements="30" conditionals="10" coveredconditionals="10" methods="15" coveredmethods="15"/>
-        <line num="17" count="4" type="stmt"/>
+        <line num="17" count="5" type="stmt"/>
         <line num="20" count="48" type="stmt"/>
         <line num="23" count="48" type="stmt"/>
         <line num="26" count="48" type="stmt"/>
@@ -518,19 +523,19 @@
       </file>
       <file name="useVoting.ts" path="/Users/mayawright/Desktop/Projects/rate-my-kitty/hooks/useVoting.ts">
         <metrics statements="13" coveredstatements="13" conditionals="8" coveredconditionals="8" methods="6" coveredmethods="6"/>
-        <line num="15" count="18" type="stmt"/>
-        <line num="17" count="18" type="cond" truecount="2" falsecount="0"/>
+        <line num="15" count="28" type="stmt"/>
+        <line num="17" count="28" type="cond" truecount="2" falsecount="0"/>
         <line num="18" count="2" type="stmt"/>
-        <line num="28" count="16" type="stmt"/>
-        <line num="30" count="16" type="stmt"/>
-        <line num="31" count="18" type="stmt"/>
-        <line num="35" count="16" type="stmt"/>
-        <line num="36" count="16" type="stmt"/>
-        <line num="39" count="16" type="stmt"/>
+        <line num="28" count="26" type="stmt"/>
+        <line num="30" count="26" type="stmt"/>
+        <line num="31" count="28" type="stmt"/>
+        <line num="35" count="26" type="stmt"/>
+        <line num="36" count="26" type="stmt"/>
+        <line num="39" count="26" type="stmt"/>
         <line num="40" count="7" type="stmt"/>
-        <line num="44" count="16" type="stmt"/>
-        <line num="45" count="16" type="stmt"/>
-        <line num="47" count="16" type="stmt"/>
+        <line num="44" count="26" type="stmt"/>
+        <line num="45" count="26" type="stmt"/>
+        <line num="47" count="26" type="stmt"/>
       </file>
     </package>
   </project>

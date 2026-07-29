@@ -21,7 +21,7 @@ const GRID_MAX_COLUMNS = 4;
 const GRID_MAX_PORTRAIT_COLUMNS = 2;
 const LIST_CONTENT_MARGIN_TOP = 50;
 
-type Props = {
+export type Props = {
   centerListImagesOnHorizontal?: boolean;
   contentContainerStyle?: StyleProp<ViewStyle>;
   favouriteImageIds: Record<string, boolean>;
@@ -121,6 +121,7 @@ export default function Gallery({
 
   return (
     <FlatList
+      testID="gallery"
       key={numColumns}
       data={images}
       style={listStyle}

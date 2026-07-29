@@ -1,36 +1,13 @@
 import { render } from "@testing-library/react-native";
 import { StyleSheet, Text } from "react-native";
 
-import { VotingContext, VotingContextValue } from "@/context/voting-context";
+import { VotingContext } from "@/context/voting-context";
 
+import {
+  testImage,
+  votingContextProps
+} from "../../../constants/test-variables";
 import Card from "../card";
-
-const testImage = {
-  id: "id",
-  url: "url",
-  width: 5,
-  height: 5,
-  mime_type: "mime_type",
-  entities: ["entities"],
-  breeds: [
-    {
-      id: 5,
-      name: "name",
-      wikipedia_url: "wikipendia_url"
-    }
-  ],
-  animals: ["string"],
-  categories: ["string"]
-};
-
-const votingContextProps: VotingContextValue = {
-  errorMessagesByImageId: { errorMessagesByImageId: "errorMessagesByImageId" },
-  isLoadingVotesByImageId: { isLoadingVotesByImageId: true },
-  isVotingByImageId: { isVotingByImageId: true },
-  loadVoteScore: jest.fn(),
-  vote: jest.fn(),
-  voteCountsByImageId: { voteCountsByImageId: 5 }
-};
 
 function RenderWithContext(ui: React.ReactElement) {
   return render(

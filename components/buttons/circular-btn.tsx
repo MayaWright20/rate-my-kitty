@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import React, { useContext } from "react";
+import { useContext } from "react";
 import {
   GestureResponderEvent,
   OpaqueColorValue,
@@ -24,8 +24,8 @@ interface Props {
   backgroundColor?: string | OpaqueColorValue;
 }
 
-const PORTRAIT_SCREEN_WIDTH = "70%";
-const HORIZONAL_SCREEN_WIDTH = "40%";
+export const PORTRAIT_SCREEN_WIDTH = "70%";
+export const HORIZONAL_SCREEN_WIDTH = "40%";
 
 export default function CircularBTN({
   icon,

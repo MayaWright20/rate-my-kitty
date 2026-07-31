@@ -1,7 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router, Tabs, usePathname } from "expo-router";
-import { useMemo } from "react";
-import { StyleSheet, useWindowDimensions, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import ImageBackgroundScreen from "@/components/backgrounds/image-background-screen";
 import CircularBTN from "@/components/buttons/circular-btn";
@@ -16,14 +15,13 @@ import {
   useVotingProviderValue,
   VotingContext
 } from "@/context/voting-context";
+import useIsScreenPortrait from "@/hooks/useIsScreenPortrait";
 
 export default function RootLayout() {
   const pathname = usePathname();
-  const { height, width } = useWindowDimensions();
   const favourites = useFavouritesProviderValue();
   const voting = useVotingProviderValue();
-
-  const isScreenPortrait = useMemo(() => height >= width, [height, width]);
+  const isScreenPortrait = useIsScreenPortrait();
 
   return (
     <IsScreenPortraitContext.Provider value={isScreenPortrait}>

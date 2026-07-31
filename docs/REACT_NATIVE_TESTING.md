@@ -27,6 +27,7 @@
 19. [Testing Navigation & Routing](#19-testing-navigation--routing)
 20. [Testing That a Page Exists & Navigation Works](#20-testing-that-a-page-exists--navigation-works)
 21. [The Great Gotcha: Default Export vs Named Export in Mocks](#21-the-great-gotcha-default-export-vs-named-export-in-mocks)
+22. [Understanding Coverage Reports (Why Unrelated Lines Get Highlighted)](#22-understanding-coverage-reports-why-unrelated-lines-get-highlighted)
 
 ---
 
@@ -3883,6 +3884,153 @@ Consider whether your module's export style affects testability. Some teams pref
 - Named exports prevent naming conflicts (you can't rename a named import)
 
 But default exports are useful for the "main" function of a module. There's no right answer - it's a team/style choice!
+
+---
+
+## 22. Understanding Coverage Reports (Why Unrelated Lines Get Highlighted)
+
+> *"Why does my integration test highlight `<Text>` and `<Ionicons>` when they have nothing to do with the integration?"*
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+We're understanding a common confusion: why coverage reports highlight lines that seem unrelated to what your test is actually testing. This is a fundamental concept that trips up many developers!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Big Misconception 🚨</div>
+
+**Coverage measures *execution*, not *integration relevance*.**
+
+When you run `npx jest --coverage`, Jest tracks **which lines of code actually ran** during the test — regardless of *why* they ran. It's not smart enough to know "this line is only relevant to the integration." It just records: "Did this line execute? Yes/No."
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Car Analogy 🚗</div>
+
+Imagine you're testing that a car's **engine and transmission** work together (an integration test). You turn the key and the car starts. The coverage report would show that the **headlights** also "ran" (they turned on) — even though the headlights have nothing to do with the engine-transmission integration.
+
+The report just records "the headlights were used," not "the headlights are part of what we're testing."
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why `<Text>` and `<Ionicons>` Get Highlighted</div>
+
+When your test renders `<CircularBTN />`, the **entire component tree executes** — including the `<Text>` and `<Ionicons>` elements. Even though your test only *asserts* on the width of the icon wrapper, the whole component renders:
+
+```tsx
+{icon && (
+  <Ionicons ... />   // This RAN because the component rendered
+)}
+{title && (
+  <Text ...>          // This RAN because the component rendered
+)}
+```
+
+So Jest marks them as "covered" because they **executed**, not because they're relevant to the integration.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Key Insight 💡</div>
+
+**Coverage is a blunt instrument.** It tells you "this code ran during *some* test," but it does **not** tell you:
+- Whether the code was *meaningfully* tested
+- Whether the assertions actually verified the behavior
+- Whether the test was an integration test or a unit test
+
+A line can be 100% "covered" but completely **unverified** — e.g., if you render a component but never assert anything about it.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Coverage vs Assertions</div>
+
+| | Coverage | Assertions |
+|--|----------|-----------|
+| **What it measures** | Did the line *run*? | Did we *verify* the behavior? |
+| **Question it answers** | "Was this code executed?" | "Is this code correct?" |
+| **Can be 100% but wrong?** | ✅ Yes | ❌ No (if the assertion is correct) |
+| **Example** | `<Text>` renders | `expect(width).toBe("70%")` |
+
+**The lesson:** A test that renders a component and asserts nothing gives you "coverage" but zero confidence. Coverage without assertions is like a security camera that records but nobody watches the footage!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What This Means for You</div>
+
+1. **Don't chase 100% coverage blindly** — it's a useful signal, but not the goal. A test that renders a component and asserts nothing gives you "coverage" but zero confidence.
+
+2. **Coverage is per-file, not per-test-type** — When you run `test:integrations`, Jest runs *only* the integration test files, but it still reports coverage for **every file those tests touch** (including `circular-btn.tsx`). So the integration test "covers" the whole component, even the parts unrelated to the integration.
+
+3. **The real question is assertion quality** — Your integration test *does* meaningfully verify the integration (the width assertion). The `<Text>` and `<Ionicons>` being highlighted is just a side effect of the component rendering — it doesn't mean those lines are "integrated," just that they "ran."
+
+---
+
+### 🎯 How to Identify What to Test in Integration Tests
+
+> *"Is there a way to know which areas of a file should be tested for integration tests, displayed visually like coverage files?"*
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Short Answer</div>
+
+**No, there's no built-in tool that visually highlights "which lines *should* be tested by integration tests"** — because that's a *judgment call*, not a measurable fact. Coverage tools can only show you what *did* run, not what *should* run.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why It Doesn't Exist (The Core Reason)</div>
+
+Coverage tools work by **instrumenting code** — they add little counters that record "this line executed." They can tell you:
+- ✅ "This line ran" (coverage)
+- ❌ "This line *should* be tested by an integration test" (judgment)
+
+The second question requires understanding your **intent** — which only a human (or a well-designed test strategy) can decide. It's like asking a speedometer to tell you which roads you *should* drive on. The speedometer only tells you how fast you're going.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Solution 1: The "Coverage Per Test Type" Trick (Closest to What You Want)</div>
+
+You already learned this in Section 17! By running coverage for **only** your integration tests, you can see exactly which lines the integration tests touch:
+
+```bash
+npx jest context/__tests__/voting-context.integration.test.tsx --coverage --coverageDirectory=coverage-integration
+open coverage-integration/lcov-report/index.html
+```
+
+This shows you **green** (lines the integration test runs) and **red** (lines it doesn't). This is the closest visual representation of "what the integration test covers."
+
+**But the gotcha:** It still shows *everything the component renders*, not just the "integration-relevant" parts. That's the exact confusion you had with `<Text>` and `<Ionicons>`.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Solution 2: The "Test Type Mapping" Mental Model (The Real Answer)</div>
+
+Since there's no tool, senior devs use a **mental framework** to decide what belongs in each test type:
+
+| Test Type | What it should cover | Visual metaphor |
+|-----------|---------------------|-----------------|
+| **Unit** | Individual functions, isolated logic | 🔬 Looking at one cell under a microscope |
+| **Integration** | The *connections* between pieces | 🔗 Tracing the wires between components |
+| **E2E** | The whole user journey | 🚗 Driving the whole car |
+
+**For integration tests specifically, ask yourself:** "Which lines represent the *handshake* between two pieces?" Those are the lines to test.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Solution 3: Focus on Branch Coverage</div>
+
+If you want a *visual* signal for integration tests, focus on **branch coverage** (the yellow indicators in the HTML report). Branches (if/else, ternaries) are where integration bugs hide — because they represent *different paths* through the code that only trigger under certain conditions.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Solution 4: The "Test Plan" Document Approach</div>
+
+The most senior-level approach is to **document your test strategy** — a simple table saying "this file's integration test should cover X, Y, Z." This becomes your "visual map" that's more useful than any automated tool:
+
+| File | Integration test should verify |
+|------|-------------------------------|
+| `circular-btn.tsx` | The width changes correctly when `IsScreenPortraitContext` changes |
+| `voting-context.tsx` | `useVoting` correctly updates provider state through context |
+| `favourites-context.tsx` | `useFavourites` correctly reads from the real provider |
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**Coverage**</span> - A metric showing how much of your code *executed* during tests
+- <span style="color: #50C878;">**Execution**</span> - Whether a line of code actually ran (not whether it was verified)
+- <span style="color: #50C878;">**Assertion**</span> - A statement that verifies behavior is correct
+- <span style="color: #50C878;">**False Confidence**</span> - Believing code is correct because it's "covered," when it's actually unverified
+
+---
+
+### 🐣 Junior Level
+
+Coverage just means "this code ran during a test." It does NOT mean "this code is correct." A line can be highlighted green (covered) but still have bugs if you never assert anything about it!
+
+### 🧑‍💻 Mid Level
+
+Understand that rendering a component executes its **entire tree** — every child element, every conditional branch that's true. So coverage highlights everything that rendered, not just what you asserted on. This is why `<Text>` and `<Ionicons>` show up in your integration test coverage.
+
+### 🧙 Senior Level
+
+Use coverage as a **roadmap**, not a **report card**. It tells you where you *haven't* tested, but it can't tell you if your tests are *good*. Focus on writing meaningful assertions, then use coverage to find untested branches and edge cases.
+
+### 🏆 Principal Level
+
+Consider the difference between **coverage** and **mutation testing**. Mutation testing (tools like Stryker) actually changes your code and checks if your tests catch the change. This is a much stronger signal than coverage — it proves your tests would *fail* if the code broke. Coverage only proves the code *ran*.
 
 ---
 

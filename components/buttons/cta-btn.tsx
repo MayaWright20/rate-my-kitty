@@ -36,7 +36,7 @@ export default function CTA_BTN({ title, icon, onPress, isDisabled }: Props) {
       disabled={isDisabled}
       style={[
         styles.container,
-        isScreenPortrait === false ? styles.containerHorizontal : undefined,
+        !isScreenPortrait && styles.containerHorizontal,
         { backgroundColor: isDisabled ? COLORS.BLACK[1] : COLORS.PURPLE[3] }
       ]}
     >

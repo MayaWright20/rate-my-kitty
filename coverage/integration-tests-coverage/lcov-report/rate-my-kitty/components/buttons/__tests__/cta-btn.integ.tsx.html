@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for rate-my-kitty/components/headers/__tests__/logo-header.test.tsx</title>
+    <title>Code coverage report for rate-my-kitty/components/buttons/__tests__/cta-btn.integ.tsx</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../../../prettify.css" />
     <link rel="stylesheet" href="../../../../base.css" />
@@ -19,13 +19,13 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../../index.html">All files</a> / <a href="index.html">rate-my-kitty/components/headers/__tests__</a> logo-header.test.tsx</h1>
+        <h1><a href="../../../../index.html">All files</a> / <a href="index.html">rate-my-kitty/components/buttons/__tests__</a> cta-btn.integ.tsx</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>0/5</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>0/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
@@ -94,13 +94,14 @@
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a>
 <a name='L31'></a><a href='#L31'>31</a>
-<a name='L32'></a><a href='#L32'>32</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -110,52 +111,54 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { render, screen } from "@testing-library/react-native";
-import React from "react";
-import { StyleSheet } from "react-native";
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js"><span class="cstat-no" title="statement not covered" >jest.mock("react-native/Libraries/Utilities/useWindowDimensions", <span class="fstat-no" title="function not covered" >()</span> =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+  __esModule: true,
+  default: jest.fn()
+}));
 &nbsp;
-import { IsScreenPortraitContext } from "@/context/screen-orientation-context";
-&nbsp;
-import LogoHeader from "../logo-header";
-&nbsp;
-function <span class="fstat-no" title="function not covered" >RenderWithContext(</span>ui: React.ReactElement, isPortrait: boolean) {
-<span class="cstat-no" title="statement not covered" >  return render(</span>
-    &lt;IsScreenPortraitContext.Provider value={isPortrait}&gt;
-      {ui}
-    &lt;/IsScreenPortraitContext.Provider&gt;
+const setScreenDimensions = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >(h</span>eight: number, width: number) =&gt; {</span>
+  const { default: useWindowDimensions } = <span class="cstat-no" title="statement not covered" >jest.requireMock(</span>
+    "react-native/Libraries/Utilities/useWindowDimensions"
   );
-}
+<span class="cstat-no" title="statement not covered" >  useWindowDimensions.mockReturnValue({ height, width });</span>
+};
 &nbsp;
-<span class="cstat-no" title="statement not covered" >test("should render LogoHeader", <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >  await render(&lt;LogoHeader /&gt;);</span>
+// test("should have maxWidth: 40% when isScreenPortrait context is false", async () =&gt; {
+//   setScreenDimensions(400, 800); // landscape
 &nbsp;
-  const logoHeader = <span class="cstat-no" title="statement not covered" >screen.getByTestId("logo-header");</span>
+//   const { result: providerResult } = await renderHook(() =&gt;
+//     useIsScreenPortrait()
+//   );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  expect(logoHeader).toBeOnTheScreen();</span>
-});
+//   await render(
+//     &lt;IsScreenPortraitContext.Provider value={providerResult.current}&gt;
+//       &lt;CTA_BTN title={"TITLE"} onPress={undefined} /&gt;
+//     &lt;/IsScreenPortraitContext.Provider&gt;
+//   );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >test("should have IMAGE_PORTRAIT_WIDTH when isScreenPortraitContext is true", <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >  await RenderWithContext(&lt;LogoHeader /&gt;, true);</span>
-  const logoHeaderPurpleSvg = <span class="cstat-no" title="statement not covered" >screen.getByTestId("logo-header-purple-svg");</span>
-  const flatStyle = <span class="cstat-no" title="statement not covered" >StyleSheet.flatten(logoHeaderPurpleSvg.props.style);</span>
+//   const circularBtnIconWrapper = screen.getByTestId("cta-btn");
+//   const circularBtnIconWrapperStyle = StyleSheet.flatten(
+//     circularBtnIconWrapper.props.style
+//   );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  expect(flatStyle.height).toBe(320);</span>
-});
+//   expect(circularBtnIconWrapperStyle.maxWidth).toBe("40%");
+// });
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -163,7 +166,7 @@ function <span class="fstat-no" title="function not covered" >RenderWithContext(
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-08-03T09:12:52.866Z
+                at 2026-08-03T09:11:47.195Z
             </div>
         <script src="../../../../prettify.js"></script>
         <script>

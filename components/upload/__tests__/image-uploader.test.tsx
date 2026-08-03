@@ -158,7 +158,7 @@ test("should show 'Permission required' if permissions are not granted", async (
 test("should call URL.createObjectURL when image has a file property", async () => {
   // Mock URL.createObjectURL to return a fake blob URL
   const mockCreateObjectURL = jest.fn(() => "blob:fake-url-123");
-  global.URL.createObjectURL = mockCreateObjectURL;
+  globalThis.URL.createObjectURL = mockCreateObjectURL;
 
   // Make the permission request say "yes"
   (
@@ -200,7 +200,7 @@ test("should call URL.createObjectURL when image has a file property", async () 
 test("should NOT call URL.createObjectURL when image has no file property", async () => {
   // Mock URL.createObjectURL
   const mockCreateObjectURL = jest.fn(() => "blob:fake-url-123");
-  global.URL.createObjectURL = mockCreateObjectURL;
+  globalThis.URL.createObjectURL = mockCreateObjectURL;
 
   // Make the permission request say "yes"
   (

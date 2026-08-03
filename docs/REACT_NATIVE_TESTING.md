@@ -29,6 +29,8 @@
 21. [The Great Gotcha: Default Export vs Named Export in Mocks](#21-the-great-gotcha-default-export-vs-named-export-in-mocks)
 22. [Understanding Coverage Reports (Why Unrelated Lines Get Highlighted)](#22-understanding-coverage-reports-why-unrelated-lines-get-highlighted)
 23. [Integration Testing a Full Screen: The "Gotcha Gauntlet"](#23-integration-testing-a-full-screen-the-gotcha-gauntlet)
+24. [Contract Testing: The Senior Pro Move](#24-contract-testing-the-senior-pro-move)
+
 
 ---
 
@@ -4193,7 +4195,159 @@ Consider whether a full-screen integration test is worth the maintenance cost. S
 
 ---
 
+## 24. Contract Testing: The Senior Pro Move
+
+> *"Unit tests check the logic, integration tests check the connections, but contract tests check the *handshake* — the exact request your code sends to the outside world."*
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We're Doing</div>
+
+**Contract testing** verifies that your code builds the **correct request** to an external service — the right URL, the right HTTP method, the right headers, the right body — **without actually hitting the network**. It "locks in" the agreement (contract) between your app and the API.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why We Test It</div>
+
+Your other tests check *what happens with the response*. But a whole class of bugs hides in *what request was sent*:
+
+| Bug it catches | Example |
+|----------------|---------|
+| Wrong endpoint | Someone changes `/images/upload` to `/images/upload2` |
+| Wrong HTTP method | Someone changes `POST` to `GET` |
+| Missing API key | Someone removes the `x-api-key` header |
+| Wrong body shape | Someone sends the wrong field names |
+
+A contract test catches these by inspecting the **arguments passed to `fetch`** — the exact request your real API function builds.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Handshake Analogy 🤝</div>
+
+Think of your app and the API like two people agreeing to meet:
+
+| Part | What it is |
+|------|-----------|
+| 🤝 **The handshake** | The exact request your app sends |
+| 📍 **The location** | The URL (`/images/upload`) |
+| 🗣️ **The greeting** | The HTTP method (`POST`) |
+| 🪪 **The ID badge** | The header (`x-api-key`) |
+
+A contract test verifies the handshake is correct — that you're meeting at the right place, greeting correctly, and showing the right ID — **without actually going to the meeting**.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">How It Works: The `mock.calls` Pattern</div>
+
+The key tool is **`mock.calls`** — it records every argument passed to a mock function. When you mock `fetch`, `mock.calls[0]` gives you the first call's arguments:
+
+```typescript
+const [url, options] = (globalThis.fetch as jest.Mock).mock.calls[0];
+// url     = "https://api.example.com/images/upload"
+// options = { method: "POST", body: FormData, headers: { "x-api-key": "..." } }
+```
+
+Then you assert on each part of the request:
+
+```typescript
+expect(url).toContain("/images/upload");              // ✅ Right endpoint
+expect(options.method).toBe("POST");                  // ✅ Right method
+expect(options.headers["x-api-key"]).toBeDefined();   // ✅ API key sent
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Test We Wrote</div>
+
+```typescript
+test("should send the correct request to the API (contract test)", async () => {
+  // The REAL uploadImage will call fetch, which returns approved: 1
+  mockFetchResponse({ approved: 1 });
+
+  const { result } = await renderHook(() => useUploadImage());
+
+  await act(async () => {
+    result.current.onChangeImage(mockImage);
+  });
+  await act(async () => {
+    await result.current.uploadSelectedImage();
+  });
+
+  // Inspect the request the REAL uploadImage built
+  const [url, options] = (globalThis.fetch as jest.Mock).mock.calls[0];
+
+  expect(url).toContain("/images/upload");
+  expect(options.method).toBe("POST");
+  expect(options.headers["x-api-key"]).toBeDefined();
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #1: You Must Use the REAL API Function 🚨</div>
+
+A contract test only works if the **real** `uploadImage` runs. If you `jest.mock("@/api/api")`, the real function never builds a request, so `fetch` is never called and `mock.calls` is empty!
+
+**The rule:** Mock the **network** (`fetch`), NOT the **function**. This is the key difference from a unit test.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #2: `mock.calls[0]` Needs a Call to Exist 🚨</div>
+
+If `fetch` was never called, `mock.calls[0]` is `undefined`, and destructuring it throws:
+```
+TypeError: Cannot destructure property 'url' of 'undefined' as it is undefined.
+```
+Make sure your test actually triggers the API call (via `uploadSelectedImage()`) before inspecting `mock.calls`.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #3: `globalThis` vs `global` 🚨</div>
+
+Use **`globalThis`**, not `global`. In React Native / TypeScript, `global` isn't recognized (it's a Node-only variable). `globalThis` works everywhere:
+```typescript
+globalThis.fetch = jest.fn(...) as unknown as typeof fetch;
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Gotcha #4: The Fake Response Needs `.text()` 🚨</div>
+
+The real `uploadImage` calls `parseResponseBody(response)` which does `response.text()`. Your fake response **must** have a `.text()` method returning a Promise:
+```typescript
+globalThis.fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    text: () => Promise.resolve(JSON.stringify({ approved: 1 }))
+  })
+) as unknown as typeof fetch;
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">When to Use It</div>
+
+✅ When your code calls an external API and you want to lock in the request shape
+✅ When you refactor API functions and want to catch accidental changes to URLs/methods/headers
+✅ When multiple teams own the API and you want to document the expected request
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">When NOT to Use It</div>
+
+❌ When you only need to test response handling — use a unit test with `jest.mock()`
+❌ When you need to test the real server's response — use an **E2E test** (Maestro)
+❌ When the request shape is trivial (a simple GET with no headers)
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**Contract Test**</span> - Verifies the exact request your code sends to an external service
+- <span style="color: #50C878;">**mock.calls**</span> - Records every argument passed to a mock function
+- <span style="color: #50C878;">**globalThis**</span> - The universal way to access the global object (works everywhere)
+- <span style="color: #50C878;">**Network Boundary**</span> - The point where your code talks to the outside world (`fetch`)
+- <span style="color: #50C878;">**Handshake**</span> - The exact request/response agreement between two systems
+
+---
+
+### 🐣 Junior Level
+
+A contract test is like checking your boarding pass before a flight — you verify the destination (URL), the airline (method), and your ID (headers) are all correct, without actually boarding the plane.
+
+### 🧑‍💻 Mid Level
+
+The `mock.calls[0]` pattern is the key. When you mock `fetch`, every call's arguments are recorded. Destructure them and assert on each part of the request. Remember: mock the **network**, not the **function**, or the real request never gets built.
+
+### 🧙 Senior Level
+
+Contract tests are especially valuable when you refactor. If someone changes the API URL or removes a header, a contract test fails immediately — catching the bug before it reaches production. Combine them with the testing pyramid: unit tests (bottom), integration + contract tests (middle), E2E tests (top).
+
+### 🏆 Principal Level
+
+For truly critical APIs, consider a **formal contract testing tool** like **Pact** or **Swagger/OpenAPI** — these generate contracts that both the consumer (your app) and provider (the API) verify against. But for most apps, a simple `mock.calls` assertion in Jest is more than enough. The principle is the same: **lock in the handshake between your code and the outside world.**
+
+---
+
 ## 📚 Useful Links
+
 
 > *Handy references to bookmark for your testing journey!*
 

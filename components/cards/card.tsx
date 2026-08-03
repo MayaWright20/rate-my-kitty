@@ -3,6 +3,7 @@ import { ComponentProps, ReactNode } from "react";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
 
 import { COLORS } from "@/constants/colors";
+import useRandomNumber from "@/hooks/useRandomNumber";
 import useVoting from "@/hooks/useVoting";
 import { CatImage } from "@/types";
 
@@ -45,7 +46,10 @@ export default function Card({
 }: Props) {
   const { count, downvote, upvote } = useVoting(image.id);
 
+  const randomNumber = useRandomNumber();
+
   if (!(children || favouriteButton || wrapperStyle)) return;
+
   return (
     <View style={[styles.wrapper, wrapperStyle]}>
       <Image
@@ -59,7 +63,7 @@ export default function Card({
           {
             borderColor:
               IMAGE_BORDER_COLORS[
-                Math.floor(Math.random() * IMAGE_BORDER_COLORS.length)
+                Math.floor(randomNumber * IMAGE_BORDER_COLORS.length)
               ]
           },
           imageStyle

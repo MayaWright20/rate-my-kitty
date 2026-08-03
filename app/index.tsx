@@ -37,8 +37,12 @@ export default function Index() {
   );
 
   return (
-    <ImageBackgroundScreen style={styles.imageBackground}>
-      <View pointerEvents="box-none" style={styles.headerOverlay}>
+    <ImageBackgroundScreen>
+      <View
+        testID="index"
+        pointerEvents="box-none"
+        style={styles.headerOverlay}
+      >
         {images.length > 0 && (
           <SwitchBTN
             style={styles.switch}
@@ -94,9 +98,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     zIndex: Z_INDEX[1]
-  },
-  imageBackground: {
-    justifyContent: "center"
   },
   list: {
     flex: 1,

@@ -28,6 +28,7 @@
 20. [Testing That a Page Exists & Navigation Works](#20-testing-that-a-page-exists--navigation-works)
 21. [The Great Gotcha: Default Export vs Named Export in Mocks](#21-the-great-gotcha-default-export-vs-named-export-in-mocks)
 22. [Understanding Coverage Reports (Why Unrelated Lines Get Highlighted)](#22-understanding-coverage-reports-why-unrelated-lines-get-highlighted)
+23. [Integration Testing a Full Screen: The "Gotcha Gauntlet"](#23-integration-testing-a-full-screen-the-gotcha-gauntlet)
 
 ---
 
@@ -3243,6 +3244,11 @@ But most importantly: **start writing tests for your real features!** The best w
 | 60 | <span style="color: #50C878;">**user.press()**</span> | Simulates a realistic press (touchStart → touchEnd → press) | `await user.press(screen.getByTestId("btn"))` |
 | 61 | <span style="color: #50C878;">**Wrapper Pattern**</span> | Wrapping a component in a context Provider to control its dependencies | `<IsScreenPortraitContext.Provider value={true}>{ui}</...>` |
 | 62 | <span style="color: #50C878;">**.tsx**</span> | File extension needed when using JSX syntax in TypeScript | `circular-btn.test.tsx` (not `.ts`) |
+| 63 | <span style="color: #50C878;">**Path Alias**</span> | A shortcut for imports (e.g., `@/` maps to the project root) | `import Index from "@/app/index"` |
+| 64 | <span style="color: #50C878;">**Default Export**</span> | The main export of a module, imported without curly braces | `import Svg from "react-native-svg"` |
+| 65 | <span style="color: #50C878;">**Named Export**</span> | A specific export, imported with curly braces | `import { Defs } from "react-native-svg"` |
+| 66 | <span style="color: #50C878;">**Native Module**</span> | A module using platform-specific code that can't run in Jest | `expo-image`, `react-native-svg` need mocks |
+| 67 | <span style="color: #50C878;">**TestWrapper**</span> | A helper component that provides contexts to the component under test | `function TestWrapper({ children }) { ... }` |
 
 ---
 
@@ -4031,6 +4037,159 @@ Use coverage as a **roadmap**, not a **report card**. It tells you where you *ha
 ### 🏆 Principal Level
 
 Consider the difference between **coverage** and **mutation testing**. Mutation testing (tools like Stryker) actually changes your code and checks if your tests catch the change. This is a much stronger signal than coverage — it proves your tests would *fail* if the code broke. Coverage only proves the code *ran*.
+
+---
+
+## 23. Integration Testing a Full Screen: The "Gotcha Gauntlet"
+
+> *"I just want to test that my background renders behind my index screen. How hard can it be?"* — Famous last words. 😅
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">What We Did</div>
+
+We wrote an integration test to verify that `ImageBackgroundScreen` renders its background image **behind** its children (the `Index` screen). This sounds simple, but rendering a **full screen** in Jest pulls in a huge dependency tree — and each dependency has its own gotcha. We hit **five** separate errors before the test passed!
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Why We Test It</div>
+
+Integration tests verify that **real components work together** — not just in isolation. Testing that the background sits behind the header confirms the `zIndex` layering works when the actual screen renders, not just in a toy example.
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The 5 Gotchas We Hit (In Order)</div>
+
+### 🚨 Gotcha #1: `import Index from "@/app"` Resolves to `app.json`!
+
+**The error:** `Element type is invalid: expected a string... but got: object.`
+
+**The cause:** The `@/*` path alias maps to `./*`, so `@/app` → `./app`. But `app` is a **directory**, and Jest resolved it to **`app.json`** (which has a top-level `expo` key) instead of `app/index.tsx`! So `Index` was actually the JSON object `{ expo: {...} }` — an **object**, not a component.
+
+**The fix:** Import the file explicitly:
+```tsx
+import Index from "@/app/index"; // ✅ NOT "@/app"
+```
+
+> 💡 **Senior tip:** When a path alias points at a directory, be explicit about which file you mean. Directory resolution is ambiguous and can surprise you.
+
+### 🚨 Gotcha #2: `react-native-svg` Needs a Default Export Mock
+
+**The error:** `Element type is invalid... Check the render method of PurpleHeader.`
+
+**The cause:** `LogoHeader` imports `Svg` as a **default** import (`import Svg, { Defs, ... } from "react-native-svg"`). My first mock only provided `Svg` as a **named** export, so the default import resolved to an object.
+
+**The fix:** Provide both a default and named exports in the mock:
+```tsx
+jest.mock("react-native-svg", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+  const MockComponent = (props: any) => React.createElement(View, props);
+  return {
+    __esModule: true,
+    default: MockComponent, // ✅ Svg is a default import!
+    Svg: MockComponent,
+    Defs: MockComponent,
+    LinearGradient: MockComponent,
+    Path: MockComponent,
+    Stop: MockComponent
+  };
+});
+```
+
+### 🚨 Gotcha #3: Hooks Can't Be Called in the Test Body
+
+**The error:** `Invalid hook call. Hooks can only be called inside of the body of a function component.`
+
+**The cause:** I called `useFavouritesProviderValue()` directly in the test body to get the context value. But it's a **hook** (uses `useState`), so it can only be called inside a component.
+
+**The fix:** Create a `TestWrapper` component that calls the hook and provides the context:
+```tsx
+function TestWrapper({ children }: { children: ReactNode }) {
+  const favourites = useFavouritesProviderValue();
+  return (
+    <IsScreenPortraitContext.Provider value={true}>
+      <FavouritesContext.Provider value={favourites}>
+        {children}
+      </FavouritesContext.Provider>
+    </IsScreenPortraitContext.Provider>
+  );
+}
+```
+
+### 🚨 Gotcha #4: The Screen Already Wraps Itself in the Component You're Testing
+
+**The error:** `Found multiple elements with testID: image-background-screen-image`
+
+**The cause:** `Index` already renders its own `ImageBackgroundScreen` internally. Wrapping `<Index />` in *another* `ImageBackgroundScreen` created **two** instances with the same `testID`.
+
+**The fix:** Don't double-wrap! Since `Index` already includes `ImageBackgroundScreen`, just render `<Index />` directly.
+
+### 🚨 Gotcha #5: Native Modules Need Mocks
+
+**The error:** `Element type is invalid... but got: object.`
+
+**The cause:** `expo-image` and `react-native-svg` are **native modules** that don't render in Jest. They resolve to objects instead of valid React components.
+
+**The fix:** Mock them to render a plain `View`:
+```tsx
+jest.mock("expo-image", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+  return { Image: (props: any) => React.createElement(View, props) };
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">The Final Passing Test</div>
+
+```tsx
+test("should render behind index screen", async () => {
+  await render(
+    <TestWrapper>
+      <Index />
+    </TestWrapper>
+  );
+
+  const backgroundImage = screen.getByTestId("image-background-screen-image");
+  const backgroundImageStyle = StyleSheet.flatten(backgroundImage.props.style);
+
+  const index = screen.getByTestId("index");
+  const indexflatStyle = StyleSheet.flatten(index.props.style);
+
+  // background zIndex is undefined (defaults to 0), index zIndex is 1
+  expect(backgroundImageStyle.zIndex ?? 0).toBeLessThan(
+    indexflatStyle.zIndex ?? 0
+  );
+});
+```
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">Key Words</div>
+
+- <span style="color: #50C878;">**Path Alias**</span> - A shortcut for imports (e.g., `@/` maps to the project root)
+- <span style="color: #50C878;">**Default Export**</span> - The main export of a module (`import Svg from ...`)
+- <span style="color: #50C878;">**Named Export**</span> - A specific export (`import { Defs } from ...`)
+- <span style="color: #50C878;">**Native Module**</span> - A module that uses platform-specific code and can't run in Jest
+- <span style="color: #50C878;">**TestWrapper</span> - A helper component that provides contexts to the component under test
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">When to Use It</div>
+
+✅ When you need to verify that **multiple real components** work together (e.g., a screen + its background + its context providers).
+
+<div style="color: #FF6B6B; font-size: 1.5em; font-weight: bold;">When NOT to Use It</div>
+
+❌ When you only need to test one component in isolation — use a **unit test** instead. Rendering a full screen is heavy and requires many mocks.
+
+---
+
+### 🐣 Junior Level
+
+Rendering a full screen in a test is like trying to bake a whole cake to test if the oven works. It's possible, but you need to prepare a lot of ingredients (mocks) first. Start with small components and work your way up!
+
+### 🧑‍💻 Mid Level
+
+The "Element type is invalid... but got: object" error is almost always one of three things: (1) a path alias resolving to the wrong file, (2) a native module that needs mocking, or (3) a default-vs-named export mismatch. Check these three first!
+
+### 🧙 Senior Level
+
+When a screen renders, it pulls in its **entire dependency tree**. Before writing an integration test for a full screen, audit its imports and mock the native modules (`expo-image`, `react-native-svg`, `expo-router`) up front. This saves you from debugging errors one-by-one.
+
+### 🏆 Principal Level
+
+Consider whether a full-screen integration test is worth the maintenance cost. Sometimes a **more targeted** integration test (rendering just the component + its direct context providers) gives you 90% of the confidence with 10% of the mocking overhead. Reserve full-screen tests for the most critical user journeys.
 
 ---
 

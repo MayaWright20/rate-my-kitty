@@ -94,6 +94,12 @@ export default function RootLayout() {
                   )
                 }}
               />
+              <Tabs.Screen
+                name="+not-found"
+                options={{
+                  href: null
+                }}
+              />
             </Tabs>
           </ImageBackgroundScreen>
         </VotingContext.Provider>

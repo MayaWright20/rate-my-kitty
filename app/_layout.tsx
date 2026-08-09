@@ -1,4 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { router, Tabs, usePathname } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
@@ -17,6 +18,8 @@ import {
 } from "@/context/voting-context";
 import useIsScreenPortrait from "@/hooks/useIsScreenPortrait";
 
+const queryClient = new QueryClient();
+
 export default function RootLayout() {
   const pathname = usePathname();
   const favourites = useFavouritesProviderValue();
@@ -24,87 +27,91 @@ export default function RootLayout() {
   const isScreenPortrait = useIsScreenPortrait();
 
   return (
-    <IsScreenPortraitContext.Provider value={isScreenPortrait}>
-      <FavouritesContext.Provider value={favourites}>
-        <VotingContext.Provider value={voting}>
-          <ImageBackgroundScreen>
-            <Tabs
-              screenOptions={{
-                headerShown: false,
-                tabBarBackground: () => {
-                  return <View style={styles.tabBarBackground}></View>;
-                }
-              }}
-            >
-              <Tabs.Screen
-                name="upload/index"
-                options={{
-                  title: "UPLOAD",
-                  tabBarLabelStyle: {
-                    color: COLORS.BLACK[3]
-                  },
-
-                  tabBarIcon: ({ focused }) => (
-                    <Ionicons
-                      name={"cloud-upload"}
-                      color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
-                      size={isScreenPortrait ? 30 : 20}
-                    />
-                  )
-                }}
-              />
-              <Tabs.Screen
-                name="index"
-                options={{
-                  tabBarButton: () => {
-                    const onPress = () => {
-                      router.push("/");
-                    };
-
-                    return (
-                      <CircularBTN
-                        onPress={onPress}
-                        title={"PAWFILE"}
-                        style={styles.container}
-                        icon={{
-                          name: "paw",
-                          size: 55,
-                          color:
-                            pathname === "/" ? COLORS.PINK[0] : COLORS.BLACK[0]
-                        }}
-                      />
-                    );
+    <QueryClientProvider client={queryClient}>
+      <IsScreenPortraitContext.Provider value={isScreenPortrait}>
+        <FavouritesContext.Provider value={favourites}>
+          <VotingContext.Provider value={voting}>
+            <ImageBackgroundScreen>
+              <Tabs
+                screenOptions={{
+                  headerShown: false,
+                  tabBarBackground: () => {
+                    return <View style={styles.tabBarBackground}></View>;
                   }
                 }}
-              />
-              <Tabs.Screen
-                name="favourites/index"
-                options={{
-                  title: "FAVOURITES",
-                  tabBarLabelStyle: {
-                    color: COLORS.BLACK[3]
-                  },
+              >
+                <Tabs.Screen
+                  name="upload/index"
+                  options={{
+                    title: "UPLOAD",
+                    tabBarLabelStyle: {
+                      color: COLORS.BLACK[3]
+                    },
 
-                  tabBarIcon: ({ focused }) => (
-                    <Ionicons
-                      name={"heart"}
-                      color={focused ? COLORS.RED[0] : COLORS.BLACK[0]}
-                      size={isScreenPortrait ? 30 : 20}
-                    />
-                  )
-                }}
-              />
-              <Tabs.Screen
-                name="+not-found"
-                options={{
-                  href: null
-                }}
-              />
-            </Tabs>
-          </ImageBackgroundScreen>
-        </VotingContext.Provider>
-      </FavouritesContext.Provider>
-    </IsScreenPortraitContext.Provider>
+                    tabBarIcon: ({ focused }) => (
+                      <Ionicons
+                        name={"cloud-upload"}
+                        color={focused ? COLORS.PINK[0] : COLORS.BLACK[0]}
+                        size={isScreenPortrait ? 30 : 20}
+                      />
+                    )
+                  }}
+                />
+                <Tabs.Screen
+                  name="index"
+                  options={{
+                    tabBarButton: () => {
+                      const onPress = () => {
+                        router.push("/");
+                      };
+
+                      return (
+                        <CircularBTN
+                          onPress={onPress}
+                          title={"PAWFILE"}
+                          style={styles.container}
+                          icon={{
+                            name: "paw",
+                            size: 55,
+                            color:
+                              pathname === "/"
+                                ? COLORS.PINK[0]
+                                : COLORS.BLACK[0]
+                          }}
+                        />
+                      );
+                    }
+                  }}
+                />
+                <Tabs.Screen
+                  name="favourites/index"
+                  options={{
+                    title: "FAVOURITES",
+                    tabBarLabelStyle: {
+                      color: COLORS.BLACK[3]
+                    },
+
+                    tabBarIcon: ({ focused }) => (
+                      <Ionicons
+                        name={"heart"}
+                        color={focused ? COLORS.RED[0] : COLORS.BLACK[0]}
+                        size={isScreenPortrait ? 30 : 20}
+                      />
+                    )
+                  }}
+                />
+                <Tabs.Screen
+                  name="+not-found"
+                  options={{
+                    href: null
+                  }}
+                />
+              </Tabs>
+            </ImageBackgroundScreen>
+          </VotingContext.Provider>
+        </FavouritesContext.Provider>
+      </IsScreenPortraitContext.Provider>
+    </QueryClientProvider>
   );
 }
 

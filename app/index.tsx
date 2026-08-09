@@ -13,7 +13,7 @@ import useFavourites from "@/hooks/useFavourites";
 import useProfile from "@/hooks/useProfile";
 
 export default function Index() {
-  const { getProfileImages, images, isLoading, errorMessage } = useProfile();
+  const { images, isLoading, errorMessage } = useProfile();
   const {
     favouriteImageIds,
     favouriteLoadingImageIds,
@@ -28,12 +28,8 @@ export default function Index() {
 
   useFocusEffect(
     useCallback(() => {
-      const loadImagesAndFavourites = async () => {
-        await Promise.all([getProfileImages(), loadFavouriteImageIds()]);
-      };
-
-      loadImagesAndFavourites();
-    }, [getProfileImages, loadFavouriteImageIds])
+      loadFavouriteImageIds();
+    }, [loadFavouriteImageIds])
   );
 
   return (

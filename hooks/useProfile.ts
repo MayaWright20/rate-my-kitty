@@ -1,32 +1,24 @@
-import { useCallback, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import getUploadedImages from "@/api/api";
-import { CatImage } from "@/types";
 
 export default function useProfile() {
-  const [images, setImages] = useState<[] | CatImage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<null | string>(null);
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["profile-images"], // the shelf label
+    queryFn: getUploadedImages // the store trip (our existing API function)
+  });
 
-  const getProfileImages = useCallback(async () => {
-    setIsLoading(true);
-    setErrorMessage(null);
+  // We keep this small helper because our API can reject with a non-Error value.
+  const errorMessage =
+    error instanceof Error
+      ? error.message
+      : error
+        ? "Failed to fetch profile images"
+        : null;
 
-    try {
-      const profileImages = await getUploadedImages();
-
-      setImages(profileImages);
-      return profileImages;
-    } catch (e) {
-      const message =
-        e instanceof Error ? e.message : "Failed to fetch profile images";
-      setErrorMessage(message);
-      setImages([]);
-      return [];
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  return { images, isLoading, errorMessage, getProfileImages };
+  return {
+    images: data ?? [], // same property name the screen already uses
+    errorMessage,
+    isLoading
+  };
 }

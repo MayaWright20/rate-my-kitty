@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react-native";
 import { ReactNode } from "react";
 import { StyleSheet } from "react-native";
@@ -46,21 +47,39 @@ jest.mock("@/api/api", () => ({
   default: jest.fn().mockResolvedValue([])
 }));
 
+// The Index screen now uses useProfile -> useQuery, which needs a pantry
+// (QueryClientProvider). Create ONE for all tests, just like the app's root
+// layout. retry:false = no retries for failed queries; gcTime: Infinity = no
+// cache-cleanup timers, so Jest can exit cleanly.
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false, gcTime: Infinity, staleTime: Infinity }
+  }
+});
+
 // A wrapper component that provides the contexts the Index screen needs.
 // Hooks (like useFavouritesProviderValue) can only be called inside a component.
 function TestWrapper({ children }: { children: ReactNode }) {
   const favourites = useFavouritesProviderValue();
 
   return (
-    <IsScreenPortraitContext.Provider value={true}>
-      <FavouritesContext.Provider value={favourites}>
-        {children}
-      </FavouritesContext.Provider>
-    </IsScreenPortraitContext.Provider>
+    <QueryClientProvider client={queryClient}>
+      <IsScreenPortraitContext.Provider value={true}>
+        <FavouritesContext.Provider value={favourites}>
+          {children}
+        </FavouritesContext.Provider>
+      </IsScreenPortraitContext.Provider>
+    </QueryClientProvider>
   );
 }
 
 test("should render behind index screen", async () => {
+  // Pre-seed the pantry: put "no images" on the ["profile-images"] shelf
+  // BEFORE the screen mounts. Combined with staleTime: Infinity above, the
+  // query finds the shelf already stocked and never needs to fetch — so the
+  // test is fast, deterministic, and doesn't trigger act() warnings.
+  queryClient.setQueryData(["profile-images"], []);
+
   // Index already renders its own ImageBackgroundScreen internally,
   // so we just render Index directly.
   await render(
